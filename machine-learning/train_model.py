@@ -2,8 +2,8 @@
 import os
 import random
 import cv2 as cv
-from datetime import datetime
 import numpy as np
+from datetime import datetime
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 
@@ -16,11 +16,11 @@ from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 
 # endregion
 
-ROOT = 'C:/Work/Projects/opencv-tanks'
+ROOT = './'
 PATH = ROOT + "./machine-learning/"
 TRAIN_PATH = PATH + "train"
 TEST_PATH = PATH + "test"
-IMG_SIZE = 28
+IMG_SIZE = 32
 CHANNELS = 1
 
 input_shape = (IMG_SIZE, IMG_SIZE, CHANNELS)
@@ -109,7 +109,7 @@ loss, acc = model.evaluate(X_test, y_cat_test)
 
 print("LOSS: {}, ACC: {}".format(loss, acc * 100))
 
-pred = model.predict_classes(X_test)
+pred = np.argmax(model.predict(X_test), axis=-1)
 print(classification_report(y_test, pred))
 
 

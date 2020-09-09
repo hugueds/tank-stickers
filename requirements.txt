@@ -1,5 +1,7 @@
 pywin32
+pyyaml
 numpy
+scikit-learn
 pillow
 python-snap7
 opencv-contrib-python
