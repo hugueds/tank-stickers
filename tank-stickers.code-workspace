@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"name": "APP",
+			"path": "./app",
+			"uri": ""
+		},
+		{
+			"path": "."			
+		},
+
+	],
+	"settings": {}
+}

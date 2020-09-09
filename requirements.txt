@@ -1,0 +1,6 @@
+pywin32
+numpy
+pillow
+python-snap7
+opencv-contrib-python
+tensorflow>=2.2

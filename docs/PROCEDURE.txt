@@ -1,0 +1,62 @@
+PROCEDIMENTOS
+
+Algoritimo:
+    - buscar o centro X e centro Y da imagem e fazer uma linha de referência
+    - utilizar Gaussian Blur para desfocar a imagem 
+	- utilizar o threshold para transformar a imagem em preto e branco binário
+    - buscar o centro vertical do tanque
+		- buscar um array grande de pixels pretos ([0]) a partir do meio horizontal da foto começando de cima (deslocar um pouco para esquerda se necessário)
+		- buscar um array grande de pixels pretos ([0]) a partir do meio horizontal da foto começando de baixo (deslocar um pouco para esquerda se necessário)
+		- pegar o valor do array da primeira incidencia superior e inferior e dividir por 2
+    - encontrar o centro horizontal do tanque
+		- a partir do Y superior, buscar um array de pixels começando pelo lado esquerdo até o meio de X 
+		- a partir do Y inferior, buscar um array de pixels começando pelo lado direito até o meio de X
+    - criar uma instancia de objeto de tanque e guardar esses parametros
+    - criar uma copia recortada apenas com as dimensoes do tanque
+	- dividir as dimensoes cortadas em 9 quadrados (adicionar dimensoes para dar tolerância)
+	- buscar a etiqueta dentro dos quadrantes:
+		- carregar quadrante por quadrante
+		- carregar todas as imagens de etiqueta base
+		- aplicar filtro no quadrante
+		- utilizar metodo Flann para pegar os melhores pontos
+	
+	
+	
+    - utilzar comparador para buscar a etiqueta dentro da imagem recortada do tanque ou utilizar esquema de bordas e contornos para identificar um grid dentro da imagem
+    - criar contorno sobre a imagem
+    - recortar a imagem da etiqueta
+    - fazer comparação com imagem previa
+
+Misc:
+    - Colocar um recorte da etiqueta no topo da imagem
+    - Escrever quantos FPS a imagem está rodando
+    - Escrever o tamanho do Frame     
+
+Variáveis:
+    - centro vertical da camera (x) aproximadamente 600px
+    - tamanho da etiqueta = 40mm
+    - densidade da imagem aproximadamente 1px por 1,05mm
+
+Melhorias:
+    - Deixar a camera o mais proximo possivel
+    - Fazer esquema para refletir menos luz
+    
+   
+
+Check: 
+    - Tamanho do tanque do onibus (arquivo 1) possui 700mm de comprimento?
+
+
+
+encontrar centro do (Y):
+    andar para baixo ate encontrar um pixel branco
+    andar mais para baixo ate encontrar um pixel preto
+    somar os pixels pretos
+    se encontrar um pixel branco tambem somar em uma outra variavel
+    se o valor dos pixels brancos estourar N pixels, é o final do tanque
+    senao continuar a somar os pixels pretos
+    se encontrar um pixel preto novamente
+
+
+
+
