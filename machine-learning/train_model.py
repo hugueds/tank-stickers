@@ -34,15 +34,17 @@ num_classes = len(labels)
 i = 0
 dataset = []
 
-print('labels: ', labels)
-print(ROOT)
+print('Labels: ', labels)
 
+# Extract the images from the folder, load them into an array, convert them to gray if necessary and attach its labels
 for folder in labels:
     files = os.listdir(f'{ROOT}/images/{labels[i]}')
     for file in files:
         ext = file.split('.')[-1]
         if ext in ['jpg', 'png']:
-            img = cv.imread(f'{ROOT}/images/{labels[i]}/{file}', 0)
+            img = cv.imread(f'{ROOT}/images/{labels[i]}/{file}')
+            if CHANNELS == 1:
+                img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
             img = cv.resize(img, input_shape[:2])
             dataset.append([img, i])
     i += 1
@@ -54,9 +56,9 @@ for images, labels in dataset:
     X.append(images)
     y.append(labels)
 
+# Convert the images to tensors and normalize them
 X = np.array(X).reshape(-1, IMG_SIZE, IMG_SIZE, CHANNELS)
 X = X / 255
-
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.1, random_state=42
@@ -69,6 +71,7 @@ X_test -= x_train_mean
 y_cat_train = to_categorical(y_train, num_classes)
 y_cat_test = to_categorical(y_test, num_classes)
 
+# Create the CNN
 model = Sequential()
 
 model.add(
@@ -98,13 +101,19 @@ board = TensorBoard(
     embeddings_freq=1
 )
 
+# Compile and Train
 model.compile(loss='categorical_crossentropy',
         optimizer='adam',
         metrics=['accuracy']
 )
 
-model.fit(X_train, y_cat_train, batch_size=4, epochs=10, validation_split=0.1, callbacks=[EarlyStopping(patience=2), board])
+batch_size = 4
+epochs = 10
+callbacks = [EarlyStopping(patience=2), board]
 
+model.fit(X_train, y_cat_train, batch_size=batch_size, epochs=epochs, callbacks=callbacks, validation_split=0.1, )
+
+# Model evaluation
 loss, acc = model.evaluate(X_test, y_cat_test)
 
 print("LOSS: {}, ACC: {}".format(loss, acc * 100))
@@ -113,18 +122,12 @@ pred = np.argmax(model.predict(X_test), axis=-1)
 print(classification_report(y_test, pred))
 
 
-# with timestamp, acc and loss
+# Model write to file
 now = datetime.now()
 str_date = now.strftime("%Y-%m-%d_%H%M%S")
-file_name = f"models/stamps_{str_date}.h5"
+file_name = f"models/stickers_{IMG_SIZE}x{IMG_SIZE}.h5"
 
-# model.save(file_name)
-# model.save('stamps_keras.h5')
-model.save('tankstickers.h5')
+model.save(file_name)
 
-print("DONE!\n")
-
-
-
-
+print("TRAINING PROCESS DONE!\n")
 
