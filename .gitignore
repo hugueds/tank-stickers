@@ -5,8 +5,6 @@ videos/
 tanklabels.h5
 logs/
 logs/*
-images/
-images/*
 captures/
 captures/*
 configs/
