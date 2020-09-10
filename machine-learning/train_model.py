@@ -62,20 +62,7 @@ for images, labels in dataset:
 
 print('Total images: ' + len(dataset))
 
-# Convert the images to tensors and normalize them
-X = np.array(X).reshape(-1, IMG_SIZE, IMG_SIZE, CHANNELS)
-X = X / 255
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.1, random_state=42
-)
-
-x_train_mean = np.mean(X_train, axis=0)
-X_train -= x_train_mean
-X_test -= x_train_mean
-
-y_cat_train = to_categorical(y_train, num_classes)
-y_cat_test = to_categorical(y_test, num_classes)
 
 # Create the CNN
 model = Sequential()
