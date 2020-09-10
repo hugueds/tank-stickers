@@ -14,7 +14,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Activation, Dense, Flatten, Conv2D, MaxPool2D, Dropout
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 
-# endregion
+### Path and model variables
 
 ROOT = './'
 PATH = ROOT + "./machine-learning/"
@@ -22,22 +22,23 @@ TRAIN_PATH = PATH + "train"
 TEST_PATH = PATH + "test"
 IMG_SIZE = 32
 CHANNELS = 1
+LABEL_FILE = "labels.txt"
 
-input_shape = (IMG_SIZE, IMG_SIZE, CHANNELS)
-
+### Get the labels from file
 labels = []
-
-with open(PATH + "labels.txt", "r") as file:
+with open(PATH + LABEL_FILE, "r") as file:
     labels = file.read().splitlines()
 
 num_classes = len(labels)
+print('Labels: ', labels)
+print('Number of classes: ' + str(num_classes))
+
+### Extract the images from the folder, load them into an array, convert them to gray if necessary and attach its labels
 i = 0
 dataset = []
-
-print('Labels: ', labels)
-
-# Extract the images from the folder, load them into an array, convert them to gray if necessary and attach its labels
+input_shape = (IMG_SIZE, IMG_SIZE, CHANNELS)
 for folder in labels:
+    counter = 0
     files = os.listdir(f'{ROOT}/images/{labels[i]}')
     for file in files:
         ext = file.split('.')[-1]
@@ -47,7 +48,10 @@ for folder in labels:
                 img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
             img = cv.resize(img, input_shape[:2])
             dataset.append([img, i])
+            counter += 1
+    print(f'Add {counter} images with label {labels[i]} ')
     i += 1
+
 
 X = []
 y = []
@@ -55,6 +59,8 @@ y = []
 for images, labels in dataset:
     X.append(images)
     y.append(labels)
+
+print('Total images: ' + len(dataset))
 
 # Convert the images to tensors and normalize them
 X = np.array(X).reshape(-1, IMG_SIZE, IMG_SIZE, CHANNELS)
