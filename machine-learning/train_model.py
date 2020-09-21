@@ -17,7 +17,7 @@ from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 ### Path and model variables
 
 ROOT = '.'
-PATH = ROOT + "./machine-learning/"
+PATH = ROOT + "/machine-learning/"
 TRAIN_PATH = PATH + "train"
 TEST_PATH = PATH + "test"
 IMG_SIZE = 32
@@ -39,11 +39,11 @@ dataset = []
 input_shape = (IMG_SIZE, IMG_SIZE, CHANNELS)
 for folder in labels:
     counter = 0
-    files = os.listdir(f'../images/{labels[i]}')
+    files = os.listdir(f'./images/{labels[i]}')
     for file in files:
         ext = file.split('.')[-1]
         if ext in ['jpg', 'png']:
-            img = cv.imread(f'../images/{labels[i]}/{file}')
+            img = cv.imread(f'./images/{labels[i]}/{file}')
             if CHANNELS == 1:
                 img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
             img = cv.resize(img, input_shape[:2])

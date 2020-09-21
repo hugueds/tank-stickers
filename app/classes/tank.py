@@ -198,7 +198,7 @@ class Tank:
 
         for c in cnt:
             area = cv.contourArea(c)
-            cond = area >= STICKER.MIN_AREA and area <= STICKER.MAX_AREA
+            cond = area >= self.STICKER.MIN_AREA and area <= self.STICKER.MAX_AREA
             if cond:
                 arc = cv.arcLength(c, True)
                 poly = cv.approxPolyDP(c, arc * 0.02, True)
@@ -206,10 +206,10 @@ class Tank:
                     (x, y, w, h) = cv.boundingRect(c)
                     ar = w / float(h)
                     cond = ar >= 0.95 and ar <= 1.05
-                    cond = h >= STICKER.MIN_HEIGHT
-                    cond = cond and h <= STICKER.MAX_HEIGHT
-                    cond = cond and w >= STICKER.MIN_WIDTH
-                    cond = cond and w <= STICKER.MAX_WIDTH
+                    cond = h >= self.STICKER.MIN_HEIGHT
+                    cond = cond and h <= self.STICKER.MAX_HEIGHT
+                    cond = cond and w >= self.STICKER.MIN_WIDTH
+                    cond = cond and w <= self.STICKER.MAX_WIDTH
                     if cond:
                         sticker = Sticker(self.x + x, self.y + y, w, h)
                         sticker.area = area
