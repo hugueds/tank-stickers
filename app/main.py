@@ -48,7 +48,9 @@ if args.no_plc:
 
 enabled = True
 tracker = False
-
+orig = 0
+g_frame = 0
+img = 0
 
 def updateTracker(key, value):
     setattr(tank, key, value)
@@ -123,8 +125,8 @@ if __name__ == "__main__":
             draw_plc_status(frame, plc)
 
             if camera.recording:
-                # camera.output.write(cv.resize(orig, (1280, 720)))
-                camera.output.write(cv.resize(frame, (1280, 720)))
+                camera.output.write(cv.resize(orig, (1280, 720)))
+                # camera.output.write(cv.resize(frame, (1280, 720)))
 
             camera.update_frame_counter()
             camera.show(frame)
