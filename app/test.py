@@ -20,7 +20,6 @@ camera = Camera(config["CAMERA"])
 tank = Tank(config)
 model = Model(config["MODEL"])
 
-
 if system == "Windows":
     camera.start(cv.VideoCapture(cv.CAP_DSHOW))
 else:
@@ -44,7 +43,6 @@ if __name__ == "__main__":
 
             last_time = time()
 
-            # Get the image, make a copy and get the HSV IMG
             if not camera.pause:
                 success, frame = camera.read()
                 if not success:
@@ -52,9 +50,6 @@ if __name__ == "__main__":
                     break
                 orig = frame.copy()
                 g_frame = cv.cvtColor(orig, cv.COLOR_BGR2GRAY)
-
-            # draw_center_axis(frame, camera)
-            # draw_roi_lines(frame, camera)
 
             tank.get_sticker_position_lab(orig)  # Get the sticker from the image
 
@@ -64,18 +59,14 @@ if __name__ == "__main__":
 
             draw_sticker(frame, tank)
 
-            # draw_camera_info(frame, camera)
-
             camera.update_frame_counter()
             camera.show(frame)
-
-            # -----------------  Commands -------------------
 
             key = cv.waitKey(10) & 0xFF
             key_pressed(key, camera, tank)
 
             if key == 27 or key == ord("q") or key == ord("Q"):
-                enabled = 0
+                enabled = False
 
             camera.fps = round(1 / (time() - last_time), 2)
 
