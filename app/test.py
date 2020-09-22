@@ -14,7 +14,7 @@ date_fmt = "%Y-%m-%d %H:%M:%S"
 logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.INFO, datefmt=date_fmt)
 
 config = ConfigParser()
-config.read("config.ini")
+config.read("test_config.ini")
 
 camera = Camera(config["CAMERA"])
 tank = Tank(config)
@@ -28,6 +28,7 @@ else:
 
 enabled = True
 tracker = False
+orig = 0
 
 def updateTracker(key, value):
     setattr(tank, key, value)
@@ -40,6 +41,7 @@ if __name__ == "__main__":
         _, frame = camera.read()
 
         while enabled:
+
             last_time = time()
 
             # Get the image, make a copy and get the HSV IMG
@@ -51,17 +53,18 @@ if __name__ == "__main__":
                 orig = frame.copy()
                 g_frame = cv.cvtColor(orig, cv.COLOR_BGR2GRAY)
 
-            draw_center_axis(frame, camera)
-            draw_roi_lines(frame, camera)
+            # draw_center_axis(frame, camera)
+            # draw_roi_lines(frame, camera)
 
             tank.get_sticker_position_lab(orig)  # Get the sticker from the image
 
             for sticker in tank.stickers:
                 sticker.label_index, sticker.label = model.predict(sticker.image)
                 sticker.update_position()
-                draw_sticker(frame, tank)
 
-            draw_camera_info(frame, camera)
+            draw_sticker(frame, tank)
+
+            # draw_camera_info(frame, camera)
 
             camera.update_frame_counter()
             camera.show(frame)
