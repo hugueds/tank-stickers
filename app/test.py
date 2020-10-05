@@ -1,4 +1,3 @@
-import argparse
 import logging
 import cv2 as cv
 import platform
@@ -21,9 +20,11 @@ tank = Tank(config)
 model = Model(config["MODEL"])
 
 if system == "Windows":
-    camera.start(cv.VideoCapture(cv.CAP_DSHOW))
+    # camera.start(cv.VideoCapture(cv.CAP_DSHOW))
+    camera.start(threaded = True)
 else:
-    camera.start(cv.VideoCapture(0))
+    camera.start()
+    # camera.start(cv.VideoCapture(0))
 
 enabled = True
 tracker = False
@@ -57,7 +58,8 @@ if __name__ == "__main__":
                 sticker.label_index, sticker.label = model.predict(sticker.image)
                 sticker.update_position()
 
-            draw_sticker(frame, tank)
+            frame = draw_sticker(frame, tank)
+            frame = draw_camera_info(frame, camera)
 
             camera.update_frame_counter()
             camera.show(frame)
@@ -71,13 +73,15 @@ if __name__ == "__main__":
             camera.fps = round(1 / (time() - last_time), 2)
 
         logging.info("Exiting Program")
-        camera.cap.release()
+        camera.stop()
+        # camera.cap.release()
         cv.destroyAllWindows()
         exit(0)
 
     except Exception as e:
         logging.exception(f"main::{str(e)}")
-        camera.cap.release()
+        camera.stop()
+        # camera.cap.release()
         cv.destroyAllWindows()
         exit(1)
 

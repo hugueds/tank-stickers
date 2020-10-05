@@ -30,18 +30,18 @@ model = Model(config["MODEL"])
 
 if args.video:
     path = args.video
-    camera.start(cv.VideoCapture(path))
+    camera.start(threaded = True)
     plc.enabled = False
 elif args.image:
     path = args.image
     img = cv.imread(path, -1)
-    camera.start(cv.VideoCapture(path))
+    camera.start(threaded = True)
     plc.enabled = False
 else:
     if system == "Windows":
-        camera.start(cv.VideoCapture(cv.CAP_DSHOW))
+        camera.start(threaded = True)
     else:
-        camera.start(cv.VideoCapture(0))
+        camera.start(threaded = True)
 
 if args.no_plc:
     plc.enabled = False
@@ -147,14 +147,14 @@ if __name__ == "__main__":
 
         logging.info("Exiting Program")
         plc.disconnect()
-        camera.cap.release()
+        camera.stop()
         cv.destroyAllWindows()
         exit(0)
 
     except Exception as e:
         logging.exception(f"main::{str(e)}")
         plc.disconnect()
-        camera.cap.release()
+        camera.stop()
         cv.destroyAllWindows()
         exit(1)
 

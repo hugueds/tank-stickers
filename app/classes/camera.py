@@ -1,3 +1,4 @@
+from time import thread_time
 import cv2 as cv
 import numpy as np
 import logging
@@ -7,7 +8,6 @@ import classes.colors as colors
 
 if platform.system() == 'Windows':
     from win32api import GetSystemMetrics
-
 
 WIDTH = 3
 HEIGHT = 4
@@ -54,17 +54,29 @@ class Camera:
         self.MONITOR_LIMIT = int(self.config['MONITOR_LIMIT'])
         self.MAX_MONITORS = int(self.config['MAX_MONITORS'])
         if platform.system() == 'Windows':
-            self.multiple_monitors = True if GetSystemMetrics(
-                78) > self.MONITOR_LIMIT else False
+            if GetSystemMetrics(78) > self.MONITOR_LIMIT:
+                self.multiple_monitors = True
 
-    def start(self, cap, source=0):
-        self.cap = cap
-        # self.stream = WebcamVideoStream(source)
-        self.set_hardware()
+    def start(self, source=cv.CAP_DSHOW, threaded=False):
+        self.threaded = threaded
+        if threaded:
+            self.cap = WebcamVideoStream(source)
+            self.set_hardware_threaded()
+            self.cap.start()
+        else:
+            self.cap = cv.VideoCapture(source)
+            self.set_hardware()
         cv.namedWindow(self.window_name, cv.WINDOW_NORMAL)
         cv.resizeWindow(self.window_name, self.MONITOR_IMAGE)
         if self.multiple_monitors:
             self.move_window(self.MONITOR_LIMIT + 1, 0)
+
+    def stop(self):
+        if self.threaded:
+            self.cap.stop()
+            self.cap.stream.release()
+        else:
+            self.cap.release()
 
     def set_hardware(self, **kwargs): # Camera properties
         # self.cap.set(39, False)
@@ -74,10 +86,23 @@ class Camera:
         self.cap.set(CONTRAST, 140) # min: 0 max: 255 increment:1
         self.cap.set(SATURATION, 255) # min: 0 max: 255 increment:1
         self.cap.set(HUE, 255) # hue
-        # self.cap.set(GAIN, 62  )  # min: 0 max: 127 increment:1
+        # self.cap.set(GAIN, 62)  # min: 0 max: 127 increment:1
         self.cap.set(EXPOSURE, -6) # min: -7 max: -1 increment:1
         self.cap.set(WHITE_BALANCE, 4200) # min: 4000 max: 7000 increment:1
         self.cap.set(FOCUS, 0)  # focus          min: 0   , max: 255 , increment:5
+
+    def set_hardware_threaded(self, **kwargs): # Camera properties
+        # self.cap.set(39, False)
+        self.cap.stream.set(WIDTH, self.width)
+        self.cap.stream.set(HEIGHT, self.height)
+        self.cap.stream.set(BRIGHTNESS, 180) # min: 0 max: 255 increment:1
+        self.cap.stream.set(CONTRAST, 140) # min: 0 max: 255 increment:1
+        self.cap.stream.set(SATURATION, 255) # min: 0 max: 255 increment:1
+        self.cap.stream.set(HUE, 255) # hue
+        # self.cap.stream.set(GAIN, 62)  # min: 0 max: 127 increment:1
+        self.cap.stream.set(EXPOSURE, -6) # min: -7 max: -1 increment:1
+        self.cap.stream.set(WHITE_BALANCE, 4200) # min: 4000 max: 7000 increment:1
+        self.cap.stream.set(FOCUS, 0)  # focus          min: 0   , max: 255 , increment:5
 
     def move_window(self, x, y):
         if self.MAX_MONITORS == 2:
@@ -116,6 +141,8 @@ class Camera:
         self.frame_counter = 0 if self.frame_counter >= 1000 else self.frame_counter
 
     def read(self):
+        if self.threaded:
+            return True, self.cap.read()
         return self.cap.read()
 
     def set_alpha(self, image):
