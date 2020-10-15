@@ -35,3 +35,4 @@ stamps*
 .editorconfig
 filters.npy
 _video_tracker_*
+workspace.code-workspace
