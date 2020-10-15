@@ -4,6 +4,7 @@ import numpy as np
 import logging
 import platform
 from imutils.video.webcamvideostream import WebcamVideoStream
+from imutils.video import VideoStream
 import classes.colors as colors
 
 if platform.system() == 'Windows':
@@ -57,9 +58,17 @@ class Camera:
             if GetSystemMetrics(78) > self.MONITOR_LIMIT:
                 self.multiple_monitors = True
 
-    def start(self, source=cv.CAP_DSHOW, threaded=False):
+    def start(self, source=cv.CAP_DSHOW, threaded=False, rpi_camera=False):
         self.threaded = threaded
-        if threaded:
+        self.rpi_camera = rpi_camera
+        if rpi_camera:
+            resolution = (640,480)
+            self.cap = VideoStream(src=0
+                        , usePiCamera=True
+                        , resolution=resolution
+                        , framerate=20)
+            self.cap.start()
+        elif threaded:
             self.cap = WebcamVideoStream(source)
             self.set_hardware_threaded()
             self.cap.start()
@@ -72,7 +81,7 @@ class Camera:
             self.move_window(self.MONITOR_LIMIT + 1, 0)
 
     def stop(self):
-        if self.threaded:
+        if self.threaded or self.rpi_camera:
             self.cap.stop()
             self.cap.stream.release()
         else:
