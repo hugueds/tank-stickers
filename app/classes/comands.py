@@ -5,6 +5,7 @@ from datetime import datetime
 
 help_window = False
 tracker_window = False
+camera_tracker_window = False
 
 
 def key_pressed(key, camera, tank):
@@ -34,6 +35,8 @@ def key_pressed(key, camera, tank):
         open_drain_debug(tank)
     elif key == ord("t"):
         open_tracker(camera, tank)
+    elif key == ord("c"):
+        open_camera_tracker(camera)
 
 
 def disable():
@@ -167,3 +170,47 @@ def open_tracker(camera, tank):
         cv.destroyWindow('config')
 
     tracker_window = not tracker_window
+
+
+def update_camera_config(camera, key, value):
+    pass
+
+def open_camera_tracker(camera):
+
+    global camera_tracker_window
+
+    BRIGHTNESS = 10
+    CONTRAST = 11
+    SATURATION = 12
+    HUE = 13
+    GAIN = 14
+    EXPOSURE = 15
+    WHITE_BALANCE = 17
+    FOCUS = 28
+    SHARPNESS = 0
+
+    if not camera_tracker_window:
+        cv.namedWindow("camera_tracker")
+        cv.resizeWindow('camera_tracker', 640, 480)
+        # camera.cap.set(BRIGHTNESS, 180) # min: 0 max: 255 increment:1
+        # camera.cap.set(CONTRAST, 140) # min: 0 max: 255 increment:1
+        # camera.cap.set(SATURATION, 255) # min: 0 max: 255 increment:1
+        # camera.cap.set(HUE, 255) # hue
+        # # camera.cap.set(GAIN, 62)  # min: 0 max: 127 increment:1
+        # camera.cap.set(EXPOSURE, -6) # min: -7 max: -1 increment:1
+        # camera.cap.set(WHITE_BALANCE, 4200) # min: 4000 max: 7000 increment:1
+        # camera.cap.set(FOCUS, 0)  # focus          min: 0   , max: 255 , increment:5
+        cv.createTrackbar("BRIGHTNESS", "camera_tracker",  180, 255, lambda value,  key='BRIGHTNESS':  updateTracker(camera, key, value))
+        cv.createTrackbar("CONTRAST", "camera_tracker", 140, 255, lambda value, key='CONTRAST': updateTracker(camera, key, value))
+        cv.createTrackbar("SATURATION", "camera_tracker",  255, 255, lambda value,  key='SATURATION':  updateTracker(camera, key, value))
+        cv.createTrackbar("HUE", "camera_tracker", 127, 255, lambda value, key='HUE': updateTracker(camera, key, value))
+        # cv.createTrackbar("EXPOSURE", "camera_tracker",  camera.DRAIN_HSV_V_LOW, 255, lambda value,  key='EXPOSURE':  updateTracker(camera, key, value))
+        cv.createTrackbar("WHITE_BALANCE", "camera_tracker", 4200, 7000, lambda value, key='WHITE_BALANCE': updateTracker(camera, key, value))
+        cv.createTrackbar("FOCUS", "camera_tracker", 0, 255, lambda value, key='FOCUS': updateTracker(camera, key, value))
+
+    else:
+        cv.destroyWindow('camera_tracker')
+
+    camera_tracker_window = not camera_tracker_window
+
+
