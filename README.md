@@ -17,6 +17,13 @@ Using a RPI camera or a common WebCam, extract from image the stickers pasted on
 
 ## INSTALLATION
 
+1. Anaconda
+1. Python Packages
+1. Check sys environment
+1. snap7 libraries
+    1. Windows
+    1. Linux (raspberry pi)
+
 ## CONFIGURATION
 
 ## RUN
