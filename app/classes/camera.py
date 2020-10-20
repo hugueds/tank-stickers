@@ -39,6 +39,9 @@ class Camera:
 
     def __init__(self, config=None):
         self.load_config(config)
+        if platform.system() == 'Windows':
+            if GetSystemMetrics(78) > self.MONITOR_LIMIT:
+                self.multiple_monitors = True
 
     def load_config(self, config):
         self.config = config
@@ -54,9 +57,17 @@ class Camera:
         self.PRC_ROI_Y_END = float(config["PRC_ROI_Y_END"])
         self.MONITOR_LIMIT = int(self.config['MONITOR_LIMIT'])
         self.MAX_MONITORS = int(self.config['MAX_MONITORS'])
-        if platform.system() == 'Windows':
-            if GetSystemMetrics(78) > self.MONITOR_LIMIT:
-                self.multiple_monitors = True
+
+    def load_hardware_config(self, config):
+        self.BRIGHTNESS = int(config["BRIGHTNESS"])
+        self.CONTRAST = int(config["CONTRAST"])
+        self.SATURATION = int(config["SATURATION"])
+        self.HUE = int(config["HUE"])
+        self.GAIN = int(config["GAIN"])
+        self.EXPOSURE = int(config["EXPOSURE"])
+        self.WHITE_BALANCE = int(config["WHITE_BALANCE"])
+        self.FOCUS = int(config["FOCUS"])
+        self.SHARPNESS = int(config["SHARPNESS"])
 
     def start(self, source=cv.CAP_DSHOW, threaded=False, rpi_camera=False):
         self.threaded = threaded
