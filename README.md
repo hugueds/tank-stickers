@@ -31,3 +31,4 @@ Using a RPI camera or a common WebCam, extract from image the stickers pasted on
 python main.py
 python main.py --no-plc
 
+## GENERATE NEW MODELS
