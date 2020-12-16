@@ -1,11 +1,13 @@
+from classes import Camera
 from .colors import *
+from models import Color
 import cv2 as cv
 import numpy as np
 
 font = cv.FONT_HERSHEY_SIMPLEX
 
-def draw_roi_lines(frame, camera):
-    color = cyan
+def draw_roi_lines(frame, camera: Camera):
+    color = Color.CYAN.value
     (y, x) = frame.shape[:2]
     x_start = int(camera.width * camera.PRC_ROI_X_START // 100)
     x_end =   int(camera.width * camera.PRC_ROI_X_END // 100)
@@ -18,7 +20,7 @@ def draw_roi_lines(frame, camera):
     cv.line(frame, (0, y_end), (x, y_end), color, 2)
     return frame
 
-def draw_center_axis(frame, camera):
+def draw_center_axis(frame, camera: Camera):
     color = fucshia
     (y, x) = frame.shape[:2]
     x_offset = x // 2 + int(camera.width * camera.PRC_CENTER_X_OFFSET // 100)
@@ -26,7 +28,7 @@ def draw_center_axis(frame, camera):
     cv.line(frame, (0, y // 2), (x, y // 2), color)
     return frame
 
-def draw_camera_info(frame, camera):
+def draw_camera_info(frame, camera: Camera):
     text = f"{frame.shape[1]}x{frame.shape[0]} "
     text += f" FPS: {camera.fps}, FRAME COUNTER: {camera.frame_counter}"
     color = (200, 100, 0)

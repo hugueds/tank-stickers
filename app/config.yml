@@ -6,23 +6,25 @@ device:
     type: 1
 camera:
     debug: False
-    rpi: False
+    rpi_camera: False
     threaded: True
     resolution: [640,480]
-    display: [1080, 720]
+    display: [400, 400]
+    monitor_limit: 1920
+    max_monitors: 1
     roi: [[6.2, 10], [92, 87]]
     fps: 15
     src: 0
-    brighteness: 180
-    contrast: 140
-    saturation: 255
+    brighteness: 127
+    contrast: 127
+    saturation: 127
     sharpness: 127
-    exposure: -6
+    exposure: -4
     white_balance: 4200
 plc:
     debug: True
-    enabled: True
-    address: "192.27.6.172"
+    enabled: False
+    ip: "192.27.6.172"
     rack: 0
     slot: 2
     db:

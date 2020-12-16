@@ -2,15 +2,15 @@ from time import sleep
 from snap7.client import Client
 from snap7.util import *
 import logging
+import yaml
 from threading import Thread
 from datetime import datetime
 from configparser import ConfigParser
 from .sticker import Sticker
 from models.plc_interface import PLCInterface
-
 class PLC:
 
-    db = dict()
+    # db = dict()
 
     online = False
     reading = False
@@ -21,26 +21,20 @@ class PLC:
     interface: PLCInterface
     thread: Thread
 
-    def __init__(self, config=None):
-        parser = ConfigParser()
-        parser.read("config.ini")
-        config = parser["PLC"]
-        self.enabled = True if config["ENABLED"].lower() == 'true' else False
-        self.ip = config["IP"]
-        self.rack = int(config["RACK"])
-        self.slot = int(config["SLOT"])
-        self.db["DB_NUMBER"] = int(config["DB_NUMBER"])
-        self.db["DB_START"] = int(config["DB_START"])
-        self.db["DB_SIZE"] = int(config["DB_SIZE"])
-        self.cycle = float(config["CYCLE_TIME"])
-        self.debug = int(config["DEBUG"])
-        if self.enabled:
-            self.client = Client()
+    def __init__(self, config_file='config.yml'):
+        self.load_config(config_file)
+        self.client = Client()
 
-
-
-    def load_config(self, config):
-        pass
+    def load_config(self, config_file='config.yml'):
+        with open(config_file) as file:
+            config = yaml.safe_load(file)['plc']
+        self.enabled = config['enabled']
+        self.ip = config['ip']
+        self.rack = config['rack']
+        self.slot = config['slot']
+        self.db = config['db']
+        self.update_time = config['update_time']
+        self.debug = config['debug']
 
     def read(self):
         db = self.db
@@ -52,7 +46,7 @@ class PLC:
         while self.enabled:
             self.read()
             self.write_()
-            sleep(self.cycle)
+            sleep(self.update_time)
 
     def connect(self):
 
