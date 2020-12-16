@@ -36,3 +36,7 @@ stamps*
 filters.npy
 _video_tracker_*
 workspace.code-workspace
+app/logs
+app/logs/*
+app/results
+app/results/*

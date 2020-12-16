@@ -7,7 +7,6 @@ help_window = False
 tracker_window = False
 camera_tracker_window = False
 
-
 def key_pressed(key, camera, tank):
 
     if key > 0 and chr(key) != "ÿ":
