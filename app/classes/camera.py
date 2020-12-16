@@ -34,11 +34,23 @@ class Camera:
                 self.multiple_monitors = True
 
     def __init__(self, config='config.yml'):
-        with open(config) as file:
-            self.config = yaml.safe_load(file)['camera']
+        pass
 
-    def load_config_2(self):
-        self.debug = self.config['debug']
+    def load_config_2(self, config_file="config.yml"):
+        with open(config_file) as file:
+            config = yaml.safe_load(file)['camera']
+        self.debug = config['debug']
+        self.display = config['display']
+        self.rpi = config['rpi']
+        self.fps = config['fps']
+        self.src = config['src']
+        self.brighteness = config['brighteness']
+        self.contrast = config['contrast']
+        self.saturation = config['saturation']
+        self.sharpness = config['sharpness']
+        self.exposure = config['exposure']
+        self.white_balance = config['white_balance']
+        self.threaded = config['threaded']
 
 
     def load_config(self, config):
@@ -100,26 +112,26 @@ class Camera:
         # self.cap.set(39, False)
         self.cap.set(CameraConstants.WIDTH, self.width)
         self.cap.set(CameraConstants.HEIGHT, self.height)
-        self.cap.set(CameraConstants.BRIGHTNESS, 180) # min: 0 max: 255 increment:1
-        self.cap.set(CameraConstants.CONTRAST, 140) # min: 0 max: 255 increment:1
-        self.cap.set(CameraConstants.SATURATION, 255) # min: 0 max: 255 increment:1
+        self.cap.set(CameraConstants.BRIGHTNESS, self.brighteness) # min: 0 max: 255 increment:1
+        self.cap.set(CameraConstants.CONTRAST, self.contrast) # min: 0 max: 255 increment:1
+        self.cap.set(CameraConstants.SATURATION, self.saturation) # min: 0 max: 255 increment:1
         self.cap.set(CameraConstants.HUE, 255) # hue
         # self.cap.set(GAIN, 62)  # min: 0 max: 127 increment:1
-        self.cap.set(CameraConstants.EXPOSURE, -6) # min: -7 max: -1 increment:1
-        self.cap.set(CameraConstants.WHITE_BALANCE, 4200) # min: 4000 max: 7000 increment:1
+        self.cap.set(CameraConstants.EXPOSURE, self.exposure) # min: -7 max: -1 increment:1
+        self.cap.set(CameraConstants.WHITE_BALANCE, self.white_balance) # min: 4000 max: 7000 increment:1
         self.cap.set(CameraConstants.FOCUS, 0)  # focus          min: 0   , max: 255 , increment:5
 
     def set_hardware_threaded(self, **kwargs): # Camera properties
         # self.cap.set(39, False)
         self.cap.stream.set(CameraConstants.WIDTH, self.width)
         self.cap.stream.set(CameraConstants.HEIGHT, self.height)
-        self.cap.stream.set(CameraConstants.BRIGHTNESS, 180) # min: 0 max: 255 increment:1
-        self.cap.stream.set(CameraConstants.CONTRAST, 140) # min: 0 max: 255 increment:1
-        self.cap.stream.set(CameraConstants.SATURATION, 255) # min: 0 max: 255 increment:1
+        self.cap.stream.set(CameraConstants.BRIGHTNESS, self.brighteness) # min: 0 max: 255 increment:1
+        self.cap.stream.set(CameraConstants.CONTRAST, self.contrast) # min: 0 max: 255 increment:1
+        self.cap.stream.set(CameraConstants.SATURATION, self.saturation) # min: 0 max: 255 increment:1
         self.cap.stream.set(CameraConstants.HUE, 255) # hue
         # self.cap.stream.set(GAIN, 62)  # min: 0 max: 127 increment:1
-        self.cap.stream.set(CameraConstants.EXPOSURE, -6) # min: -7 max: -1 increment:1
-        self.cap.stream.set(CameraConstants.WHITE_BALANCE, 4200) # min: 4000 max: 7000 increment:1
+        self.cap.stream.set(CameraConstants.EXPOSURE, self.exposure) # min: -7 max: -1 increment:1
+        self.cap.stream.set(CameraConstants.WHITE_BALANCE, self.white_balance) # min: 4000 max: 7000 increment:1
         self.cap.stream.set(CameraConstants.FOCUS, 0)  # focus          min: 0   , max: 255 , increment:5
 
     def move_window(self, x, y):

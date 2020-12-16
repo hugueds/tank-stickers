@@ -6,18 +6,19 @@ device:
     type: 1
 camera:
     debug: False
-    resolution: "640x480"
-    display: "1080x720"
+    rpi: False
+    threaded: True
+    resolution: [640,480]
+    display: [1080, 720]
     roi: [[6.2, 10], [92, 87]]
     fps: 15
     src: 0
-    brighteness: 127
-    contrast: 127
-    saturation: 127
+    brighteness: 180
+    contrast: 140
+    saturation: 255
     sharpness: 127
-    exposure: 127
-    rpi: False
-    threaded: True
+    exposure: -6
+    white_balance: 4200
 plc:
     debug: True
     enabled: True
@@ -51,4 +52,4 @@ model:
     channels: 1
     file: "graph.h5"
     labels_file: "labels.txt"
-    default_labels: 1,2,P,T,1_180,2_180,P_180,T_180,1_90,2_90,P_90,T_90
+    default_labels: ["1","2","P","T","1_180","2_180","P_180","T_180","1_90","2_90","P_90","T_90"]
