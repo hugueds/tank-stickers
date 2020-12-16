@@ -7,3 +7,4 @@ from .model import Model
 from .colors import *
 from .image_writter import *
 from .comands import *
+from .controller import *

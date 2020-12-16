@@ -23,7 +23,7 @@ FOCUS = 28
 SHARPNESS = 0
 class Camera:
 
-    MONITOR_IMAGE = (1280, 720)
+    MONITOR_IMAGE = (1080, 720)
     SKIP_FRAMES = 50
     cap = None
     output = None
