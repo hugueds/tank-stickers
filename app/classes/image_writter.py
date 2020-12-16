@@ -34,6 +34,7 @@ def draw_camera_info(frame, camera):
     if camera.recording:
         text = f" -- RECORDING --"
         color = (0, 0, 255)
+        # use camera percentage
         cv.putText(frame, text, (500, 650), font, 0.7, color, 2)
     return frame
 

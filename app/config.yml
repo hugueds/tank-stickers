@@ -1,6 +1,9 @@
 app:
     name: "Sticker Tanks"
     version: 0.1.0
+device:
+    number: 0
+    type: 1
 camera:
     debug: False
     resolution: "640x480"

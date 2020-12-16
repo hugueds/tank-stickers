@@ -1,10 +1,12 @@
-import cv2 as cv
+from time import sleep
+from snap7.client import Client
+from snap7.util import *
 import logging
+from threading import Thread
 from datetime import datetime
 from configparser import ConfigParser
 from .sticker import Sticker
-from snap7.client import Client
-from snap7.util import *
+from models.plc_interface import PLCInterface
 
 class PLC:
 
@@ -15,6 +17,9 @@ class PLC:
     life_bit = False
     lock = False
     debug = False
+    read_bytes: bytearray
+    interface: PLCInterface
+    thread: Thread
 
     def __init__(self, config=None):
         parser = ConfigParser()
@@ -32,18 +37,32 @@ class PLC:
         if self.enabled:
             self.client = Client()
 
+
+
     def load_config(self, config):
         pass
+
+    def read(self):
+        db = self.db
+        self.read_bytes = self.client.db_read(db['number'], db['start'], db['size'])
+        self.interface = PLCInterface(self.read_bytes)
+
+    def update(self):
+        print('Starting PLC Thread')
+        while self.enabled:
+            self.read()
+            self.write_()
+            sleep(self.cycle)
 
     def connect(self):
 
         if not self.enabled:
-            logging.info('PLC is Disabled, change config.ini to start communication')
+            logging.info('PLC is Disabled, change config file to start communication')
             return
 
         if self.client:
             try:
-                self.client.connect(self.ip, self.rack, self.slot)                
+                self.client.connect(self.ip, self.rack, self.slot)
                 self.online = True
                 logging.info(f"PLC Connected to {self.ip} Rack {self.rack} Slot {self.slot}")
 
@@ -51,7 +70,7 @@ class PLC:
                 logging.error(f"connect::Failed to connect to PLC {self.ip} " + str(e))
 
     def write(self, tank):
-        
+
         if self.lock or not self.enabled:
             return False
 
@@ -59,7 +78,7 @@ class PLC:
         self.life_bit = not self.life_bit
 
         label = ' '
-        quantity = len(tank.stickers)       
+        quantity = len(tank.stickers)
         position = 0
         x, y, angle, quadrant = 0, 0, 0, 0
 
@@ -70,27 +89,27 @@ class PLC:
             y = sticker.relative_y
             position = sticker.position
             quadrant = sticker.quadrant
-            angle = int(sticker.angle)            
+            angle = int(sticker.angle)
 
         height = tank.h
         width = tank.w
-        last_update = datetime.now()        
-        
+        last_update = datetime.now()
+
         if tank.drain_found:
             drain_x = tank.drain_rel_x
             drain_y = tank.drain_rel_y
         else:
             drain_x, drain_y = 0, 0
 
-        if self.debug:            
+        if self.debug:
             print(f"LABEL {label} POSITION {position}  QUANTITY {quantity}")
             print(f"W {width}  H {height}  X {x} Y {y} ANGLE {angle}, D_X {drain_x} D_Y {drain_y}")
-            return 
+            return
 
         try:
             lock = True
             data = bytearray(self.db["DB_SIZE"])
-            
+
             # data[0] = 7 if self.life_bit else 5
             # 000001X0 -> 0.0 = Reading, 0.1 = Lifebit, 0.2 = Always True, 0.3 = Drain
             data[0] = (tank.drain_found << 3) + (1 << 2) + (self.life_bit << 1) + (self.reading << 0)
@@ -114,7 +133,7 @@ class PLC:
 
         except Exception as e:
             self.online = False
-            print("Error::PLC::write => " + str(e))            
+            print("Error::PLC::write => " + str(e))
 
         finally:
             self.lock = False
@@ -151,7 +170,7 @@ class PLC:
             )
 
         except Exception as e:
-            self.online = False            
+            self.online = False
             logging.error("Error::clean_values " + str(e))
 
         finally:
@@ -161,12 +180,12 @@ class PLC:
         if not self.enabled:
             return False
 
-        logging.info('Checking PLC Connection')        
+        logging.info('Checking PLC Connection')
 
         try:
             res = self.client.db_read(
                 db_number=self.db["DB_NUMBER"], start=0, size=1)
-            
+
             if not res:
                 Exception('Error at reading PLC values')
             else:
@@ -178,8 +197,12 @@ class PLC:
             self.disconnect()
             self.connect()
 
-    
+
     def disconnect(self):
         # self.client.disconnect()
         pass
+
+
+
+
 

@@ -1,3 +1,4 @@
+from typing import List
 import numpy as np
 import cv2 as cv
 from .sticker import Sticker
@@ -11,7 +12,7 @@ class Tank:
     image = 0
     x, y, w, h = 0, 0, 0, 0
     sticker_count = 0
-    stickers = []
+    stickers: List[Sticker] = []
     drain_found = False
     drain_x, drain_y, drain_w, drain_h = 0, 0, 0, 0
     drain_rel_x, drain_rel_y = 0, 0
