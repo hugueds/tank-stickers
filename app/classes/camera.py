@@ -1,26 +1,16 @@
 from time import thread_time
 import cv2 as cv
+import yaml
 import numpy as np
 import logging
 import platform
 from imutils.video.webcamvideostream import WebcamVideoStream
 from imutils.video import VideoStream
 import classes.colors as colors
+from models.camera_constants import CameraConstants
 
 if platform.system() == 'Windows':
     from win32api import GetSystemMetrics
-
-WIDTH = 3
-HEIGHT = 4
-BRIGHTNESS = 10
-CONTRAST = 11
-SATURATION = 12
-HUE = 13
-GAIN = 14
-EXPOSURE = 15
-WHITE_BALANCE = 17
-FOCUS = 28
-SHARPNESS = 0
 class Camera:
 
     MONITOR_IMAGE = (1080, 720)
@@ -37,11 +27,19 @@ class Camera:
     multiple_monitors = False
     monitor_counter = 0
 
-    def __init__(self, config=None):
+    def __init__1(self, config=None):
         self.load_config(config)
         if platform.system() == 'Windows':
             if GetSystemMetrics(78) > self.MONITOR_LIMIT:
                 self.multiple_monitors = True
+
+    def __init__(self, config='config.yml'):
+        with open(config) as file:
+            self.config = yaml.safe_load(file)['camera']
+
+    def load_config_2(self):
+        self.debug = self.config['debug']
+
 
     def load_config(self, config):
         self.config = config
@@ -100,29 +98,29 @@ class Camera:
 
     def set_hardware(self, **kwargs): # Camera properties
         # self.cap.set(39, False)
-        self.cap.set(WIDTH, self.width)
-        self.cap.set(HEIGHT, self.height)
-        self.cap.set(BRIGHTNESS, 180) # min: 0 max: 255 increment:1
-        self.cap.set(CONTRAST, 140) # min: 0 max: 255 increment:1
-        self.cap.set(SATURATION, 255) # min: 0 max: 255 increment:1
-        self.cap.set(HUE, 255) # hue
+        self.cap.set(CameraConstants.WIDTH, self.width)
+        self.cap.set(CameraConstants.HEIGHT, self.height)
+        self.cap.set(CameraConstants.BRIGHTNESS, 180) # min: 0 max: 255 increment:1
+        self.cap.set(CameraConstants.CONTRAST, 140) # min: 0 max: 255 increment:1
+        self.cap.set(CameraConstants.SATURATION, 255) # min: 0 max: 255 increment:1
+        self.cap.set(CameraConstants.HUE, 255) # hue
         # self.cap.set(GAIN, 62)  # min: 0 max: 127 increment:1
-        self.cap.set(EXPOSURE, -6) # min: -7 max: -1 increment:1
-        self.cap.set(WHITE_BALANCE, 4200) # min: 4000 max: 7000 increment:1
-        self.cap.set(FOCUS, 0)  # focus          min: 0   , max: 255 , increment:5
+        self.cap.set(CameraConstants.EXPOSURE, -6) # min: -7 max: -1 increment:1
+        self.cap.set(CameraConstants.WHITE_BALANCE, 4200) # min: 4000 max: 7000 increment:1
+        self.cap.set(CameraConstants.OCUS, 0)  # focus          min: 0   , max: 255 , increment:5
 
     def set_hardware_threaded(self, **kwargs): # Camera properties
         # self.cap.set(39, False)
-        self.cap.stream.set(WIDTH, self.width)
-        self.cap.stream.set(HEIGHT, self.height)
-        self.cap.stream.set(BRIGHTNESS, 180) # min: 0 max: 255 increment:1
-        self.cap.stream.set(CONTRAST, 140) # min: 0 max: 255 increment:1
-        self.cap.stream.set(SATURATION, 255) # min: 0 max: 255 increment:1
-        self.cap.stream.set(HUE, 255) # hue
+        self.cap.stream.set(CameraConstants.WIDTH, self.width)
+        self.cap.stream.set(CameraConstants.HEIGHT, self.height)
+        self.cap.stream.set(CameraConstants.BRIGHTNESS, 180) # min: 0 max: 255 increment:1
+        self.cap.stream.set(CameraConstants.CONTRAST, 140) # min: 0 max: 255 increment:1
+        self.cap.stream.set(CameraConstants.SATURATION, 255) # min: 0 max: 255 increment:1
+        self.cap.stream.set(CameraConstants.HUE, 255) # hue
         # self.cap.stream.set(GAIN, 62)  # min: 0 max: 127 increment:1
-        self.cap.stream.set(EXPOSURE, -6) # min: -7 max: -1 increment:1
-        self.cap.stream.set(WHITE_BALANCE, 4200) # min: 4000 max: 7000 increment:1
-        self.cap.stream.set(FOCUS, 0)  # focus          min: 0   , max: 255 , increment:5
+        self.cap.stream.set(CameraConstants.EXPOSURE, -6) # min: -7 max: -1 increment:1
+        self.cap.stream.set(CameraConstants.WHITE_BALANCE, 4200) # min: 4000 max: 7000 increment:1
+        self.cap.stream.set(CameraConstants.FOCUS, 0)  # focus          min: 0   , max: 255 , increment:5
 
     def move_window(self, x, y):
         if self.MAX_MONITORS == 2:
