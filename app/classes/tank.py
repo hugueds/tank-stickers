@@ -280,7 +280,7 @@ class Tank:
                 self.drain_rel_y = (-1) * (y - zero_y) - (h // 2)
 
 
-    def get_drain_lab(self, frame, ):
+    def get_drain_lab(self, frame):
         # TODO: Eliminar o berço
         cam_config = self.config['CAMERA']
 

@@ -146,7 +146,6 @@ class Camera:
         cv.imshow(self.window_name, self.cap.read())
         cv.waitKey(1) & 0xFF
 
-
         # if platform.system() == 'Windows':
         #     if GetSystemMetrics(78) == 3200 and not self.multiple_monitors:
         #         self.multiple_monitors = True

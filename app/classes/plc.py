@@ -1,3 +1,4 @@
+from classes.tank import Tank
 from time import sleep
 from snap7.client import Client
 from snap7.util import *
@@ -63,7 +64,7 @@ class PLC:
             except Exception as e:
                 logging.error(f"connect::Failed to connect to PLC {self.ip} " + str(e))
 
-    def write(self, tank):
+    def write(self, tank: Tank):
 
         if self.lock or not self.enabled:
             return False

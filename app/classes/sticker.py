@@ -1,29 +1,26 @@
 import cv2 as cv
 import numpy as np
 from tensorflow.keras.models import load_model
-from classes.colors import color_list
 import tensorflow as tf
 tf.compat.v1.disable_eager_execution()
 
-font = cv.FONT_HERSHEY_SIMPLEX
-
 class Sticker:
 
-    label = ""    
-    label_index = 0    
-    position = 255    
+    label = ""
+    label_index = 0
+    position = 255
     angle = 999
     area = 0
-    quadrant = 255    
+    quadrant = 255
     found = False
-    debug = False    
+    debug = False
     image = 0
 
     def __init__(self, x=0, y=0, w=0, h=0):
         self.x = x
         self.y = y
         self.w = w
-        self.h = h                 
+        self.h = h
 
     def update_position(self):
         if self.label_index <= 3:

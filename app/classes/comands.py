@@ -1,3 +1,6 @@
+from classes.tank import Tank
+from classes.camera import Camera
+from models.camera_constants import CameraConstants
 import logging
 import cv2 as cv
 from configparser import ConfigParser
@@ -7,7 +10,7 @@ help_window = False
 tracker_window = False
 camera_tracker_window = False
 
-def key_pressed(key, camera, tank):
+def key_pressed(key, camera: Camera, tank: Tank):
 
     if key > 0 and chr(key) != "ÿ":
         logging.info('Key Pressed ' + chr(key))
@@ -53,7 +56,7 @@ def open_help():
         cv.destroyWindow("Instructions")
 
 
-def save_image(camera, gray=False):
+def save_image(camera: Camera, gray=False):
     _, frame = camera.read()
     now = datetime.now()
     str_date = now.strftime("%Y-%m-%d_%H%M%S")
@@ -63,7 +66,7 @@ def save_image(camera, gray=False):
     logging.info(f"Screenshot saved in " + path)
 
 
-def record(camera):
+def record(camera: Camera):
     if not camera.recording:
         logging.info("START RECORDING...")
         camera.recording = True
@@ -83,14 +86,14 @@ def close():
     pass
 
 
-def skip_frames(camera):
+def skip_frames(camera: Camera):
     logging.info("Adding frames")
     current_frame = camera.cap.get(cv.CAP_PROP_POS_FRAMES)
     frame = current_frame + camera.SKIP_FRAMES
     camera.cap.set(cv.CAP_PROP_POS_FRAMES, frame)
 
 
-def rewind_frames(camera):
+def rewind_frames(camera: Camera):
     logging.info("Subtracting frames")
     current_frame = camera.cap.get(cv.CAP_PROP_POS_FRAMES)
     if current_frame > camera.SKIP_FRAMES:
@@ -98,13 +101,13 @@ def rewind_frames(camera):
         camera.cap.set(cv.CAP_PROP_POS_FRAMES, frame)
 
 
-def pause(camera):
+def pause(camera: Camera):
     camera.pause = not camera.pause
     status = "Pause" if camera.pause else "Play"
     logging.info(status + " Video Stream")
 
 
-def reload_config(camera, tank):
+def reload_config(camera: Camera, tank: Tank):
     logging.info("Reloading configuration")
     config = ConfigParser()
     config.read("config.ini")
@@ -114,13 +117,13 @@ def reload_config(camera, tank):
     tank.load_drain_config(config["DRAIN"])
 
 
-def open_sticker_debug(tank):
+def open_sticker_debug(tank: Tank):
     if tank.debug_sticker:
         cv.destroyWindow('debug_tank_sticker')
     tank.debug_sticker = not tank.debug_sticker
 
 
-def open_drain_debug(tank):
+def open_drain_debug(tank: Tank):
     if tank.debug_drain:
         cv.destroyWindow('debug_drain')
         cv.destroyWindow('debug_drain_lab')
@@ -132,7 +135,7 @@ def updateTracker(obj, key, value):
     setattr(obj, key, value)
 
 
-def open_tracker(camera, tank):
+def open_tracker(camera: Camera, tank: Tank):
     global tracker_window
     if not tracker_window:
         cv.namedWindow("config")

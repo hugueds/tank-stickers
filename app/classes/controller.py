@@ -1,4 +1,5 @@
 from datetime import datetime
+from models import PLCInterface
 from threading import Thread
 from time import sleep
 from classes.tank import Tank, Sticker
@@ -11,10 +12,12 @@ class Controller:
     state: AppState = AppState.INITIAL
     camera: Camera
     plc: PLC
+    plc_interface: PLCInterface
     start_time = datetime.now()
     tank: Tank
     thread_plc: Thread
     thread_camera: Thread
+
 
     def __init__(self):
         self.plc = PLC()
@@ -43,6 +46,8 @@ class Controller:
         self.camera.start()
         while True:
             self.camera.show()
+        else:
+            print('Camera update ended')
 
 
     def save_result(self):
