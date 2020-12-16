@@ -1,0 +1,46 @@
+app:
+    name: 'Sticker Tanks'
+    version: 0.1.0
+camera:
+    debug: False
+    resolution: '640x480'
+    display: '1080x720'
+    roi:
+    fps: 15
+    src: 0
+    brighteness: 127
+    contrast: 127
+    saturation: 127
+    sharpness: 127
+    exposure: 127
+plc:
+    debug: True
+    address: '192.27.6.172'
+    rack: 0
+    slot: 2
+    db:
+        number: 16
+        start: 0
+        size: 30
+    update_time: 0.25
+sticker:
+    area: [0,1]
+    size: [0,1]
+    hsv_filter:
+    lab_filter:
+tank:
+    prc_min: [0,1]
+    prc_max: [0,1]
+    area: []
+    blur: []
+drain:
+    blur:
+    kernel:
+    area: [0,1]
+    hsv_filter:
+    lab_filter:
+model:
+    size: 70
+    channels: 1
+    file: 'graph.h5'
+    labels_file: 'labels.txt'
