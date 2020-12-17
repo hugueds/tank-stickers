@@ -1,3 +1,4 @@
+import yaml
 from typing import List
 import numpy as np
 import cv2 as cv
@@ -21,51 +22,42 @@ class Tank:
     debug_sticker = False
     debug_drain = False
 
-    def __init__(self, config=None):
+    def __init__(self, config_file='config.yml'):
+        with open(config_file) as file:
+            config = yaml.safe_load(file)
         self.config = config
-        self.load_config(config["TANK"])
-        self.load_sticker_config(config["STICKER"])
-        self.load_drain_config(config["DRAIN"])
+        self.load_config(config["tank"])
+        self.load_sticker_config(config["sticker"])
+        self.load_drain_config(config["drain"])
 
     def load_config(self, config):
-        self.MIN_HEIGHT = int(config["MIN_HEIGHT"])
-        self.MAX_HEIGHT = int(config["MAX_HEIGHT"])
-        self.MIN_WIDTH = int(config["MIN_WIDTH"])
-        self.MAX_WIDTH = int(config["MAX_WIDTH"])
+        self.weight = { 'min': config['min'], 'max': config['max'] }
+        width, height = config['size']
+        self.MIN_WIDTH = width[0]
+        self.MAX_WIDTH = width[1]
+        self.MIN_HEIGHT = height[0]
+        self.MAX_HEIGHT = height[1]
+
 
     def load_sticker_config(self, config):
-        self.STICKER_L_LOW = int(config["L_LOW"])
-        self.STICKER_L_HIGH = int(config["L_HIGH"])
-        self.STICKER_A_LOW = int(config["A_LOW"])
-        self.STICKER_A_HIGH = int(config["A_HIGH"])
-        self.STICKER_B_LOW = int(config["B_LOW"])
-        self.STICKER_B_HIGH = int(config["B_HIGH"])
-        self.STICKER_MIN_HEIGHT = int(config["MIN_HEIGHT"])
-        self.STICKER_MAX_HEIGHT = int(config["MAX_HEIGHT"])
-        self.STICKER_MIN_WIDTH = int(config["MIN_WIDTH"])
-        self.STICKER_MAX_WIDTH = int(config["MAX_WIDTH"])
-        self.STICKER_MIN_AREA = int(config["MIN_AREA"])
-        self.STICKER_MAX_AREA = int(config["MAX_AREA"])
-        self.STICKER_MODEL_SIZE = int(config["MODEL_SIZE"])
+        self.sticker_size = config['size']
+        self.sticker_area = config['area']
+        self.sticker_hsv = {
+            'low':  np.array(config['hsv_filter'][0]),
+            'high': np.array(config['hsv_filter'][1]),
+        }
+        self.sticker_lab = {
+            'low':  np.array(config['lab_filter'][0]),
+            'high': np.array(config['lab_filter'][1])
+        }
 
     def load_drain_config(self, config):
-        self.DRAIN_FILTER_BLUR = tuple(map(int, config["FILTER_BLUR"].split(',')))
-        self.DRAIN_FILTER_KERNEL = tuple(map(int, config["FILTER_KERNEL"].split(',')))
-        self.DRAIN_ARC_MIN = int(config['ARC_MIN'])
-        self.DRAIN_AREA_MIN = int(config['AREA_MIN'])
-        self.DRAIN_AREA_MAX = int(config['AREA_MAX'])
-        self.DRAIN_LAB_L_LOW = int(config['L_LOW'])
-        self.DRAIN_LAB_L_HIGH = int(config['L_HIGH'])
-        self.DRAIN_LAB_A_LOW = int(config['A_LOW'])
-        self.DRAIN_LAB_A_HIGH = int(config['A_HIGH'])
-        self.DRAIN_LAB_B_LOW = int(config['B_LOW'])
-        self.DRAIN_LAB_B_HIGH = int(config['B_HIGH'])
-        self.DRAIN_HSV_H_LOW = int(config['H_LOW'])
-        self.DRAIN_HSV_H_HIGH = int(config['H_HIGH'])
-        self.DRAIN_HSV_S_LOW = int(config['S_LOW'])
-        self.DRAIN_HSV_S_HIGH = int(config['S_HIGH'])
-        self.DRAIN_HSV_V_LOW = int(config['V_LOW'])
-        self.DRAIN_HSV_V_HIGH = int(config['V_HIGH'])
+        self.drain_blur = config['blur']
+        self.drain_kernel = config['kernel']
+        self.drain_hsv = config['hsv_filter']
+        self.drain_lab = config['lab_filter']
+        self.area = config['area']
+        self.arc = config['arc']
 
     def get_tank_image(self, image):
         self.color_image = image[self.y: self.y + self.h, self.x: self.x + self.w, :]
@@ -147,12 +139,12 @@ class Tank:
         # blur ???
         kernel = np.ones((5,5), np.uint8) # GET the kernel from config
         lab = cv.cvtColor(tank, cv.COLOR_BGR2LAB)
-        low = np.array([self.STICKER_L_LOW,self.STICKER_A_LOW,self.STICKER_B_LOW])
-        high = np.array([self.STICKER_L_HIGH, self.STICKER_A_HIGH,self.STICKER_B_HIGH])
+        # low = np.array([self.STICKER_L_LOW,self.STICKER_A_LOW,self.STICKER_B_LOW])
+        # high = np.array([self.STICKER_L_HIGH, self.STICKER_A_HIGH,self.STICKER_B_HIGH])
 
-        mask = cv.inRange(lab, low, high)
+        mask = cv.inRange(lab, self.sticker_lab['low'], self.sticker_lab['high'])
         mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel, iterations=2)
-        cnt, hier = cv.findContours(mask, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
+        cnt, _ = cv.findContours(mask, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
 
         if self.debug_sticker:
             cv.imshow('debug_tank_sticker', mask)
@@ -160,7 +152,7 @@ class Tank:
         self.stickers = []
         for c in cnt:
             area = cv.contourArea(c)
-            cond = area >= self.STICKER_MIN_AREA
+            cond = area >= self.stick
             cond = cond and area <= self.STICKER_MAX_AREA
             if cond:
                 arc = cv.arcLength(c, True)
@@ -169,10 +161,10 @@ class Tank:
                     (x, y, w, h) = cv.boundingRect(c)
                     ar = w / float(h)
                     cond = ar >= 0.92 and ar <= 1.08
-                    cond = h >= self.STICKER_MIN_HEIGHT
-                    cond = cond and h <= self.STICKER_MAX_HEIGHT
-                    cond = cond and w >= self.STICKER_MIN_WIDTH
-                    cond = cond and w <= self.STICKER_MAX_WIDTH
+                    cond = h >= self.sticker_size['min']
+                    cond = cond and h <= self.sticker_size['max']
+                    cond = cond and w >= self.sticker_size['min']
+                    cond = cond and w <= self.sticker_size['max']
                     if cond:
                         sticker = Sticker(self.x + x, self.y + y, w, h)
                         sticker.area = area
@@ -199,7 +191,8 @@ class Tank:
 
         for c in cnt:
             area = cv.contourArea(c)
-            cond = area >= self.STICKER.MIN_AREA and area <= self.STICKER.MAX_AREA
+            cond = area >= self.sticker_area['min']
+            cond = cond and area <= self.sticker_area['max']
             if cond:
                 arc = cv.arcLength(c, True)
                 poly = cv.approxPolyDP(c, arc * 0.02, True)
@@ -207,10 +200,10 @@ class Tank:
                     (x, y, w, h) = cv.boundingRect(c)
                     ar = w / float(h)
                     cond = ar >= 0.95 and ar <= 1.05
-                    cond = h >= self.STICKER.MIN_HEIGHT
-                    cond = cond and h <= self.STICKER.MAX_HEIGHT
-                    cond = cond and w >= self.STICKER.MIN_WIDTH
-                    cond = cond and w <= self.STICKER.MAX_WIDTH
+                    cond = h >= self.sticker_size['min']
+                    cond = cond and h <= self.sticker_size['max']
+                    cond = cond and w >= self.sticker_size['min']
+                    cond = cond and w <= self.sticker_size['max']
                     if cond:
                         sticker = Sticker(self.x + x, self.y + y, w, h)
                         sticker.area = area
@@ -269,7 +262,8 @@ class Tank:
         for c in cnt:
             area = cv.contourArea(c)
             (x, y, w, h) = cv.boundingRect(c)
-            cond = area >= self.DRAIN_AREA_MIN and area < self.DRAIN_AREA_MAX
+            cond = area >= self.drain_area['min']
+            cond = cond and area < self.drain_area['max']
             if cond:
                 self.drain_found = True
                 self.drain_x, self.drain_y, self.drain_w, self.drain_h = x, y, w, h
@@ -307,15 +301,12 @@ class Tank:
 
         lab = cv.cvtColor(croped_img, cv.COLOR_BGR2LAB) # LAB
         hsv = cv.cvtColor(croped_img, cv.COLOR_BGR2HSV) # HSV
-        blur_kernel = self.DRAIN_FILTER_BLUR
-        blur = cv.GaussianBlur(lab, blur_kernel, 1)
+        blur = cv.GaussianBlur(lab, self.drain_blur, 1)
 
         # TEST WITH HSV FILTER ADD
         # hsv_low_mask = np.array([7, 20, 10]) # add in config
         # hsv_high_mask = np.array([25, 255, 255]) # add in config
-        hsv_low_mask =  np.array([self.DRAIN_HSV_H_LOW,  self.DRAIN_HSV_S_LOW,  self.DRAIN_HSV_V_LOW])  # add in config
-        hsv_high_mask = np.array([self.DRAIN_HSV_H_HIGH, self.DRAIN_HSV_S_HIGH, self.DRAIN_HSV_V_HIGH]) # add in config
-        hsv_mask = cv.inRange(hsv, hsv_low_mask, hsv_high_mask)
+        hsv_mask = cv.inRange(hsv, self.drain_hsv['low'], self.drain_hsv['high'])
 
         # --------------------------
 
