@@ -90,8 +90,8 @@ class Tank:
         mid_y = image.shape[0] // 2
 
         # Search for the central line (in pink) and count the black pixel quantity
-        x_center_offset = int(
-            float(cam_config["PRC_CENTER_X_OFFSET"]) * int(cam_config['WIDTH']) // 100)
+        
+        x_center_offset = int(cam_config['center_x_offset'] * c_width // 100)
         vector_y = image[:, mid_x + x_center_offset]
         roi_vector_y = vector_y[y_offset_start:y_offset_end]
         roi_vector_y = roi_vector_y[roi_vector_y == 0]

@@ -9,10 +9,10 @@ font = cv.FONT_HERSHEY_SIMPLEX
 def draw_roi_lines(frame, camera: Camera):
     color = Color.CYAN.value
     (y, x) = frame.shape[:2]
-    x_start = int(camera.width * camera.PRC_ROI_X_START // 100)
-    x_end =   int(camera.width * camera.PRC_ROI_X_END // 100)
-    y_start = int(camera.height * camera.PRC_ROI_Y_START // 100)
-    y_end =   int(camera.height * camera.PRC_ROI_Y_END // 100)
+    x_start = int(camera.width * camera.roi['x'][0] // 100)
+    x_end =   int(camera.width * camera.roi['x'][1] // 100)
+    y_start = int(camera.height * camera.roi['y'][0] // 100)
+    y_end =   int(camera.height * camera.roi['y'][1] // 100)
 
     cv.line(frame, (x_start, 0), (x_start, y), color, 2)
     cv.line(frame, (x_end, 0), (x_end, y), color, 2)
@@ -23,7 +23,7 @@ def draw_roi_lines(frame, camera: Camera):
 def draw_center_axis(frame, camera: Camera):
     color = fucshia
     (y, x) = frame.shape[:2]
-    x_offset = x // 2 + int(camera.width * camera.PRC_CENTER_X_OFFSET // 100)
+    x_offset = int(x // 2 + (camera.width * camera.center_x_offset) // 100)
     cv.line(frame, (x_offset, 0), (x_offset, y), color)
     cv.line(frame, (0, y // 2), (x, y // 2), color)
     return frame

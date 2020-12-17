@@ -30,18 +30,18 @@ model = Model()
 
 if args.video:
     path = args.video
-    camera.start(threaded = True)
+    camera.start()
     plc.enabled = False
 elif args.image:
     path = args.image
     img = cv.imread(path, -1)
-    camera.start(threaded = True)
+    camera.start()
     plc.enabled = False
 else:
     if system == "Windows":
-        camera.start(threaded = True)
+        camera.start()
     else:
-        camera.start(threaded = True)
+        camera.start()
 
 if args.no_plc:
     plc.enabled = False

@@ -10,6 +10,7 @@ camera:
     threaded: True
     resolution: [640, 480]
     display: [400, 400]
+    center_x_offset: -6.1    
     monitor_limit: 1920
     max_monitors: 1
     roi:

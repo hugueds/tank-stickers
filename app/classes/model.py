@@ -2,7 +2,6 @@ import yaml
 import tensorflow as tf
 import cv2 as cv
 import numpy as np
-from tensorflow._api.v2.compat import v1
 from tensorflow.keras.models import load_model
 tf.compat.v1.disable_eager_execution()
 
@@ -11,7 +10,7 @@ class Model:
 
     def __init__(self, config_file='config.yml'):
         with open(config_file) as file:
-            config = yaml.safe_load(config_file)['model']
+            config = yaml.safe_load(file)['model']                
 
         self.size = config['size']
         self.channels = config['channels']

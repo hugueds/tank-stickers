@@ -42,6 +42,8 @@ class Camera:
         self.width = config['resolution'][0]
         self.height = config['resolution'][1]
         self.display = config['display']
+        self.center_x_offset = config['center_x_offset']
+        self.roi = config['roi']
         self.rpi_camera = config['rpi_camera']
         self.fps = config['fps']
         self.src = config['src']
