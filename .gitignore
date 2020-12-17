@@ -28,8 +28,8 @@ machine_learning/train
 machine-learning/training/
 utils/
 utils/*
-models/
-models/*
+
+keras_models
 token.txt
 stamps*
 .editorconfig
