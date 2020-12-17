@@ -8,7 +8,7 @@ camera:
     debug: False
     rpi_camera: False
     threaded: True
-    resolution: [640, 480]
+    resolution: [1080, 720]
     display: [400, 400]
     center_x_offset: -6.1    
     monitor_limit: 1920

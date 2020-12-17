@@ -33,9 +33,9 @@ class Camera:
                 self.multiple_monitors = True
 
     def __init__(self, config='config.yml'):
-        self.load_config_2(config)
+        self.load_config(config)
 
-    def load_config_2(self, config_file="config.yml"):
+    def load_config(self, config_file="config.yml"):
         with open(config_file) as file:
             config = yaml.safe_load(file)['camera']
         self.debug = config['debug']
@@ -57,21 +57,6 @@ class Camera:
         self.monitor_display = tuple(config['display'])
 
 
-    def load_config(self, config):
-        self.config = config
-        self.fps = int(config["FPS"])
-        self.width = int(config["WIDTH"])
-        self.height = int(config["HEIGHT"])
-        self.DISPLAY_WIDTH = int(config["DISPLAY_WIDTH"])
-        self.DISPLAY_HEIGHT = int(config["DISPLAY_HEIGHT"])
-        self.PRC_CENTER_X_OFFSET = float(config["PRC_CENTER_X_OFFSET"])
-        self.PRC_ROI_X_START = float(config["PRC_ROI_X_START"])
-        self.PRC_ROI_X_END = float(config["PRC_ROI_X_END"])
-        self.PRC_ROI_Y_START = float(config["PRC_ROI_Y_START"])
-        self.PRC_ROI_Y_END = float(config["PRC_ROI_Y_END"])
-        self.MONITOR_LIMIT = int(self.config['MONITOR_LIMIT'])
-        self.MAX_MONITORS = int(self.config['MAX_MONITORS'])
-
     def load_hardware_config(self, config):
         self.BRIGHTNESS = int(config["BRIGHTNESS"])
         self.CONTRAST = int(config["CONTRAST"])
@@ -85,7 +70,7 @@ class Camera:
 
     def start(self, source=cv.CAP_DSHOW):
         if self.rpi_camera:
-            res = tuple(self.resolution)
+            res = tuple(self.resolution)            
             self.cap = VideoStream(src=0
                         , usePiCamera=True
                         , resolution=res
