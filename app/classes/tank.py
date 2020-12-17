@@ -10,7 +10,7 @@ font = cv.FONT_HERSHEY_SIMPLEX
 class Tank:
 
     found = False
-    image = 0
+    image: np.ndarray = 0
     x, y, w, h = 0, 0, 0, 0
     sticker_count = 0
     stickers: List[Sticker] = []
@@ -47,15 +47,21 @@ class Tank:
             'high': np.array(config['hsv_filter'][1]),
         }
         self.sticker_lab = {
-            'low':  np.array(config['lab_filter'][0]),
-            'high': np.array(config['lab_filter'][1])
+            'low':  np.array(config['lab_filter'][0], np.uint8),
+            'high': np.array(config['lab_filter'][1], np.uint8)
         }
 
     def load_drain_config(self, config):
         self.drain_blur = config['blur']
         self.drain_kernel = config['kernel']
-        self.drain_hsv = config['hsv_filter']
-        self.drain_lab = config['lab_filter']
+        self.drain_hsv = {
+            'low':  np.array(config['hsv_filter'][0], np.uint8),
+            'high': np.array(config['hsv_filter'][1], np.uint8)
+        }
+        self.drain_lab = {
+            'low': np.array(config['lab_filter'][0], np.uint8),
+            'high': np.array(config['lab_filter'][1], np.uint8)
+        }
         self.area = config['area']
         self.arc = config['arc']
 
@@ -65,12 +71,11 @@ class Tank:
 
     def find(self, frame):
 
-        cam_config = self.config['CAMERA']
-
-        y_offset_start = int(
-            int(cam_config['HEIGHT']) * float(cam_config['PRC_ROI_Y_START']) // 100)
-        y_offset_end = int(
-            int(cam_config['HEIGHT']) * float(cam_config['PRC_ROI_Y_END']) // 100)
+        cam_config = self.config['camera']
+        c_width, c_height = cam_config['resolution']
+        roi = cam_config['roi']
+        y_offset_start = int(c_height * roi['y'][0] // 100)
+        y_offset_end = int(c_height * roi['y'][1] // 100)
 
         image = frame
         # image = frame.copy()
@@ -101,10 +106,9 @@ class Tank:
         self.y = np.where(vector_y == 0)[0][0]  # Get the first black pixel
 
         center_y = (self.y + self.h) // 2
-        off1 = int(float(cam_config['PRC_ROI_X_START'])
-                   * int(cam_config['WIDTH']) // 100)
-        off2 = int(float(cam_config['PRC_ROI_X_END'])
-                   * int(cam_config['WIDTH']) // 100)
+        c_width, c_height = cam_config['resolution']
+        off1 = cam_config['x'][0] * c_width // 100
+        off2 = cam_config['x'][1] * c_width // 100
 
         adj_y1 = int(self.y + (self.h * 0.22))  # SET IN CONFIG
         adj_y2 = int(center_y + (self.h * 0.3))
@@ -152,8 +156,8 @@ class Tank:
         self.stickers = []
         for c in cnt:
             area = cv.contourArea(c)
-            cond = area >= self.stick
-            cond = cond and area <= self.STICKER_MAX_AREA
+            cond = area >= self.sticker_area['min']
+            cond = cond and area <= self.sticker_area['max']
             if cond:
                 arc = cv.arcLength(c, True)
                 poly = cv.approxPolyDP(c, arc * 0.02, True)
@@ -216,15 +220,12 @@ class Tank:
 
     def get_drain(self, frame):
 
-        cam_config = self.config['CAMERA']
-
-        y_offset_start = int(
-            int(cam_config['HEIGHT']) * float(cam_config['PRC_ROI_Y_START']) // 100)
-        y_offset_end = int(
-            int(cam_config['HEIGHT']) * float(cam_config['PRC_ROI_Y_END']) // 100)
-
-        crop_mask = np.ones(
-            (int(cam_config['HEIGHT']), int(cam_config['WIDTH'])), np.uint8)
+        cam_config = self.config['camera']
+        c_width, c_height = cam_config['resolution']
+        roi = cam_config['roi']
+        y_offset_start = c_height * roi['y'][0] // 100
+        y_offset_end = c_height * roi['y'][1] // 100
+        crop_mask = np.ones(c_height, c_width, np.uint8)
 
         # Corta as laterais
         crop_mask[:, 0:self.x + 10] = 0
@@ -240,13 +241,11 @@ class Tank:
         croped_img = cv.bitwise_and(frame, frame, mask=crop_mask)
 
         hsv = cv.cvtColor(croped_img, cv.COLOR_BGR2HSV)
-        mask_low = self.DRAIN_FILTER_MASK_LOW
-        mask_high = self.DRAIN_FILTER_MASK_HIGH
 
-        blur_kernel = self.DRAIN_FILTER_BLUR
+        blur_kernel = self.drain_blur
 
         blur = cv.GaussianBlur(hsv, blur_kernel, 1)
-        mask = cv.inRange(blur, mask_low, mask_high)
+        mask = cv.inRange(blur, self.drain_hsv['low'], self.drain_hsv['high'])
 
         kernel_open = np.ones(self.DRAIN_FILTER_OPEN, np.uint8)
         mask = cv.morphologyEx(mask, cv.MORPH_OPEN, kernel_open, iterations=2)
@@ -267,7 +266,6 @@ class Tank:
             if cond:
                 self.drain_found = True
                 self.drain_x, self.drain_y, self.drain_w, self.drain_h = x, y, w, h
-
                 zero_x = self.x + self.w // 2
                 zero_y = self.y + self.h // 2
                 self.drain_rel_x = x - zero_x + (w // 2)
@@ -275,16 +273,13 @@ class Tank:
 
 
     def get_drain_lab(self, frame):
-        # TODO: Eliminar o berço
-        cam_config = self.config['CAMERA']
 
-        y_offset_start = int(
-            int(cam_config['HEIGHT']) * float(cam_config['PRC_ROI_Y_START']) // 100)
-        y_offset_end = int(
-            int(cam_config['HEIGHT']) * float(cam_config['PRC_ROI_Y_END']) // 100)
-
-        crop_mask = np.ones(
-            (int(cam_config['HEIGHT']), int(cam_config['WIDTH'])), np.uint8)
+        cam_config = self.config['camera']
+        c_width, c_height = cam_config['resolution']
+        roi = cam_config['roi']
+        y_offset_start = c_height * roi['y'][0] // 100
+        y_offset_end = c_height * roi['y'][1] // 100
+        crop_mask = np.ones(c_height, c_width, np.uint8)
 
         # Laterais
         crop_mask[:, 0:self.x + 10] = 0
@@ -304,22 +299,18 @@ class Tank:
         blur = cv.GaussianBlur(lab, self.drain_blur, 1)
 
         # TEST WITH HSV FILTER ADD
-        # hsv_low_mask = np.array([7, 20, 10]) # add in config
-        # hsv_high_mask = np.array([25, 255, 255]) # add in config
+
         hsv_mask = cv.inRange(hsv, self.drain_hsv['low'], self.drain_hsv['high'])
 
         # --------------------------
 
-        mask_low =  np.array([self.DRAIN_LAB_L_LOW, self.DRAIN_LAB_A_LOW, self.DRAIN_LAB_B_LOW], np.uint8)
-        mask_high = np.array([self.DRAIN_LAB_L_HIGH, self.DRAIN_LAB_A_HIGH, self.DRAIN_LAB_B_HIGH], np.uint8)
-
-        lab_mask = cv.inRange(blur, mask_low, mask_high)
+        lab_mask = cv.inRange(blur, self.drain_lab['low'], self.drain_lab['high'])
 
         # mask = lab_mask + hsv_mask -- Aditive
         # mask = cv.bitwise_and(lab_mask, hsv_mask)  # subtrative
         mask = lab_mask  # just lab
 
-        kernel = np.ones(self.DRAIN_FILTER_KERNEL, np.uint8)
+        kernel = np.ones(self.drain_kernel, np.uint8)
         mask = cv.morphologyEx(mask, cv.MORPH_OPEN, kernel, iterations=2)
 
         if self.debug_drain:
@@ -327,8 +318,7 @@ class Tank:
             cv.imshow('debug_drain_lab', lab_mask)
             cv.imshow('debug_drain_hsv', hsv_mask)
 
-        cnt, hier = cv.findContours(
-            mask, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
+        cnt, hier = cv.findContours(mask, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
 
         self.drain_found = False
         self.drain_area = 0
@@ -339,7 +329,8 @@ class Tank:
         if len(sorted_cnts):
             c = sorted_cnts[-1]
             area = cv.contourArea(c)
-            cond = area >= int(self.DRAIN_AREA_MIN) and area <= self.DRAIN_AREA_MAX
+            cond = area >= self.drain_area['min']
+            cond = cond and area <= self.drain_area['max']
             if cond:
                 self.drain_found = True
                 (x, y, w, h) = cv.boundingRect(c)
