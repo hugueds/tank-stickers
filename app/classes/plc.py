@@ -8,7 +8,8 @@ from threading import Thread
 from datetime import datetime
 from configparser import ConfigParser
 from .sticker import Sticker
-from models.plc_interface import PLCInterface
+from models.plc_read_interface import PLCInterface
+from models.plc_write_interface import PLCWriteInterface
 class PLC:
 
     # db = dict()
@@ -33,7 +34,7 @@ class PLC:
         self.ip = config['ip']
         self.rack = config['rack']
         self.slot = config['slot']
-        self.db = config['db']
+        self.db: dict = config['db']
         self.update_time = config['update_time']
         self.debug = config['debug']
 
@@ -192,6 +193,13 @@ class PLC:
             self.disconnect()
             self.connect()
 
+
+    def read_v2(self):
+        pass
+
+    def write_v2(self, data: PLCWriteInterface):
+        self.client.db_write(self.db['number'], self.db['start'], self.db['size'], data)
+        pass
 
     def disconnect(self):
         # self.client.disconnect()

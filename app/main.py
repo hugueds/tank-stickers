@@ -23,10 +23,10 @@ args = parser.parse_args()
 config = ConfigParser()
 config.read("config.ini")
 
-camera = Camera(config["CAMERA"])
-tank = Tank(config)
-plc = PLC(config["PLC"])
-model = Model(config["MODEL"])
+camera = Camera()
+tank = Tank()
+plc = PLC()
+model = Model()
 
 if args.video:
     path = args.video

@@ -140,11 +140,10 @@ class Tank:
             tank = frame
         else:
             tank = frame[self.y: self.y + self.h, self.x: self.x + self.w]
+
         # blur ???
         kernel = np.ones((5,5), np.uint8) # GET the kernel from config
         lab = cv.cvtColor(tank, cv.COLOR_BGR2LAB)
-        # low = np.array([self.STICKER_L_LOW,self.STICKER_A_LOW,self.STICKER_B_LOW])
-        # high = np.array([self.STICKER_L_HIGH, self.STICKER_A_HIGH,self.STICKER_B_HIGH])
 
         mask = cv.inRange(lab, self.sticker_lab['low'], self.sticker_lab['high'])
         mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel, iterations=2)

@@ -8,11 +8,13 @@ camera:
     debug: False
     rpi_camera: False
     threaded: True
-    resolution: [640,480]
+    resolution: [640, 480]
     display: [400, 400]
     monitor_limit: 1920
     max_monitors: 1
-    roi: [[6.2, 10], [92, 87]]
+    roi:
+        x: [6.2, 92.0]
+        y: [10.0, 87.0]
     fps: 15
     src: 0
     brighteness: 127
@@ -32,21 +34,29 @@ plc:
         start: 0
         size: 30
     update_time: 0.2
-sticker:
-    area: [3000, 8000]
-    size: [45, 100]
-    hsv_filter: [[0, 0, 0], [179, 255, 255]]
-    lab_filter: [[200, 115, 100], [255, 145, 140]]
 tank:
-    prc_min: [0, 1]
-    prc_max: [0, 1]
-    size: [[700, 250], [500, 1100]]
+    min: [0, 1]
+    max: [0, 1]
+    size: [[700, 1100], [250, 500]]
     area: [0,99999]
     blur: [9,9]
+sticker:
+    threshold: 172
+    area:
+        min: 3000
+        max: 8000
+    size:
+        min: 45
+        max: 100
+    hsv_filter: [[0, 0, 0], [179, 255, 255]]
+    lab_filter: [[200, 115, 100], [255, 145, 140]]
 drain:
+    arc: 100
     blur: [7, 7]
     kernel: [1, 3]
-    area: [0, 1]
+    area:
+        min: 0
+        max: 1
     hsv_filter: [[7, 20, 10], [25, 255, 255]]
     lab_filter: [[100, 120, 140], [255, 140, 180]]
 model:
