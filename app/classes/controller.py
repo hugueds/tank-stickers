@@ -6,6 +6,7 @@ from classes.tank import Tank, Sticker
 from models.app_states import AppState
 from .plc import PLC
 from .camera import Camera
+import keyboard
 
 class Controller:
 
@@ -17,16 +18,21 @@ class Controller:
     tank: Tank
     thread_plc: Thread
     thread_camera: Thread
+    camera_enabled = True
 
 
     def __init__(self):
         self.plc = PLC()
         self.camera = Camera()
-        # self.camera.start()
+        self.camera.start()
         self.thread_plc = Thread(name='thread_plc', target=self.update_plc, daemon=True)
-        self.thread_plc.start()
-        self.thread_camera = Thread(name='thread_camera', target=self.update_camera, daemon=True)
-        self.thread_camera.start()
+        self.thread_plc.start()        
+        keyboard.on_press(self.on_press)
+
+    def start_camera(self):
+        Thread(name='thread_camera', target=self.update_camera, daemon=True).start()
+        self.start_camera()
+
 
     def set_state(self, state: AppState):
         self.state = state
@@ -42,12 +48,22 @@ class Controller:
             print('PLC is not enabled')
 
     def update_camera(self):
-        print('Starting Camera Update')
-        self.camera.start()
-        while True:
-            self.camera.show()
+        print('Starting Camera Update')        
+
+        while self.camera_enabled:
+            frame = self.camera.read()
+            self.camera.show(frame)
         else:
             print('Camera update ended')
+
+
+    def on_press(self, e: keyboard.KeyboardEvent):
+        print(e.name)
+        if e.name == 'q':
+            self.camera_enabled = False
+        elif e.name == 's':
+            self.camera_enabled = True
+            Thread(name='thread_camera', target=self.update_camera, daemon=True).start()
 
 
     def save_result(self):

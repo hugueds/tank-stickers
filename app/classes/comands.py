@@ -134,6 +134,10 @@ def open_drain_debug(tank: Tank):
 def updateTracker(obj, key, value):
     setattr(obj, key, value)
 
+def update_camera_config(camera: Camera, key, value):
+    setattr(camera, key, value)
+
+
 
 def open_tracker(camera: Camera, tank: Tank):
     global tracker_window
@@ -142,30 +146,30 @@ def open_tracker(camera: Camera, tank: Tank):
         cv.resizeWindow('config', 1200, 800)
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-        cv.createTrackbar("hsv_drain_low_h", "config",  tank.DRAIN_HSV_H_LOW, 255, lambda value,  key='DRAIN_HSV_H_LOW': updateTracker(tank, key, value))
-        cv.createTrackbar("hsv_drain_high_h", "config", tank.DRAIN_HSV_H_HIGH, 255, lambda value, key='DRAIN_HSV_H_HIGH': updateTracker(tank, key, value))
-        cv.createTrackbar("hsv_drain_low_s", "config",  tank.DRAIN_HSV_S_LOW, 255, lambda value,  key='DRAIN_HSV_S_LOW': updateTracker(tank, key, value))
-        cv.createTrackbar("hsv_drain_high_s", "config", tank.DRAIN_HSV_S_HIGH, 255, lambda value, key='DRAIN_HSV_S_HIGH': updateTracker(tank, key, value))
-        cv.createTrackbar("hsv_drain_low_v", "config",  tank.DRAIN_HSV_V_LOW, 255, lambda value,  key='DRAIN_HSV_V_LOW': updateTracker(tank, key, value))
-        cv.createTrackbar("hsv_drain_high_v", "config", tank.DRAIN_HSV_V_HIGH, 255, lambda value, key='DRAIN_HSV_V_HIGH': updateTracker(tank, key, value))
+        # cv.createTrackbar("hsv_drain_low_h", "config",  tank.DRAIN_HSV_H_LOW, 255, lambda value,  key='DRAIN_HSV_H_LOW': updateTracker(tank, key, value))
+        # cv.createTrackbar("hsv_drain_high_h", "config", tank.DRAIN_HSV_H_HIGH, 255, lambda value, key='DRAIN_HSV_H_HIGH': updateTracker(tank, key, value))
+        # cv.createTrackbar("hsv_drain_low_s", "config",  tank.DRAIN_HSV_S_LOW, 255, lambda value,  key='DRAIN_HSV_S_LOW': updateTracker(tank, key, value))
+        # cv.createTrackbar("hsv_drain_high_s", "config", tank.DRAIN_HSV_S_HIGH, 255, lambda value, key='DRAIN_HSV_S_HIGH': updateTracker(tank, key, value))
+        # cv.createTrackbar("hsv_drain_low_v", "config",  tank.DRAIN_HSV_V_LOW, 255, lambda value,  key='DRAIN_HSV_V_LOW': updateTracker(tank, key, value))
+        # cv.createTrackbar("hsv_drain_high_v", "config", tank.DRAIN_HSV_V_HIGH, 255, lambda value, key='DRAIN_HSV_V_HIGH': updateTracker(tank, key, value))
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-        cv.createTrackbar("lab_drain_low_l", "config", tank.DRAIN_LAB_L_LOW, 255, lambda value, key='DRAIN_LAB_L_LOW': updateTracker(tank, key, value))
-        cv.createTrackbar("lab_drain_high_l", "config", tank.DRAIN_LAB_L_HIGH, 255, lambda value, key='DRAIN_LAB_L_HIGH': updateTracker(tank, key, value))
-        cv.createTrackbar("lab_drain_low_a", "config", tank.DRAIN_LAB_A_LOW, 255, lambda value, key='DRAIN_LAB_A_LOW': updateTracker(tank, key, value))
-        cv.createTrackbar("lab_drain_high_a", "config", tank.DRAIN_LAB_A_HIGH, 255, lambda value, key='DRAIN_LAB_A_HIGH': updateTracker(tank, key, value))
-        cv.createTrackbar("lab_drain_low_b", "config", tank.DRAIN_LAB_B_LOW, 255, lambda value, key='DRAIN_LAB_B_LOW': updateTracker(tank, key, value))
-        cv.createTrackbar("lab_drain_high_b", "config", tank.DRAIN_LAB_B_HIGH, 255, lambda value, key='DRAIN_LAB_B_HIGH': updateTracker(tank, key, value))
+        cv.createTrackbar("DRAIN_LL", "config", tank.drain_lab['low'][0], 255,  lambda value, key='DRAIN_LAB_L_LOW':  updateTracker(tank, key, value))
+        cv.createTrackbar("DRAIN_HL", "config", tank.drain_lab['high'][0], 255, lambda value, key='DRAIN_LAB_L_HIGH': updateTracker(tank, key, value))
+        cv.createTrackbar("DRAIN_LA", "config", tank.drain_lab['low'][1], 255,  lambda value, key='DRAIN_LAB_A_LOW':  updateTracker(tank, key, value))
+        cv.createTrackbar("DRAIN_HA", "config", tank.drain_lab['high'][1], 255, lambda value, key='DRAIN_LAB_A_HIGH': updateTracker(tank, key, value))
+        cv.createTrackbar("DRAIN_LB", "config", tank.drain_lab['low'][2], 255,  lambda value, key='DRAIN_LAB_B_LOW':  updateTracker(tank, key, value))
+        cv.createTrackbar("DRAIN_HB", "config", tank.drain_lab['high'][2], 255, lambda value, key='DRAIN_LAB_B_HIGH': updateTracker(tank, key, value))
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-        cv.createTrackbar("lab_sticker_low_l", "config",  tank.STICKER_L_LOW, 255, lambda value,  key='STICKER_L_LOW': updateTracker(tank, key, value))
-        cv.createTrackbar("lab_sticker_high_l", "config", tank.STICKER_L_HIGH, 255, lambda value, key='STICKER_L_HIGH': updateTracker(tank, key, value))
-        cv.createTrackbar("lab_sticker_low_a", "config",  tank.STICKER_A_LOW, 255, lambda value,  key='STICKER_A_LOW': updateTracker(tank, key, value))
-        cv.createTrackbar("lab_sticker_high_a", "config", tank.STICKER_A_HIGH, 255, lambda value, key='STICKER_A_HIGH': updateTracker(tank, key, value))
-        cv.createTrackbar("lab_sticker_low_b", "config",  tank.STICKER_B_LOW, 255, lambda value,  key='STICKER_B_LOW': updateTracker(tank, key, value))
-        cv.createTrackbar("lab_sticker_high_b", "config", tank.STICKER_B_HIGH, 255, lambda value, key='STICKER_B_HIGH': updateTracker(tank, key, value))
+        # cv.createTrackbar("STICKER_LL",  "config",  tank.STICKER_L_LOW,  255, lambda value,  key='STICKER_L_LOW': updateTracker(tank, key, value))
+        # cv.createTrackbar("STICKER_HL",  "config",  tank.STICKER_L_HIGH, 255, lambda value,  key='STICKER_L_HIGH': updateTracker(tank, key, value))
+        # cv.createTrackbar("STICKER_LA",  "config",  tank.STICKER_A_LOW,  255, lambda value,  key='STICKER_A_LOW': updateTracker(tank, key, value))
+        # cv.createTrackbar("STICKER_HA",  "config",  tank.STICKER_A_HIGH, 255, lambda value,  key='STICKER_A_HIGH': updateTracker(tank, key, value))
+        # cv.createTrackbar("STICKER_LB",  "config",  tank.STICKER_B_LOW,  255, lambda value,  key='STICKER_B_LOW': updateTracker(tank, key, value))
+        # cv.createTrackbar("STICKER_HB",  "config",  tank.STICKER_B_HIGH, 255, lambda value,  key='STICKER_B_HIGH': updateTracker(tank, key, value))
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        # cv.createTrackbar("cam_bright", "config", 0, 255, nothing)
-        # cv.createTrackbar("cam_hue", "config", 0, 255, nothing)
+        cv.createTrackbar("cam_bright", "config", camera.brightness, 255, lambda value, key='brightness': update_camera_config(camera, key, value))
+        # cv.createTrackbar("cam_sharpness", "config", camera.sharpness, 255, nothing)
         # cv.createTrackbar("cam_contrast", "config", 0, 255, nothing)
         # cv.createTrackbar("cam_saturation", "config", 0, 255, nothing)
     else:

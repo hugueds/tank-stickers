@@ -33,7 +33,7 @@ class Camera:
                 self.multiple_monitors = True
 
     def __init__(self, config='config.yml'):
-        self.load_config(config)
+        self.load_config(config)        
 
     def load_config(self, config_file="config.yml"):
         with open(config_file) as file:
@@ -47,7 +47,7 @@ class Camera:
         self.rpi_camera = config['rpi_camera']
         self.fps = config['fps']
         self.src = config['src']
-        self.brighteness = config['brighteness']
+        self.brightness = config['brightness']
         self.contrast = config['contrast']
         self.saturation = config['saturation']
         self.sharpness = config['sharpness']
@@ -90,7 +90,7 @@ class Camera:
 
     def stop(self):
         if self.threaded or self.rpi_camera:
-            self.cap.stop()
+            self.cap.stop()            
             self.cap.stream.release()
         else:
             self.cap.release()
@@ -109,10 +109,10 @@ class Camera:
         self.cap.set(CameraConstants.FOCUS.value, 0)  # focus          min: 0   , max: 255 , increment:5
 
     def set_hardware_threaded(self, **kwargs): # Camera properties
-        # self.cap.set(39, False)
+        # self.cap.set(39, False)        
         self.cap.stream.set(CameraConstants.WIDTH.value, self.width)
         self.cap.stream.set(CameraConstants.HEIGHT.value, self.height)
-        self.cap.stream.set(CameraConstants.BRIGHTNESS.value, self.brighteness) # min: 0 max: 255 increment:1
+        self.cap.stream.set(CameraConstants.BRIGHTNESS.value, self.brightness) # min: 0 max: 255 increment:1
         self.cap.stream.set(CameraConstants.CONTRAST.value, self.contrast) # min: 0 max: 255 increment:1
         self.cap.stream.set(CameraConstants.SATURATION.value, self.saturation) # min: 0 max: 255 increment:1
         self.cap.stream.set(CameraConstants.HUE.value, 255) # hue
@@ -129,7 +129,7 @@ class Camera:
     def write_on_image(self):
         pass
 
-    def show(self, main_frame: np.ndarray=0):
+    def show(self, main_frame: np.ndarray):
         cv.imshow(self.window_name, self.cap.read())
         cv.waitKey(1) & 0xFF
 

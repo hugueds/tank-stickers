@@ -1,8 +1,11 @@
 import yaml
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import tensorflow as tf
 import cv2 as cv
 import numpy as np
 from tensorflow.keras.models import load_model
+
 tf.compat.v1.disable_eager_execution()
 
 

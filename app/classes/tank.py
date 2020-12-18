@@ -17,7 +17,6 @@ class Tank:
     drain_found = False
     drain_x, drain_y, drain_w, drain_h = 0, 0, 0, 0
     drain_rel_x, drain_rel_y = 0, 0
-    drain_area = 0
     debug_tank = False
     debug_sticker = False
     debug_drain = False
@@ -52,7 +51,7 @@ class Tank:
         }
 
     def load_drain_config(self, config):
-        self.drain_blur = config['blur']
+        self.drain_blur = tuple(config['blur'])
         self.drain_kernel = config['kernel']
         self.drain_hsv = {
             'low':  np.array(config['hsv_filter'][0], np.uint8),
@@ -62,7 +61,7 @@ class Tank:
             'low': np.array(config['lab_filter'][0], np.uint8),
             'high': np.array(config['lab_filter'][1], np.uint8)
         }
-        self.area = config['area']
+        self.drain_area = config['area']
         self.arc = config['arc']
 
     def get_tank_image(self, image):
@@ -107,8 +106,9 @@ class Tank:
 
         center_y = (self.y + self.h) // 2
         c_width, c_height = cam_config['resolution']
-        off1 = cam_config['x'][0] * c_width // 100
-        off2 = cam_config['x'][1] * c_width // 100
+        roi = cam_config['roi']
+        off1 = int(roi['x'][0] * c_width // 100)
+        off2 = int(roi['x'][1] * c_width // 100)
 
         adj_y1 = int(self.y + (self.h * 0.22))  # SET IN CONFIG
         adj_y2 = int(center_y + (self.h * 0.3))
@@ -271,14 +271,14 @@ class Tank:
                 self.drain_rel_y = (-1) * (y - zero_y) - (h // 2)
 
 
-    def get_drain_lab(self, frame):
+    def get_drain_lab(self, frame: np.ndarray):
 
         cam_config = self.config['camera']
         c_width, c_height = cam_config['resolution']
         roi = cam_config['roi']
         y_offset_start = c_height * roi['y'][0] // 100
         y_offset_end = c_height * roi['y'][1] // 100
-        crop_mask = np.ones(c_height, c_width, np.uint8)
+        crop_mask = np.ones((c_height, c_width), np.uint8)
 
         # Laterais
         crop_mask[:, 0:self.x + 10] = 0
@@ -319,8 +319,7 @@ class Tank:
 
         cnt, hier = cv.findContours(mask, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
 
-        self.drain_found = False
-        self.drain_area = 0
+        self.drain_found = False        
         self.drain_x, self.drain_y, self.drain_w, self.drain_h = 0, 0, 0, 0
 
         sorted_cnts = sorted(cnt, key=lambda cnt: cv.contourArea(cnt))
@@ -328,13 +327,13 @@ class Tank:
         if len(sorted_cnts):
             c = sorted_cnts[-1]
             area = cv.contourArea(c)
+            cond = False
             cond = area >= self.drain_area['min']
             cond = cond and area <= self.drain_area['max']
             if cond:
                 self.drain_found = True
                 (x, y, w, h) = cv.boundingRect(c)
-                self.drain_x, self.drain_y, self.drain_w, self.drain_h = x, y, w, h
-                self.drain_area = area
+                self.drain_x, self.drain_y, self.drain_w, self.drain_h = x, y, w, h                
                 zero_x = self.x + self.w // 2
                 zero_y = self.y + self.h // 2
                 self.drain_rel_x = x - zero_x + (w // 2)
