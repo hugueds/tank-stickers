@@ -7,7 +7,7 @@ from threading import Thread
 from configparser import ConfigParser
 from classes import Tank, Sticker, Camera, PLC, Model
 from classes.image_writter import *
-from classes.comands import *
+from classes.commands import *
 
 system = platform.system()
 date_fmt = "%Y-%m-%d %H:%M:%S"

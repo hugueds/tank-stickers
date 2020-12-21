@@ -6,5 +6,5 @@ from .tracker import Tracker
 from .model import Model
 from .colors import *
 from .image_writter import *
-from .comands import *
+from .commands import *
 from .controller import *

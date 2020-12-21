@@ -194,8 +194,10 @@ class PLC:
             self.connect()
 
 
-    def read_v2(self):
-        pass
+    def read_v2(self) -> PLCInterface:
+        db = self.db
+        data = self.client.db_read(db['number'], db['start'], db['size'])
+        return PLCInterface(data)
 
     def write_v2(self, data: PLCWriteInterface):
         self.client.db_write(self.db['number'], self.db['start'], self.db['size'], data)

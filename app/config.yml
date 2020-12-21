@@ -8,8 +8,8 @@ camera:
     debug: False
     rpi_camera: False
     threaded: True
-    resolution: [640, 480]
-    display: [1080, 720]
+    resolution: [640,480]
+    display: [1080,720]
     center_x_offset: -6.1    
     monitor_limit: 1920
     max_monitors: 1
@@ -18,7 +18,7 @@ camera:
         y: [10.0, 87.0]
     fps: 15
     src: 0
-    brightness: 127
+    brightness: 120
     contrast: 127
     saturation: 127
     sharpness: 127

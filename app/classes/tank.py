@@ -41,26 +41,15 @@ class Tank:
     def load_sticker_config(self, config):
         self.sticker_size = config['size']
         self.sticker_area = config['area']
-        self.sticker_hsv = {
-            'low':  np.array(config['hsv_filter'][0]),
-            'high': np.array(config['hsv_filter'][1]),
-        }
-        self.sticker_lab = {
-            'low':  np.array(config['lab_filter'][0], np.uint8),
-            'high': np.array(config['lab_filter'][1], np.uint8)
-        }
+        self.sticker_hsv = config['hsv_filter']
+        self.sticker_lab = config['lab_filter']
+            
 
     def load_drain_config(self, config):
         self.drain_blur = tuple(config['blur'])
         self.drain_kernel = config['kernel']
-        self.drain_hsv = {
-            'low':  np.array(config['hsv_filter'][0], np.uint8),
-            'high': np.array(config['hsv_filter'][1], np.uint8)
-        }
-        self.drain_lab = {
-            'low': np.array(config['lab_filter'][0], np.uint8),
-            'high': np.array(config['lab_filter'][1], np.uint8)
-        }
+        self.drain_hsv = config['hsv_filter']
+        self.drain_lab = config['lab_filter']            
         self.drain_area = config['area']
         self.arc = config['arc']
 
@@ -145,7 +134,7 @@ class Tank:
         kernel = np.ones((5,5), np.uint8) # GET the kernel from config
         lab = cv.cvtColor(tank, cv.COLOR_BGR2LAB)
 
-        mask = cv.inRange(lab, self.sticker_lab['low'], self.sticker_lab['high'])
+        mask = cv.inRange(lab, self.sticker_lab[0], self.sticker_lab[1])
         mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel, iterations=2)
         cnt, _ = cv.findContours(mask, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
 
@@ -244,7 +233,7 @@ class Tank:
         blur_kernel = self.drain_blur
 
         blur = cv.GaussianBlur(hsv, blur_kernel, 1)
-        mask = cv.inRange(blur, self.drain_hsv['low'], self.drain_hsv['high'])
+        mask = cv.inRange(blur, self.drain_hsv[0], self.drain_hsv[1])
 
         kernel_open = np.ones(self.DRAIN_FILTER_OPEN, np.uint8)
         mask = cv.morphologyEx(mask, cv.MORPH_OPEN, kernel_open, iterations=2)
@@ -299,11 +288,11 @@ class Tank:
 
         # TEST WITH HSV FILTER ADD
 
-        hsv_mask = cv.inRange(hsv, self.drain_hsv['low'], self.drain_hsv['high'])
+        hsv_mask = cv.inRange(hsv, self.drain_hsv[0], self.drain_hsv[1])
 
         # --------------------------
 
-        lab_mask = cv.inRange(blur, self.drain_lab['low'], self.drain_lab['high'])
+        lab_mask = cv.inRange(blur, self.drain_lab[0], self.drain_lab[1])
 
         # mask = lab_mask + hsv_mask -- Aditive
         # mask = cv.bitwise_and(lab_mask, hsv_mask)  # subtrative

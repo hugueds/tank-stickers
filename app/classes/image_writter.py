@@ -1,12 +1,12 @@
-from classes import Camera
-from classes.colors import *
-from models import Color as C
 import cv2 as cv
 import numpy as np
+from classes import Camera, PLC, Tank
+from classes.colors import *
+from models import Color as C
 
 font = cv.FONT_HERSHEY_SIMPLEX
 
-def draw_roi_lines(frame, camera: Camera):
+def draw_roi_lines(frame: np.ndarray, camera: Camera):
     color = C.CYAN.value    
     (y, x) = frame.shape[:2]
     x_start = int(camera.width * camera.roi['x'][0] // 100)
@@ -20,7 +20,7 @@ def draw_roi_lines(frame, camera: Camera):
     cv.line(frame, (0, y_end), (x, y_end), color, 2)
     return frame
 
-def draw_center_axis(frame, camera: Camera):
+def draw_center_axis(frame: np.ndarray, camera: Camera):
     color = C.FUSHIA.value
     (y, x) = frame.shape[:2]
     x_offset = int(x // 2 + (camera.width * camera.center_x_offset) // 100)
@@ -28,7 +28,7 @@ def draw_center_axis(frame, camera: Camera):
     cv.line(frame, (0, y // 2), (x, y // 2), color)
     return frame
 
-def draw_camera_info(frame, camera: Camera):
+def draw_camera_info(frame: np.ndarray, camera: Camera):
     text = f"{frame.shape[1]}x{frame.shape[0]} "
     text += f" FPS: {camera.fps}, FRAME COUNTER: {camera.frame_counter}"
     color = (200, 100, 0)
@@ -40,13 +40,13 @@ def draw_camera_info(frame, camera: Camera):
         cv.putText(frame, text, (500, 650), font, 0.7, color, 2)
     return frame
 
-def draw_tank_center_axis(frame, tank):
+def draw_tank_center_axis(frame: np.ndarray, tank: Tank):
     x, y, w, h = tank.x, tank.y, tank.w, tank.h
     cv.line(frame, (x, y + (h // 2)), (x + w, y + (h // 2)), red, 1)
     cv.line(frame, (x + (w // 2), y), (x + (w // 2), y + h), red, 1)
     return frame
 
-def draw_tank_rectangle(frame, tank):
+def draw_tank_rectangle(frame: np.ndarray, tank: Tank):
     color = tank_color
     x, y, w, h = tank.x, tank.y, tank.w, tank.h
     text = f"TANK WIDTH: {w}, TANK HEIGHT: {h}"
@@ -54,7 +54,7 @@ def draw_tank_rectangle(frame, tank):
     cv.rectangle(frame, (x, y), (x + w, y + h), color, 2)
     return frame
 
-def draw_drain(frame, tank):
+def draw_drain(frame: np.ndarray, tank: Tank):
     dx, dy, dw, dh = tank.drain_x, tank.drain_y, tank.drain_w, tank.drain_h
     cv.rectangle(frame, (dx, dy), (dx+dw, dy+dh), dark_yellow, 2)
     pt = (int(frame.shape[1] * 0.70), int(frame.shape[0] * 0.07))
@@ -62,14 +62,14 @@ def draw_drain(frame, tank):
     cv.putText(frame,text, pt, font, 0.6, dark_yellow ,2)
     return frame
 
-def draw_plc_status(frame, plc):
+def draw_plc_status(frame: np.ndarray, plc: PLC):
     pt = (int(frame.shape[1] * 0.70), int(frame.shape[0] * 0.04))
     color = (128,0,0)
     text = f"PLC STATUS {plc.online}, LIFEBIT: {plc.life_bit}"
     cv.putText(frame, text, pt, font, 0.6, color, 2)
     return frame
 
-def draw_sticker(frame, tank):
+def draw_sticker(frame: np.ndarray, tank: Tank):
     i = 1
     for s in tank.stickers:
         color = color_list[s.label_index]
@@ -83,7 +83,7 @@ def draw_sticker(frame, tank):
         i += 1
     return frame
 
-def draw_gradient(frame):
+def draw_gradient(frame: np.ndarray):
     _, frame = cv.threshold(frame, 127, 255, cv.THRESH_BINARY)
     blur = cv.GaussianBlur(frame,(5,5),0)
     blur = cv.bilateralFilter(frame,9,75,75)
@@ -91,7 +91,7 @@ def draw_gradient(frame):
     cv.imshow("Laplace", laplacian)
     return frame
 
-def draw_sobel(frame):
+def draw_sobel(frame: np.ndarray):
     _, frame = cv.threshold(frame, 100, 255, cv.THRESH_BINARY)
     blur = cv.GaussianBlur(frame,(3,3),0)
     sobelx = cv.Sobel(blur, cv.CV_64F,0,1,ksize=3)
@@ -99,7 +99,7 @@ def draw_sobel(frame):
     cv.imshow("sobel", sobelx)
     return frame
 
-def draw_canny(frame):
+def draw_canny(frame: np.ndarray):
     _, frame = cv.threshold(frame, 50, 255, cv.THRESH_BINARY)
     sigma = 0.5
     v = np.median(frame)

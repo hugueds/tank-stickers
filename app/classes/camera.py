@@ -7,33 +7,26 @@ from imutils.video.webcamvideostream import WebcamVideoStream
 from imutils.video import VideoStream
 from models.camera_constants import CameraConstants
 
-
 if platform.system() == 'Windows':
     from win32api import GetSystemMetrics
+
+SKIP_FRAMES = 50
+
 class Camera:
 
-    SKIP_FRAMES = 50
     cap = None
     output = None
     enabled = True
     pause = False
     recording = False
-    pause = False
     frame_counter = 0
     current_frame = 0
     window_name = 'Main'
     multiple_monitors = False
-    monitor_counter = 0
-    frame: np.ndarray
-
-    def __init__1(self, config=None):
-        self.load_config(config)
-        if platform.system() == 'Windows':
-            if GetSystemMetrics(CameraConstants.MONITOR_SIZE.value) > self.MONITOR_LIMIT:
-                self.multiple_monitors = True
+    monitor_counter = 0    
 
     def __init__(self, config='config.yml'):
-        self.load_config(config)        
+        self.load_config(config)
 
     def load_config(self, config_file="config.yml"):
         with open(config_file) as file:
@@ -55,7 +48,7 @@ class Camera:
         self.white_balance = config['white_balance']
         self.threaded = config['threaded']
         self.monitor_display = tuple(config['display'])
-
+        self.hue = 0
 
     def load_hardware_config(self, config):
         self.BRIGHTNESS = int(config["BRIGHTNESS"])
@@ -68,58 +61,74 @@ class Camera:
         self.FOCUS = int(config["FOCUS"])
         self.SHARPNESS = int(config["SHARPNESS"])
 
-    def start(self, source=cv.CAP_DSHOW):
+    def start(self):        
         if self.rpi_camera:
-            res = tuple(self.resolution)            
-            self.cap = VideoStream(src=0
-                        , usePiCamera=True
-                        , resolution=res
-                        , framerate=self.fps)
+            res = tuple(self.resolution)
+            self.cap = VideoStream(
+                src=self.src, usePiCamera=True, resolution=res, framerate=self.fps)
             self.cap.start()
         elif self.threaded:
-            self.cap = WebcamVideoStream(source)
-            self.set_hardware_threaded()
+            self.cap = WebcamVideoStream(self.src, name='cam', resolution=(self.width, self.height))
             self.cap.start()
+            self.set_hardware_threaded()
         else:
-            self.cap = cv.VideoCapture(source)
+            self.cap = cv.VideoCapture(self.src)
             self.set_hardware()
-        cv.namedWindow(self.window_name, cv.WINDOW_NORMAL)
-        cv.resizeWindow(self.window_name, self.monitor_display)
+
         if self.multiple_monitors:
             self.move_window(self.MONITOR_LIMIT + 1, 0)
 
+        cv.namedWindow(self.window_name, cv.WINDOW_NORMAL)
+        cv.resizeWindow(self.window_name, self.monitor_display)
+
     def stop(self):
         if self.threaded or self.rpi_camera:
-            self.cap.stop()            
+            self.cap.stop()
             self.cap.stream.release()
         else:
             self.cap.release()
 
-    def set_hardware(self, **kwargs): # Camera properties
+    def set_hardware(self, **kwargs):  # Camera properties
         # self.cap.set(39, False)
         self.cap.set(CameraConstants.WIDTH.value, self.width)
         self.cap.set(CameraConstants.HEIGHT.value, self.height)
-        self.cap.set(CameraConstants.BRIGHTNESS.value, self.brighteness) # min: 0 max: 255 increment:1
-        self.cap.set(CameraConstants.CONTRAST.value, self.contrast) # min: 0 max: 255 increment:1
-        self.cap.set(CameraConstants.SATURATION.value, self.saturation) # min: 0 max: 255 increment:1
-        self.cap.set(CameraConstants.HUE.value, 255) # hue
+        # min: 0 max: 255 increment:1
+        self.cap.set(CameraConstants.BRIGHTNESS.value, self.brighteness)
+        # min: 0 max: 255 increment:1
+        self.cap.set(CameraConstants.CONTRAST.value, self.contrast)
+        # min: 0 max: 255 increment:1
+        self.cap.set(CameraConstants.SATURATION.value, self.saturation)
+        self.cap.set(CameraConstants.HUE.value, 255)  # hue
         # self.cap.set(GAIN, 62)  # min: 0 max: 127 increment:1
-        self.cap.set(CameraConstants.EXPOSURE.value, self.exposure) # min: -7 max: -1 increment:1
-        self.cap.set(CameraConstants.WHITE_BALANCE.value, self.white_balance) # min: 4000 max: 7000 increment:1
-        self.cap.set(CameraConstants.FOCUS.value, 0)  # focus          min: 0   , max: 255 , increment:5
+        # min: -7 max: -1 increment:1
+        self.cap.set(CameraConstants.EXPOSURE.value, self.exposure)
+        # min: 4000 max: 7000 increment:1
+        self.cap.set(CameraConstants.WHITE_BALANCE.value, self.white_balance)
+        # focus          min: 0   , max: 255 , increment:5
+        self.cap.set(CameraConstants.FOCUS.value, 0)
 
-    def set_hardware_threaded(self, **kwargs): # Camera properties
+    def set_hardware_threaded(self, **kwargs):  # Camera properties
         # self.cap.set(39, False)        
-        self.cap.stream.set(CameraConstants.WIDTH.value, self.width)
-        self.cap.stream.set(CameraConstants.HEIGHT.value, self.height)
-        self.cap.stream.set(CameraConstants.BRIGHTNESS.value, self.brightness) # min: 0 max: 255 increment:1
-        self.cap.stream.set(CameraConstants.CONTRAST.value, self.contrast) # min: 0 max: 255 increment:1
-        self.cap.stream.set(CameraConstants.SATURATION.value, self.saturation) # min: 0 max: 255 increment:1
-        self.cap.stream.set(CameraConstants.HUE.value, 255) # hue
-        # self.cap.stream.set(GAIN, 62)  # min: 0 max: 127 increment:1
-        self.cap.stream.set(CameraConstants.EXPOSURE.value, self.exposure) # min: -7 max: -1 increment:1
-        self.cap.stream.set(CameraConstants.WHITE_BALANCE.value, self.white_balance) # min: 4000 max: 7000 increment:1
-        self.cap.stream.set(CameraConstants.FOCUS.value, 0)  # focus          min: 0   , max: 255 , increment:5
+        # self.cap.stream.set(cv.CAP_PROP_FRAME_WIDTH, self.width)
+        # self.cap.stream.set(cv.CAP_PROP_FRAME_HEIGHT, self.height)        
+
+        # # min: 0 max: 255 increment:1
+        self.cap.stream.set(cv.CAP_PROP_BRIGHTNESS, self.brightness) # # min: 0 max: 255 increment:1
+        self.cap.stream.set(cv.CAP_PROP_CONTRAST, self.contrast)  # min: 0 max: 255 increment:1        
+        self.cap.stream.set(cv.CAP_PROP_SATURATION, self.saturation) #  min: 0 max: 255 increment:1
+        # self.cap.stream.set(cv.CAP_PROP_HUE, self.hue)  # hue
+        # self.cap.stream.set(cv.CAP_PROP_GAIN, 127)  # min: 0 max: 127 increment:1
+        # self.cap.stream.set(cv.CAP_PROP_EXPOSURE, 0)  # min: -13 max: -1 increment:1
+        # # min: 4000 max: 7000 increment:1
+        # self.cap.stream.set(cv.CAP_WHITE, self.white_balance)        
+        # # focus          min: 0   , max: 255 , increment:5
+        # self.cap.stream.set(CameraConstants.FOCUS.value, 0)
+
+    def set_hardware_rpi(self):
+        pass
+
+    def show(self, frame: np.ndarray = np.ones((400, 400, 1))):
+        cv.imshow(self.window_name, frame)
 
     def move_window(self, x, y):
         if self.MAX_MONITORS == 2:
@@ -129,10 +138,35 @@ class Camera:
     def write_on_image(self):
         pass
 
-    def show(self, main_frame: np.ndarray):
-        cv.imshow(self.window_name, self.cap.read())
-        cv.waitKey(1) & 0xFF
+    def update_frame_counter(self):
+        if self.frame_counter % 200 == 0:
+            logging.info("Keep Alive Camera Message")
 
+        self.frame_counter = self.frame_counter + \
+            1 if not self.pause else self.frame_counter
+        self.frame_counter = 0 if self.frame_counter >= 1000 else self.frame_counter
+
+    def read(self) -> (bool, np.ndarray):
+        if self.threaded:
+            return True, self.cap.read()
+        return self.cap.read()
+
+    def update(self):
+        print('Starting update')
+
+    def set_alpha(self, image):
+        # loop over the alpha transparency values
+        alpha = 0.5
+        beta = (1 - alpha)
+        gamma = 0.0
+        background = np.zeros((self.height, self.width, 3), np.uint8)
+        background[:, :, 1] = 200
+        background[:, :, 2] = 200
+        added_image = cv.addWeighted(background, alpha, image, beta, gamma)
+        return added_image
+
+    def update_window_position(self):
+        pass
         # if platform.system() == 'Windows':
         #     if GetSystemMetrics(78) == 3200 and not self.multiple_monitors:
         #         self.multiple_monitors = True
@@ -153,27 +187,3 @@ class Camera:
         # else:
         #     self.monitor_counter = 0
         #     cv.destroyWindow(self.window_name)
-
-    def update_frame_counter(self):
-        if self.frame_counter % 200 == 0:
-            logging.info("Keep Alive Camera Message")
-
-        self.frame_counter = self.frame_counter + \
-            1 if not self.pause else self.frame_counter
-        self.frame_counter = 0 if self.frame_counter >= 1000 else self.frame_counter
-
-    def read(self):
-        if self.threaded:
-            return True, self.cap.read()
-        return self.cap.read()
-
-    def set_alpha(self, image):
-        # loop over the alpha transparency values
-        alpha = 0.5
-        beta = (1 - alpha)
-        gamma = 0.0
-        background = np.zeros((self.height, self.width, 3), np.uint8)
-        background[:, :, 1] = 200
-        background[:, :, 2] = 200
-        added_image = cv.addWeighted(background, alpha, image, beta, gamma)
-        return added_image
