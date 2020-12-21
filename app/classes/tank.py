@@ -53,26 +53,27 @@ class Tank:
         self.drain_area = config['area']
         self.arc = config['arc']
 
-    def get_tank_image(self, image):
-        self.color_image = image[self.y: self.y + self.h, self.x: self.x + self.w, :]
+    def get_tank_image(self, frame: np.ndarray):
+        self.color_image = frame[self.y: self.y + self.h, self.x: self.x + self.w, :]
         return self.color_image
 
-    def find(self, frame):
+    def find(self, frame: np.ndarray):
 
         cam_config = self.config['camera']
         c_width, c_height = cam_config['resolution']
         roi = cam_config['roi']
         y_offset_start = int(c_height * roi['y'][0] // 100)
         y_offset_end = int(c_height * roi['y'][1] // 100)
-
-        image = frame
-        # image = frame.copy()
+        
+        image = frame.copy()
+        image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
         image[:y_offset_start, :] = 255  # CONFIG TABLE OFFSET
 
         # image = cv.GaussianBlur(image, (7,7), 0)
         image = cv.blur(image, (9, 9), cv.BORDER_WRAP)
-        # _, image = cv.threshold(image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
-        _, image = cv.threshold(image, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)  # Test
+        _, image = cv.threshold(image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
+        # cv.threshold
+        # _, image = cv.threshold(image, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)  # Test
 
         mid_x = image.shape[1] // 2
         mid_y = image.shape[0] // 2
@@ -123,7 +124,7 @@ class Tank:
         self.found = self.h >= self.MIN_HEIGHT
         self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
-    def get_sticker_position_lab(self, frame):
+    def get_sticker_position_lab(self, frame: np.ndarray):
 
         if not self.x:
             tank = frame
@@ -133,8 +134,9 @@ class Tank:
         # blur ???
         kernel = np.ones((5,5), np.uint8) # GET the kernel from config
         lab = cv.cvtColor(tank, cv.COLOR_BGR2LAB)
-
-        mask = cv.inRange(lab, self.sticker_lab[0], self.sticker_lab[1])
+        lower = np.array(self.sticker_lab[0], np.uint8)
+        higher = np.array(self.sticker_lab[1], np.uint8)
+        mask = cv.inRange(lab, lower, higher)
         mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel, iterations=2)
         cnt, _ = cv.findContours(mask, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
 
@@ -233,7 +235,9 @@ class Tank:
         blur_kernel = self.drain_blur
 
         blur = cv.GaussianBlur(hsv, blur_kernel, 1)
-        mask = cv.inRange(blur, self.drain_hsv[0], self.drain_hsv[1])
+        lower = np.array(self.drain_hsv[0], np.uint8)
+        higher = np.array(self.drain_hsv[1], np.uint8)
+        mask = cv.inRange(blur, lower, higher)
 
         kernel_open = np.ones(self.DRAIN_FILTER_OPEN, np.uint8)
         mask = cv.morphologyEx(mask, cv.MORPH_OPEN, kernel_open, iterations=2)
@@ -288,11 +292,15 @@ class Tank:
 
         # TEST WITH HSV FILTER ADD
 
-        hsv_mask = cv.inRange(hsv, self.drain_hsv[0], self.drain_hsv[1])
+        lower = np.array(self.drain_hsv[0], np.uint8)
+        higher = np.array(self.drain_hsv[1], np.uint8)
+        hsv_mask = cv.inRange(hsv, lower, higher)
 
         # --------------------------
 
-        lab_mask = cv.inRange(blur, self.drain_lab[0], self.drain_lab[1])
+        lower = np.array(self.drain_lab[0], np.uint8)
+        higher = np.array(self.drain_lab[1], np.uint8)
+        lab_mask = cv.inRange(blur, lower, higher)
 
         # mask = lab_mask + hsv_mask -- Aditive
         # mask = cv.bitwise_and(lab_mask, hsv_mask)  # subtrative

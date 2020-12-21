@@ -5,7 +5,7 @@ import platform
 from time import sleep, time
 from threading import Thread
 from configparser import ConfigParser
-from classes import Tank, Sticker, Camera, PLC, Model
+from classes import Tank, Sticker, Camera, PLC, TFModel
 from classes.image_writter import *
 from classes.commands import *
 
@@ -26,7 +26,7 @@ config.read("config.ini")
 camera = Camera()
 tank = Tank()
 plc = PLC()
-model = Model()
+model = TFModel()
 
 if args.video:
     path = args.video
@@ -102,7 +102,7 @@ if __name__ == "__main__":
             draw_center_axis(frame, camera)
             draw_roi_lines(frame, camera)
 
-            tank.find(g_frame) # Get the Tank image and return if it was found
+            tank.find(orig) # Get the Tank image and return if it was found
 
             if tank.found:
                 draw_tank_center_axis(frame, tank)

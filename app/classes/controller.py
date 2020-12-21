@@ -5,11 +5,12 @@ from time import sleep
 from threading import Thread
 from models import PLCInterface
 from classes.tank import Tank, Sticker
-from models.app_states import AppState
 from classes.plc import PLC
 from classes.camera import Camera
 from classes.commands import *
 from classes.image_writter import *
+from models.app_states import AppState
+from classes.tf_model import TFModel
 
 
 class Controller:
@@ -26,7 +27,7 @@ class Controller:
     thread_camera: Thread
     camera_enabled = True
     start_time: datetime   
-
+    frame: np.ndarray
 
     def __init__(self):
         # self.plc = PLC()    
@@ -34,13 +35,36 @@ class Controller:
         self.tank = Tank()    
         self.camera = Camera()
         self.camera.start()
+        self.model = TFModel()
         
-        
+
+    def get_frame(self):
+        success, self.frame = self.camera.read()            
+
     def show(self):
-        _, frame = self.camera.read()
+        if self.tank.found:
+            frame = draw_tank_center_axis(frame, self.tank)
+            frame = draw_tank_rectangle(frame, self.tank)
+            frame = draw_sticker(frame, self.tank)
+
+        frame = draw_camera_info(frame, self.camera)
+        # frame = draw_plc_status(frame, self.plc)
         frame = draw_roi_lines(frame, self.camera)
         frame = draw_center_axis(frame, self.camera)
         self.camera.show(frame)        
+
+    def process(self, frame: np.ndarray = 0):
+        if not frame:
+            frame = self.frame
+        self.tank.find(frame)
+        if self.tank.found:
+            # if it is a superior tank, find the drain -- addicional, compare the drain position
+            self.tank.get_sticker_position_lab(frame) # count how many times sticker is the same before proceed (e.g 10x)
+            for sticker in self.tank.stickers:
+                # check if it is only one sticker, if it is required and if it is on right quadrant based on the drain if it is superior
+                sticker.label_index, sticker.label = self.model.predict(sticker.image)
+                sticker.update_position()
+    
 
     def get_command(self):
         key = cv.waitKey(1) & 0xFF

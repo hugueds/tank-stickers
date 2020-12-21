@@ -10,6 +10,10 @@ from configparser import ConfigParser
 from .sticker import Sticker
 from models.plc_read_interface import PLCInterface
 from models.plc_write_interface import PLCWriteInterface
+
+
+# TODO: Receive PLC values to restart the program or the RPI
+
 class PLC:
 
     # db = dict()
@@ -25,7 +29,7 @@ class PLC:
 
     def __init__(self, config_file='config.yml'):
         self.load_config(config_file)
-        self.client = Client()
+        # self.client = Client()
 
     def load_config(self, config_file='config.yml'):
         with open(config_file) as file:
