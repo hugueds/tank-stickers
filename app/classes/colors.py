@@ -14,11 +14,14 @@ brown = (0, 50, 100)
 golden_rod = (32, 165, 128)
 teal = (128, 0, 0)
 
+
 tank_color = (100, 230, 0)
 drain_color = (50, 200, 230)
 
 dark_yellow = (0, 220, 220)
 
+navy_blue = (200, 100, 0)
+mid_blue = (128, 0, 0)
 
 color_list = [
     red,
@@ -34,4 +37,3 @@ color_list = [
     golden_rod,
     teal,
 ]
-

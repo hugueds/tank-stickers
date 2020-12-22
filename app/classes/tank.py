@@ -3,6 +3,7 @@ from typing import List
 import numpy as np
 import cv2 as cv
 from .sticker import Sticker
+from .drain import Drain
 from .colors import *
 
 font = cv.FONT_HERSHEY_SIMPLEX
@@ -14,6 +15,7 @@ class Tank:
     x, y, w, h = 0, 0, 0, 0
     sticker_count = 0
     stickers: List[Sticker] = []
+    drain: Drain
     drain_found = False
     drain_x, drain_y, drain_w, drain_h = 0, 0, 0, 0
     drain_rel_x, drain_rel_y = 0, 0
@@ -52,6 +54,7 @@ class Tank:
         self.drain_lab = config['lab_filter']            
         self.drain_area = config['area']
         self.arc = config['arc']
+        self.drain_area_found = 0
 
     def get_tank_image(self, frame: np.ndarray):
         self.color_image = frame[self.y: self.y + self.h, self.x: self.x + self.w, :]
@@ -248,6 +251,7 @@ class Tank:
         cnt, hier = cv.findContours(mask, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
 
         self.drain_found = False
+        self.drain_area_found = 0
         self.drain_x, self.drain_y, self.drain_w, self.drain_h = 0, 0, 0, 0
 
         for c in cnt:
@@ -262,6 +266,7 @@ class Tank:
                 zero_y = self.y + self.h // 2
                 self.drain_rel_x = x - zero_x + (w // 2)
                 self.drain_rel_y = (-1) * (y - zero_y) - (h // 2)
+                self.drain_area_found = area
 
 
     def get_drain_lab(self, frame: np.ndarray):
@@ -316,7 +321,8 @@ class Tank:
 
         cnt, hier = cv.findContours(mask, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
 
-        self.drain_found = False        
+        self.drain_found = False    
+        self.drain_area_found = 0    
         self.drain_x, self.drain_y, self.drain_w, self.drain_h = 0, 0, 0, 0
 
         sorted_cnts = sorted(cnt, key=lambda cnt: cv.contourArea(cnt))
@@ -335,6 +341,7 @@ class Tank:
                 zero_y = self.y + self.h // 2
                 self.drain_rel_x = x - zero_x + (w // 2)
                 self.drain_rel_y = (-1) * (y - zero_y) - (h // 2)
+                self.drain_area_found = area
 
         # for c in cnt:
         #     area = cv.contourArea(c)

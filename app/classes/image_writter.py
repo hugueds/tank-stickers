@@ -2,12 +2,11 @@ import cv2 as cv
 import numpy as np
 from classes import Camera, PLC, Tank
 from classes.colors import *
-from models import Color as C
 
 font = cv.FONT_HERSHEY_SIMPLEX
 
 def draw_roi_lines(frame: np.ndarray, camera: Camera):
-    color = C.CYAN.value    
+    color = cyan
     (y, x) = frame.shape[:2]
     x_start = int(camera.width * camera.roi['x'][0] // 100)
     x_end =   int(camera.width * camera.roi['x'][1] // 100)
@@ -21,7 +20,7 @@ def draw_roi_lines(frame: np.ndarray, camera: Camera):
     return frame
 
 def draw_center_axis(frame: np.ndarray, camera: Camera):
-    color = C.FUSHIA.value
+    color = fucshia
     (y, x) = frame.shape[:2]
     x_offset = int(x // 2 + (camera.width * camera.center_x_offset) // 100)
     cv.line(frame, (x_offset, 0), (x_offset, y), color)
@@ -29,16 +28,22 @@ def draw_center_axis(frame: np.ndarray, camera: Camera):
     return frame
 
 def draw_camera_info(frame: np.ndarray, camera: Camera):
-    text = f"{frame.shape[1]}x{frame.shape[0]} "
-    text += f" FPS: {camera.fps}, FRAME COUNTER: {camera.frame_counter}"
-    color = (200, 100, 0)
-    cv.putText(frame, text, (20, 20), font, 0.6, color, 2)
+    text = f"{camera.width}x{camera.height} "
+    color = navy_blue
+    font_size = (frame.shape[1] * 0.001)
+    cv.putText(frame, text, (10, 25), font, font_size, color, 2)
+    text = f"FPS: {camera.fps}, FRAME COUNTER: {camera.frame_counter}"
+    cv.putText(frame, text, (10, 50), font, font_size, color, 2)
     if camera.recording:
         text = f" -- RECORDING --"
-        color = (0, 0, 255)
-        # use camera percentage
+        color = red        
+        x,y = 0,0 # use camera percentage
         cv.putText(frame, text, (500, 650), font, 0.7, color, 2)
     return frame
+
+def draw_job_info(self):
+    # display POPID, Quadrant, LT, Sticker Label, Angle
+    pass
 
 def draw_tank_center_axis(frame: np.ndarray, tank: Tank):
     x, y, w, h = tank.x, tank.y, tank.w, tank.h
@@ -50,36 +55,44 @@ def draw_tank_rectangle(frame: np.ndarray, tank: Tank):
     color = tank_color
     x, y, w, h = tank.x, tank.y, tank.w, tank.h
     text = f"TANK WIDTH: {w}, TANK HEIGHT: {h}"
-    cv.putText(frame, text, (20, 45), font, 0.6, tank_color, 2)
+    # x,y = 0,0
+    font_size = (frame.shape[1] * 0.001)
+    cv.putText(frame, text, (10, 75), font, font_size, tank_color, 2)
     cv.rectangle(frame, (x, y), (x + w, y + h), color, 2)
     return frame
 
 def draw_drain(frame: np.ndarray, tank: Tank):
+    x, y = frame.shape[1], frame.shape[0]
+    color = dark_yellow
     dx, dy, dw, dh = tank.drain_x, tank.drain_y, tank.drain_w, tank.drain_h
     cv.rectangle(frame, (dx, dy), (dx+dw, dy+dh), dark_yellow, 2)
-    pt = (int(frame.shape[1] * 0.70), int(frame.shape[0] * 0.07))
-    text = f"DRAIN X: {tank.drain_rel_x} Y: {tank.drain_rel_y} AREA: {tank.drain_area}"
-    cv.putText(frame,text, pt, font, 0.6, dark_yellow ,2)
+    point = (10, 100)
+    font_size = (0.001 * x)
+    text = f"DRAIN X: {tank.drain_rel_x} Y: {tank.drain_rel_y}, AREA: {tank.drain_area_found}"
+    cv.putText(frame,text, point, font, font_size, color ,2)
     return frame
 
-def draw_plc_status(frame: np.ndarray, plc: PLC):
-    pt = (int(frame.shape[1] * 0.70), int(frame.shape[0] * 0.04))
-    color = (128,0,0)
-    text = f"PLC STATUS {plc.online}, LIFEBIT: {plc.life_bit}"
-    cv.putText(frame, text, pt, font, 0.6, color, 2)
+def draw_plc_status(frame: np.ndarray, camera: Camera, plc: PLC):
+    x, y = frame.shape[1], frame.shape[0]
+    point = (int(frame.shape[1] * 0.5), int(frame.shape[0] * 0.04))
+    color = mid_blue
+    text = f"PLC STATUS {plc.online}\, LIFEBIT: {plc.life_bit}"
+    font_size = (0.001 * x)
+    cv.putText(frame, text, point, font, font_size, color, 2)
     return frame
 
-def draw_sticker(frame: np.ndarray, tank: Tank):
+def draw_sticker(frame: np.ndarray, camera: Camera, tank: Tank):
     i = 1
     for s in tank.stickers:
         color = color_list[s.label_index]
-        text = f"""STICKER {s.label}\
-        X: {s.x} Y: {s.y}\
-        REL_X: {s.relative_x} REL_Y: {s.relative_y}\
-        AREA: {s.area} W: {s.w} H: {s.h}\
-            """
+        text =  f"STICKER {s.label}\ X: {s.x} Y: {s.y}"
+        text += f"REL_X: {s.relative_x} REL_Y: {s.relative_y}" 
+        text += f"AREA: {s.area} W: {s.w} H: {s.h}"        
         cv.rectangle(frame, (s.x, s.y), (s.x + s.w, s.y + s.h), color, 2)
-        cv.putText(frame, text, (100, 700 - (20 * i)), font ,0.6,color,2)
+        font_size = (camera.height / camera.width)
+        x = int(0.25 * camera.width)
+        y = camera.height - (20 * i)
+        cv.putText(frame, text, (x, y), font , font_size, color, 2)
         i += 1
     return frame
 

@@ -20,9 +20,6 @@ parser.add_argument("--image", help="enable test an image")
 parser.add_argument("--no-plc", action="store_true", help="run without PLC connection")
 args = parser.parse_args()
 
-config = ConfigParser()
-config.read("config.ini")
-
 camera = Camera()
 tank = Tank()
 plc = PLC()
@@ -119,10 +116,10 @@ if __name__ == "__main__":
                     sticker.label_index, sticker.label = model.predict(sticker.image)
                     sticker.update_position()
 
-                draw_sticker(frame, tank)
+                draw_sticker(frame, camera, tank)
 
             draw_camera_info(frame, camera)
-            draw_plc_status(frame, plc)
+            draw_plc_status(frame, camera, plc)
 
             if camera.recording:
                 camera.output.write(cv.resize(orig, (1280, 720)))

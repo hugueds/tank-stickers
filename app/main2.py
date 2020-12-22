@@ -13,6 +13,7 @@ controller.set_state(AppState.INITIAL)
 while True:
     
     controller.get_frame()
+    controller.process()
     controller.show()    
     controller.get_command()
 

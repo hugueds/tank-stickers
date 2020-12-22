@@ -42,13 +42,14 @@ class Controller:
         success, self.frame = self.camera.read()            
 
     def show(self):
+        frame = self.frame.copy()
         if self.tank.found:
             frame = draw_tank_center_axis(frame, self.tank)
             frame = draw_tank_rectangle(frame, self.tank)
-            frame = draw_sticker(frame, self.tank)
+            frame = draw_sticker(frame, self.camera, self.tank)
 
         frame = draw_camera_info(frame, self.camera)
-        # frame = draw_plc_status(frame, self.plc)
+        # frame = draw_plc_status(frame, self.camera, self.plc)
         frame = draw_roi_lines(frame, self.camera)
         frame = draw_center_axis(frame, self.camera)
         self.camera.show(frame)        

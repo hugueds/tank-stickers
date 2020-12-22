@@ -14,9 +14,7 @@ from models.plc_write_interface import PLCWriteInterface
 
 # TODO: Receive PLC values to restart the program or the RPI
 
-class PLC:
-
-    # db = dict()
+class PLC:    
 
     online = False
     reading = False
