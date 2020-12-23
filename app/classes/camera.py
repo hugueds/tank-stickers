@@ -6,6 +6,7 @@ import platform
 from imutils.video.webcamvideostream import WebcamVideoStream
 from imutils.video import VideoStream
 from models.camera_constants import CameraConstants
+from logger import logger
 
 if platform.system() == 'Windows':
     from win32api import GetSystemMetrics
@@ -61,7 +62,8 @@ class Camera:
         self.FOCUS = int(config["FOCUS"])
         self.SHARPNESS = int(config["SHARPNESS"])
 
-    def start(self):        
+    def start(self):
+        logger.info('Starting Camera')
         if self.rpi_camera:
             res = tuple(self.resolution)
             self.cap = VideoStream(
@@ -88,31 +90,18 @@ class Camera:
         else:
             self.cap.release()
 
-    def set_hardware(self, **kwargs):  # Camera properties
-        # self.cap.set(39, False)
+    def set_hardware(self, **kwargs):
         self.cap.set(CameraConstants.WIDTH.value, self.width)
         self.cap.set(CameraConstants.HEIGHT.value, self.height)
-        # min: 0 max: 255 increment:1
-        self.cap.set(CameraConstants.BRIGHTNESS.value, self.brighteness)
-        # min: 0 max: 255 increment:1
-        self.cap.set(CameraConstants.CONTRAST.value, self.contrast)
-        # min: 0 max: 255 increment:1
+        self.cap.set(CameraConstants.BRIGHTNESS.value, self.brighteness)        
+        self.cap.set(CameraConstants.CONTRAST.value, self.contrast)        
         self.cap.set(CameraConstants.SATURATION.value, self.saturation)
-        self.cap.set(CameraConstants.HUE.value, 255)  # hue
-        # self.cap.set(GAIN, 62)  # min: 0 max: 127 increment:1
-        # min: -7 max: -1 increment:1
-        self.cap.set(CameraConstants.EXPOSURE.value, self.exposure)
-        # min: 4000 max: 7000 increment:1
-        self.cap.set(CameraConstants.WHITE_BALANCE.value, self.white_balance)
-        # focus          min: 0   , max: 255 , increment:5
+        self.cap.set(CameraConstants.HUE.value, 255)        
+        self.cap.set(CameraConstants.EXPOSURE.value, self.exposure)        
+        self.cap.set(CameraConstants.WHITE_BALANCE.value, self.white_balance)        
         self.cap.set(CameraConstants.FOCUS.value, 0)
 
-    def set_hardware_threaded(self, **kwargs):  # Camera properties
-        # self.cap.set(39, False)        
-        # self.cap.stream.set(cv.CAP_PROP_FRAME_WIDTH, self.width)
-        # self.cap.stream.set(cv.CAP_PROP_FRAME_HEIGHT, self.height)        
-
-        # # min: 0 max: 255 increment:1
+    def set_hardware_threaded(self, **kwargs):        
         self.cap.stream.set(cv.CAP_PROP_BRIGHTNESS, self.brightness) # # min: 0 max: 255 increment:1
         self.cap.stream.set(cv.CAP_PROP_CONTRAST, self.contrast)  # min: 0 max: 255 increment:1        
         self.cap.stream.set(cv.CAP_PROP_SATURATION, self.saturation) #  min: 0 max: 255 increment:1
