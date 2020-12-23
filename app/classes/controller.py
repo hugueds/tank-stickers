@@ -71,24 +71,37 @@ class Controller:
         Thread(name='thread_plc', target=self.update_plc, daemon=True).start()
 
     def set_state(self, state: AppState):
-        logger.info(f'Updating state to: {self.state}')
+        logger.info(f'Updating state to: {state}')
         self.state = state
 
-    def update_plc(self):        
-        while self.plc.enabled:
-            try:
-                read_plc = self.plc.read_v2()
-                self.write_plc.update_life_beat()
-                data = self.write_plc.get_bytearray()
-                self.plc.write_v2(data)
-                sleep(0.2) # PLC Cycle
-            except Exception as e:
-                print(e)
+    def update_plc(self):
+        last_life_beat = -1
+        while self.plc.enabled:            
+            self.read_plc = self.plc.read_v2()
+            self.write_plc.update_life_beat()
+            data = self.write_plc.get_bytearray()
+            self.plc.write_v2(data)
+            if self.read_plc.life_beat == last_life_beat:
+                logger.error('PLC is not responding... Trying to reconnect')
+                self.plc.disconnect()
+                sleep(1)
+                self.plc.connect()
+            else:
+                last_life_beat = self.read_plc.life_beat
+            sleep(self.plc.update_time)            
         else:
             logger.warning('PLC is not Enabled')
 
     def save_result(self):
-        logger.info('Saving results to ')
+        try: 
+            now = datetime.now()
+            file = f'{now.strftime("%Y%m%d-%H%M%S")}_{self.read_plc.parameter}.jpg'
+            path = f'../results/{now.year}/{now.month}/{now.day}/{self.read_plc.popid}/{file}'
+            logger.info(f'Saving results to {path}')
+            # log to a different result path
+            cv.imwrite(path, self.frame)
+        except Exception as e:
+            logger.exception(e)      
                 
 
     def update_camera_setting(self):

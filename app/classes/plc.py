@@ -1,16 +1,12 @@
-from classes.tank import Tank
-from time import sleep
 from snap7.client import Client
 from snap7.util import *
-import logging
+from time import sleep
 import yaml
 from threading import Thread
 from datetime import datetime
-from configparser import ConfigParser
-from .sticker import Sticker
-from models.plc_read_interface import PLCInterface
-from models.plc_write_interface import PLCWriteInterface
-
+from classes import Sticker, Tank
+from models import PLCInterface, PLCWriteInterface 
+from logger import logger
 
 # TODO: Receive PLC values to restart the program or the RPI
 
@@ -40,23 +36,11 @@ class PLC:
         self.update_time = config['update_time']
         self.debug = config['debug']
 
-    def read(self) -> PLCInterface:
-        db = self.db
-        self.read_bytes = self.client.db_read(db['number'], db['start'], db['size'])
-        self.interface = PLCInterface(self.read_bytes)
-
-    def update(self):
-        print('Starting PLC Thread')
-        while self.enabled:
-            self.read()
-            self.write_()
-            sleep(self.update_time)
 
     def connect(self):
 
         if not self.enabled:
-            logging.info('PLC is Disabled, change config file to start communication')
-            return
+            return logger.info('PLC is Disabled, change config file to start communication')            
 
         if self.client:
             try:
@@ -175,10 +159,11 @@ class PLC:
             self.lock = False
 
     def check_connection(self):
+
         if not self.enabled:
             return False
 
-        logging.info('Checking PLC Connection')
+        logger.info('Checking PLC Connection')
 
         try:
             res = self.client.db_read(
@@ -197,18 +182,21 @@ class PLC:
 
 
     def read_v2(self) -> PLCInterface:
-        db = self.db
-        data = self.client.db_read(db['number'], db['start'], db['size'])
-        return PLCInterface(data)
+        try:
+            db = self.db
+            data = self.client.db_read(db['number'], db['start'], db['size'])
+            return PLCInterface(data)
+        except Exception as e:
+            logger.exception(e)
 
     def write_v2(self, data: PLCWriteInterface):
-        self.client.db_write(self.db['number'], self.db['start'], self.db['size'], data)
-        pass
+        try:
+            self.client.db_write(self.db['number'], self.db['start'], self.db['size'], data)
+        except Exception as e:
+            logger.exception(e)
 
     def disconnect(self):
-        # self.client.disconnect()
-        pass
-
+        self.client.disconnect()        
 
 
 

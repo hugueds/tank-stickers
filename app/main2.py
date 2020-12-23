@@ -8,6 +8,7 @@ from classes import Controller, Camera
 
 controller = Controller()
 controller.set_state(AppState.INITIAL)
+controller.set_state(AppState.FINDING_DRAIN)
 
 
 while True:
@@ -16,6 +17,7 @@ while True:
     controller.process()
     controller.show()    
     controller.get_command()
+
 
     if controller.state == AppState.INITIAL:
         if True:

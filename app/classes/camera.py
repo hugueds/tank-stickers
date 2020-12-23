@@ -35,7 +35,7 @@ class Camera:
         self.debug = config['debug']
         self.width = config['resolution'][0]
         self.height = config['resolution'][1]
-        self.display = config['display']
+        self.display = tuple(config['display'])
         self.center_x_offset = config['center_x_offset']
         self.roi = config['roi']
         self.rpi_camera = config['rpi_camera']
@@ -82,6 +82,7 @@ class Camera:
 
         cv.namedWindow(self.window_name, cv.WINDOW_NORMAL)
         cv.resizeWindow(self.window_name, self.monitor_display)
+        # cv.setWindowProperty(self.window_name, cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
 
     def stop(self):
         if self.threaded or self.rpi_camera:
@@ -117,6 +118,7 @@ class Camera:
         pass
 
     def show(self, frame: np.ndarray = np.ones((400, 400, 1))):
+        frame = cv.resize(frame, self.display)
         cv.imshow(self.window_name, frame)
 
     def move_window(self, x, y):
