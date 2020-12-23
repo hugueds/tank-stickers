@@ -43,6 +43,7 @@ def draw_camera_info(frame: np.ndarray, camera: Camera):
 
 def draw_job_info(self):
     # display POPID, Quadrant, LT, Sticker Label, Angle
+    # display POPID, Quadrant, LT, Sticker Label, Angle
     pass
 
 def draw_tank_center_axis(frame: np.ndarray, tank: Tank):

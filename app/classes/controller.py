@@ -4,6 +4,7 @@ from datetime import datetime
 from time import sleep
 from threading import Thread
 from models import PLCInterface
+from models.plc_write_interface import PLCWriteInterface
 from classes.tank import Tank, Sticker
 from classes.plc import PLC
 from classes.camera import Camera
@@ -11,7 +12,7 @@ from classes.commands import *
 from classes.image_writter import *
 from models.app_states import AppState
 from classes.tf_model import TFModel
-
+from logger import logger
 
 class Controller:
 
@@ -20,7 +21,8 @@ class Controller:
     state: AppState = AppState.INITIAL
     camera: Camera
     plc: PLC
-    plc_interface: PLCInterface
+    read_plc: PLCInterface
+    write_plc: PLCWriteInterface
     start_time = datetime.now()
     tank: Tank
     thread_plc: Thread
@@ -75,21 +77,27 @@ class Controller:
         Thread(name='thread_plc', target=self.update_plc, daemon=True).start()
 
     def set_state(self, state: AppState):
+        logger.log(f'Updating state to: {self.state}')
         self.state = state
 
     def update_plc(self):
-        print('Starting PLC Thread')
+        logger.log('Starting PLC Thread')
         self.plc.connect()
+        self.write_plc = PLCWriteInterface(self.plc.db['size'])
         while self.plc.enabled:
-            self.plc.read()
-            self.plc.write(self.tank)
-            sleep(0.2) # PLC Cycle
+            try:
+                read_plc = self.plc.read_v2()
+                self.write_plc.update_life_beat()
+                data = self.write_plc.get_bytearray()
+                self.plc.write_v2(data)
+                sleep(0.2) # PLC Cycle
+            except Exception as e:
+                print(e)
         else:
             print('PLC is not enabled')
 
     def save_result(self):
         pass
-
 
     def extract_tank(self):        
         if self.camera_side == 0:

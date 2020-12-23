@@ -40,7 +40,7 @@ class PLC:
         self.update_time = config['update_time']
         self.debug = config['debug']
 
-    def read(self):
+    def read(self) -> PLCInterface:
         db = self.db
         self.read_bytes = self.client.db_read(db['number'], db['start'], db['size'])
         self.interface = PLCInterface(self.read_bytes)
