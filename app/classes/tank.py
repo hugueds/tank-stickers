@@ -204,11 +204,11 @@ class Tank:
                 if len(poly) == 4:
                     (x, y, w, h) = cv.boundingRect(c)
                     ar = w / float(h)
-                    cond = ar >= 0.95 and ar <= 1.05
-                    cond = h >= self.sticker_size['min']
-                    cond = cond and h <= self.sticker_size['max']
-                    cond = cond and w >= self.sticker_size['min']
-                    cond = cond and w <= self.sticker_size['max']
+                    cond = ar >= 0.94 and ar <= 1.06
+                    cond = h / frame[0] >= self.sticker_size['min']
+                    cond = cond and h / frame[0] <= self.sticker_size['max']
+                    cond = cond and w / frame[1] >= self.sticker_size['min']
+                    cond = cond and w / frame[1] <= self.sticker_size['max']
                     if cond:
                         sticker = Sticker(self.x + x, self.y + y, w, h)
                         sticker.area = area
