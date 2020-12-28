@@ -4,6 +4,7 @@ from classes import Camera, PLC, Tank
 from classes.colors import *
 
 font = cv.FONT_HERSHEY_SIMPLEX
+offset = 25
 
 def draw_roi_lines(frame: np.ndarray, camera: Camera):
     color = cyan
@@ -28,22 +29,22 @@ def draw_center_axis(frame: np.ndarray, camera: Camera):
     return frame
 
 def draw_camera_info(frame: np.ndarray, camera: Camera):
-    text = f"{camera.width}x{camera.height} "
+    text = f"Resolution {camera.width}x{camera.height} "
     color = navy_blue
-    font_size = (frame.shape[1] * 0.001)
+    font_size = (frame.shape[1] * 0.0007)
     cv.putText(frame, text, (10, 25), font, font_size, color, 2)
-    text = f"FPS: {camera.fps}, FRAME COUNTER: {camera.frame_counter}"
+    text = f"FPS: {camera.fps}, COUNTER: {camera.frame_counter}"
     cv.putText(frame, text, (10, 50), font, font_size, color, 2)
     if camera.recording:
         text = f" -- RECORDING --"
-        color = red        
+        color = red
         x,y = 0,0 # use camera percentage
         cv.putText(frame, text, (500, 650), font, 0.7, color, 2)
     return frame
 
 def draw_job_info(self):
-    # display POPID, Quadrant, LT, Sticker Label, Angle
-    # display POPID, Quadrant, LT, Sticker Label, Angle
+    # display POPID, Parameter, Quadrant, LT, Sticker Label, Angle
+    # display POPID, Parameter, Quadrant, LT, Sticker Label, Angle
     pass
 
 def draw_tank_center_axis(frame: np.ndarray, tank: Tank):
@@ -55,12 +56,15 @@ def draw_tank_center_axis(frame: np.ndarray, tank: Tank):
 def draw_tank_rectangle(frame: np.ndarray, tank: Tank):
     color = tank_color
     x, y, w, h = tank.x, tank.y, tank.w, tank.h
-    text = f"TANK WIDTH: {w}, TANK HEIGHT: {h}"
+    text = f"TANK WIDTH {w}, HEIGHT {h}"
     # x,y = 0,0
-    font_size = (frame.shape[1] * 0.001)
+    font_size = (frame.shape[1] * 0.0007)
     cv.putText(frame, text, (10, 75), font, font_size, tank_color, 2)
     cv.rectangle(frame, (x, y), (x + w, y + h), color, 2)
     return frame
+
+def draw_tank_circle(frame: np.ndarray, tank: Tank):
+    pass
 
 def draw_drain(frame: np.ndarray, tank: Tank):
     x, y = frame.shape[1], frame.shape[0]
@@ -77,8 +81,8 @@ def draw_plc_status(frame: np.ndarray, camera: Camera, plc: PLC):
     x, y = frame.shape[1], frame.shape[0]
     point = (int(frame.shape[1] * 0.5), int(frame.shape[0] * 0.04))
     color = mid_blue
-    text = f"PLC STATUS {plc.online}\, LIFEBIT: {plc.life_bit}"
-    font_size = (0.001 * x)
+    text = f"PLC STATUS {plc.online}, LIFEBIT: {plc.life_bit}"
+    font_size = (0.0007 * x)
     cv.putText(frame, text, point, font, font_size, color, 2)
     return frame
 
@@ -86,9 +90,9 @@ def draw_sticker(frame: np.ndarray, camera: Camera, tank: Tank):
     i = 1
     for s in tank.stickers:
         color = color_list[s.label_index]
-        text =  f"STICKER {s.label}\ X: {s.x} Y: {s.y}"
-        text += f"REL_X: {s.relative_x} REL_Y: {s.relative_y}" 
-        text += f"AREA: {s.area} W: {s.w} H: {s.h}"        
+        text =  f"STICKER {s.label} X: {s.x} Y: {s.y}"
+        text += f"REL_X: {s.relative_x} REL_Y: {s.relative_y}"
+        text += f"AREA: {s.area} W: {s.w} H: {s.h}"
         cv.rectangle(frame, (s.x, s.y), (s.x + s.w, s.y + s.h), color, 2)
         font_size = (camera.height / camera.width)
         x = int(0.25 * camera.width)

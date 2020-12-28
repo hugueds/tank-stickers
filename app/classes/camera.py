@@ -115,8 +115,16 @@ class Camera:
 
     def set_hardware_rpi(self):
         self.cap.stream.camera.iso = 0
-        self.cap.stream.exposure_mode = 'off'
-        pass
+        self.cap.stream.camera.exposure_mode = 'off'
+        self.cap.stream.camera.brightness = self._scale(self.brightness)
+        self.cap.stream.camera.contrast = self._scale(self.contrast)
+        self.cap.stream.camera.saturation = self._scale(self.saturation)
+        self.cap.stream.camera.sharpness = self._scale(self.sharpness)
+
+    def _scale(self, x, y0, y1):
+        x0, x1 = 0, 255
+        return int(y0 + ( (y1 -y0) / (x1 - x0) * (x - x0)) )
+
 
     def show(self, frame: np.ndarray = np.ones((400, 400, 1))):
         frame = cv.resize(frame, self.display)

@@ -13,6 +13,7 @@ class Tank:
     found = False
     image: np.ndarray = 0
     x, y, w, h = 0, 0, 0, 0
+    radius = 0
     sticker_count = 0
     stickers: List[Sticker] = []
     drain: Drain
@@ -45,13 +46,13 @@ class Tank:
         self.sticker_area = config['area']
         self.sticker_hsv = config['hsv_filter']
         self.sticker_lab = config['lab_filter']
-            
+
 
     def load_drain_config(self, config):
         self.drain_blur = tuple(config['blur'])
         self.drain_kernel = config['kernel']
         self.drain_hsv = config['hsv_filter']
-        self.drain_lab = config['lab_filter']            
+        self.drain_lab = config['lab_filter']
         self.drain_area = config['area']
         self.arc = config['arc']
         self.drain_area_found = 0
@@ -67,7 +68,7 @@ class Tank:
         roi = cam_config['roi']
         y_offset_start = int(c_height * roi['y'][0] // 100)
         y_offset_end = int(c_height * roi['y'][1] // 100)
-        
+
         image = frame.copy()
         image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
         image[:y_offset_start, :] = 255  # CONFIG TABLE OFFSET
@@ -82,7 +83,7 @@ class Tank:
         mid_y = image.shape[0] // 2
 
         # Search for the central line (in pink) and count the black pixel quantity
-        
+
         x_center_offset = int(cam_config['center_x_offset'] * c_width // 100)
         vector_y = image[:, mid_x + x_center_offset]
         roi_vector_y = vector_y[y_offset_start:y_offset_end]
@@ -321,8 +322,8 @@ class Tank:
 
         cnt, hier = cv.findContours(mask, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
 
-        self.drain_found = False    
-        self.drain_area_found = 0    
+        self.drain_found = False
+        self.drain_area_found = 0
         self.drain_x, self.drain_y, self.drain_w, self.drain_h = 0, 0, 0, 0
 
         sorted_cnts = sorted(cnt, key=lambda cnt: cv.contourArea(cnt))
@@ -336,7 +337,7 @@ class Tank:
             if cond:
                 self.drain_found = True
                 (x, y, w, h) = cv.boundingRect(c)
-                self.drain_x, self.drain_y, self.drain_w, self.drain_h = x, y, w, h                
+                self.drain_x, self.drain_y, self.drain_w, self.drain_h = x, y, w, h
                 zero_x = self.x + self.w // 2
                 zero_y = self.y + self.h // 2
                 self.drain_rel_x = x - zero_x + (w // 2)
@@ -356,5 +357,14 @@ class Tank:
         #         self.drain_rel_x = x - zero_x + (w // 2)
         #         self.drain_rel_y = (-1) * (y - zero_y) - (h // 2)
         #         # self.drain_rel_y = zero_y - y
+
+
+    def find_circle(self, frame: np.ndarray):
+        g_frame = cv.cvtColor(frame, cv.COLOR_BAYER_BG2GRAY)
+        circle = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.5, 100)
+        self.circle = np.round(circle[0, :]).astype("int")
+
+
+
 
 
