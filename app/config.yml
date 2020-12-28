@@ -10,7 +10,7 @@ camera:
     threaded: True
     resolution: [640,480]
     display: [1080,720]
-    center_x_offset: -6.1    
+    center_x_offset: -6.1
     monitor_limit: 1920
     max_monitors: 1
     roi:
@@ -47,8 +47,8 @@ sticker:
         min: 3000
         max: 8000
     size:
-        min: 45
-        max: 100
+        min: 0.1
+        max: 0.13
     hsv_filter: [[0, 0, 0], [179, 255, 255]]
     lab_filter: [[200, 115, 100], [255, 145, 140]]
 drain:
