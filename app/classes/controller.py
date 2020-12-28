@@ -22,21 +22,32 @@ class Controller:
     tank: Tank
     camera_enabled = True
     start_time: datetime
-    frame: np.ndarray
+    frame: np.ndarray = None
+    img_frame = None
+    is_picture = True
 
-    def __init__(self):
+    def __init__(self, is_picture=False):
         # self.plc = PLC()
         self.start_time = datetime.now()
         self.tank = Tank()
         self.camera = Camera()
         self.camera.start()
         self.model = TFModel()
+        self.is_picture = is_picture
 
     def get_frame(self):
-        success, self.frame = self.camera.read()
+        if not self.is_picture:
+            success, self.frame = self.camera.read()
+        else:
+            self.frame = self.img_frame
+
+    def read_file(self, file):
+        if self.frame is None:
+            self.frame = cv.imread(file)
+            self.img_frame = self.frame
 
     def show_circle(self):
-        frame = self.frame
+        frame = self.frame.copy()
         self.tank.find_circle(frame)
         frame = draw_tank_circle(frame, self.tank)
         self.camera.show(frame)
@@ -83,10 +94,10 @@ class Controller:
     def update_plc(self):
         last_life_beat = -1
         while self.plc.enabled:
-            self.read_plc = self.plc.read_v2()
+            self.read_plc = self.plc.read()
             self.write_plc.update_life_beat()
             data = self.write_plc.get_bytearray()
-            self.plc.write_v2(data)
+            self.plc.write(data)
             if self.read_plc.life_beat == last_life_beat:
                 logger.error('PLC is not responding... Trying to reconnect')
                 self.plc.disconnect()

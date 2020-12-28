@@ -114,12 +114,14 @@ class Camera:
         # self.cap.stream.set(CameraConstants.FOCUS.value, 0)
 
     def set_hardware_rpi(self):
-        self.cap.stream.camera.iso = 0
+        # search for minimum and maximus
+        self.cap.stream.camera.iso = 100
         self.cap.stream.camera.exposure_mode = 'off'
-        self.cap.stream.camera.brightness = self._scale(self.brightness)
-        self.cap.stream.camera.contrast = self._scale(self.contrast)
-        self.cap.stream.camera.saturation = self._scale(self.saturation)
-        self.cap.stream.camera.sharpness = self._scale(self.sharpness)
+        self.cap.stream.camera.brightness = self._scale(self.brightness, 0, 100)
+        self.cap.stream.camera.contrast = self._scale(self.contrast,0 ,200)
+        self.cap.stream.camera.saturation = self._scale(self.saturation, 0, 200)
+        self.cap.stream.camera.sharpness = self._scale(self.sharpness,0,200)
+        # self.cap.stream.camera.exposure_comp = self._scale(self.sharpness)
 
     def _scale(self, x, y0, y1):
         x0, x1 = 0, 255

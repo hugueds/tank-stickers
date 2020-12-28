@@ -1,8 +1,5 @@
-import cv2 as cv
 import numpy as np
-from tensorflow.keras.models import load_model
-import tensorflow as tf
-tf.compat.v1.disable_eager_execution()
+from classes.tank import Tank
 
 class Sticker:
 
@@ -11,10 +8,10 @@ class Sticker:
     position = 255
     angle = 999
     area = 0
-    quadrant = 255
+    quadrant = 0
     found = False
     debug = False
-    image = 0
+    image: np.ndarray = 0
 
     def __init__(self, x=0, y=0, w=0, h=0):
         self.x = x
@@ -30,7 +27,7 @@ class Sticker:
         else:
             self.position = 90
 
-    def calc_quadrant(self, tank):
+    def calc_quadrant(self, tank: Tank):
         temp_x = 0
         temp_y = 0
         res = 0

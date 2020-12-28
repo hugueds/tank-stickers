@@ -17,8 +17,10 @@ class Tank:
     radius = 0
     sticker_count = 0
     stickers: List[Sticker] = []
+    sticker_quadrant = 0
     drain: Drain
     drain_found = False
+    drain_quadrant = 0
     drain_x, drain_y, drain_w, drain_h = 0, 0, 0, 0
     drain_rel_x, drain_rel_y = 0, 0
     debug_tank = False
@@ -36,10 +38,10 @@ class Tank:
     def load_config(self, config):
         self.weight = { 'min': config['min'], 'max': config['max'] }
         width, height = config['size']
-        self.MIN_WIDTH = width[0]
-        self.MAX_WIDTH = width[1]
-        self.MIN_HEIGHT = height[0]
-        self.MAX_HEIGHT = height[1]
+        self.min_width = width[0]
+        self.max_width = width[1]
+        self.min_height = height[0]
+        self.max_height = height[1]
 
 
     def load_sticker_config(self, config):
@@ -47,7 +49,6 @@ class Tank:
         self.sticker_area = config['area']
         self.sticker_hsv = config['hsv_filter']
         self.sticker_lab = config['lab_filter']
-
 
     def load_drain_config(self, config):
         self.drain_blur = tuple(config['blur'])
@@ -64,7 +65,7 @@ class Tank:
 
     def find_circle(self, frame: np.ndarray):
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.5, 100)
+        self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.5, 1000)
 
     def find(self, frame: np.ndarray):
 
@@ -94,7 +95,7 @@ class Tank:
         roi_vector_y = vector_y[y_offset_start:y_offset_end]
         roi_vector_y = roi_vector_y[roi_vector_y == 0]
 
-        if roi_vector_y.size > int(self.MIN_HEIGHT):
+        if roi_vector_y.size > int(self.min_height):
             self.h = roi_vector_y.size
         else:
             self.h = 0
@@ -130,13 +131,13 @@ class Tank:
                 break
 
         # self.found = True if self.h >= self.MIN_HEIGHT else False
-        self.found = self.h >= self.MIN_HEIGHT
+        self.found = self.h >= self.min_height
         self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
     def get_sticker_position_lab(self, frame: np.ndarray):
 
         if not self.x:
-            tank = frame
+            tank = frame.copy()
         else:
             tank = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
@@ -273,7 +274,6 @@ class Tank:
                 self.drain_rel_x = x - zero_x + (w // 2)
                 self.drain_rel_y = (-1) * (y - zero_y) - (h // 2)
                 self.drain_area_found = area
-
 
     def get_drain_lab(self, frame: np.ndarray):
 

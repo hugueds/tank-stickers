@@ -66,8 +66,10 @@ def draw_tank_rectangle(frame: np.ndarray, tank: Tank):
 def draw_tank_circle(frame: np.ndarray, tank: Tank):
     if tank.circles is not None:
         circles = np.uint16(np.around(tank.circles))
-        for i in circles[0,:]:
-            cv.circle(frame, (i[0], i[1]), i[2], (0, 255, 0), 2)
+        for x,y,r in circles[0,:]:
+            cv.circle(frame, (x, y), r, (0, 255, 0), 2)
+            cv.line(frame, (x,y -r), (x,y + r), (0,0,255), 1)
+            cv.line(frame, (x-r,y), (x+r,y), (0,0,255), 1)
     return frame
 
 def draw_drain(frame: np.ndarray, tank: Tank):

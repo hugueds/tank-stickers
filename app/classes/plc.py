@@ -5,12 +5,12 @@ import yaml
 from threading import Thread
 from datetime import datetime
 from classes import Sticker, Tank
-from models import PLCInterface, PLCWriteInterface 
+from models import PLCInterface, PLCWriteInterface
 from logger import logger
 
 # TODO: Receive PLC values to restart the program or the RPI
 
-class PLC:    
+class PLC:
 
     online = False
     reading = False
@@ -40,7 +40,7 @@ class PLC:
     def connect(self):
 
         if not self.enabled:
-            return logger.info('PLC is Disabled, change config file to start communication')            
+            return logger.info('PLC is Disabled, change config file to start communication')
 
         if self.client:
             try:
@@ -51,7 +51,7 @@ class PLC:
             except Exception as e:
                 logging.error(f"connect::Failed to connect to PLC {self.ip} " + str(e))
 
-    def write(self, tank: Tank):
+    def write_old(self, tank: Tank):
 
         if self.lock or not self.enabled:
             return False
@@ -180,8 +180,7 @@ class PLC:
             self.disconnect()
             self.connect()
 
-
-    def read_v2(self) -> PLCInterface:
+    def read(self) -> PLCInterface:
         try:
             db = self.db
             data = self.client.db_read(db['number'], db['start'], db['size'])
@@ -189,14 +188,14 @@ class PLC:
         except Exception as e:
             logger.exception(e)
 
-    def write_v2(self, data: PLCWriteInterface):
+    def write(self, data: PLCWriteInterface):
         try:
             self.client.db_write(self.db['number'], self.db['start'], self.db['size'], data)
         except Exception as e:
             logger.exception(e)
 
     def disconnect(self):
-        self.client.disconnect()        
+        self.client.disconnect()
 
 
 
