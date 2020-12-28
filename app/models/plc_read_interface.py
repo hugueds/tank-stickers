@@ -14,4 +14,5 @@ class PLCInterface:
         self.command = int(data[7])
         self.popid = get_string(data, 8, 8)
         self.parameter = get_string(data, 18, 10)
-        
+        self.tank = get_string(data, 30, 8)
+
