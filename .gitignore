@@ -3,8 +3,7 @@ __pycache__
 .ipynb_checkpoints/
 videos/
 tanklabels.h5
-logs/
-logs/*
+
 captures/
 captures/*
 configs/
@@ -36,7 +35,10 @@ stamps*
 filters.npy
 _video_tracker_*
 workspace.code-workspace
-app/logs
-app/logs/*
+app/logs/*.log
+app/logs/error/*.log
+# app/logs/
 app/results
 app/results/*
+
+test.jpg

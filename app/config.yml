@@ -1,10 +1,8 @@
 app:
     name: "Sticker Tanks"
     version: 0.1.0
-device:
-    number: 0
-    type: 1
 camera:
+    number: 0
     debug: False
     rpi_camera: False
     threaded: True

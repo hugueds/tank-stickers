@@ -65,7 +65,8 @@ class Tank:
 
     def find_circle(self, frame: np.ndarray):
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.5, 1000)
+        self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.5, 1000) # parametrizar o segundo valor
+        pass
 
     def find(self, frame: np.ndarray):
 
@@ -219,7 +220,7 @@ class Tank:
                         sticker.relative_y = (-1) * (y - zero_y) - (h // 2)
                         self.stickers.append(sticker)
 
-    def get_drain(self, frame):
+    def get_drain(self, frame: np.ndarray):
 
         cam_config = self.config['camera']
         c_width, c_height = cam_config['resolution']

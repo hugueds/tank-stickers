@@ -33,6 +33,7 @@ class Camera:
         with open(config_file) as file:
             config = yaml.safe_load(file)['camera']
         self.debug = config['debug']
+        self.number = config['number']
         self.width = config['resolution'][0]
         self.height = config['resolution'][1]
         self.display = tuple(config['display'])

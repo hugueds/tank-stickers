@@ -60,7 +60,7 @@ class Controller:
             frame = draw_sticker(frame, self.camera, self.tank)
 
         frame = draw_camera_info(frame, self.camera)
-        # frame = draw_plc_status(frame, self.camera, self.plc)
+        # frame = draw_plc_status(frame, self.plc, self.read_plc, self.write_plc)
         frame = draw_roi_lines(frame, self.camera)
         frame = draw_center_axis(frame, self.camera)
         self.camera.show(frame)
@@ -68,14 +68,17 @@ class Controller:
     def process(self, frame: np.ndarray = 0):
         if not frame:
             frame = self.frame
-        self.tank.find(frame)
-        if self.tank.found:
-            # if it is a superior tank, find the drain -- addicional, compare the drain position
-            self.tank.get_sticker_position_lab(frame) # count how many times sticker is the same before proceed (e.g 10x)
-            for sticker in self.tank.stickers:
-                # check if it is only one sticker, if it is required and if it is on right quadrant based on the drain if it is superior
-                sticker.label_index, sticker.label = self.model.predict(sticker.image)
-                sticker.update_position()
+        if self.camera.number != 0:
+            self.tank.find_circle(frame)
+        else:
+            self.tank.find(frame)
+            if self.tank.found:
+                self.tank.get_drain_lab(frame)
+                self.tank.get_sticker_position_lab(frame) # count how many times sticker is the same before proceed (e.g 10x)
+                for sticker in self.tank.stickers:
+                    # check if it is only one sticker, if it is required and if it is on right quadrant based on the drain if it is superior
+                    sticker.label_index, sticker.label = self.model.predict(sticker.image)
+                    sticker.update_position()
 
     def get_command(self):
         key = cv.waitKey(1) & 0xFF

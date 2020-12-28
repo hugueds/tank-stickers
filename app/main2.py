@@ -8,43 +8,25 @@ from classes import Controller, Camera
 
 controller = Controller()
 controller.set_state(AppState.INITIAL)
-controller.set_state(AppState.FINDING_DRAIN)
-
+sleep(1)
+controller.set_state(AppState.WAITING_REQUEST)
 
 while True:
-    
+
     controller.get_frame()
+
+    if controller.state == AppState.WAITING_REQUEST:
+        if controller.read_plc.read_request:
+            controller.set_state(AppState.PROCESSING_IMAGE)
+
+    elif controller.state == AppState.PROCESSING_IMAGE:
+        controller.process() # input number of processed images
+        if True:
+            controller.set_state(AppState.INITIAL)
+
+    elif controller.state == AppState.INITIAL:
+        pass
+
     controller.process()
-    controller.show()    
+    controller.show()
     controller.get_command()
-
-
-    if controller.state == AppState.INITIAL:
-        if True:
-            controller.set_state(AppState.INITIAL)
-
-    elif controller.state == AppState.INITIAL:
-        if True:
-            controller.set_state(AppState.INITIAL)
-
-    elif controller.state == AppState.INITIAL:
-        if True:
-            controller.set_state(AppState.INITIAL)
-
-    elif controller.state == AppState.INITIAL:
-        if True:
-            controller.set_state(AppState.INITIAL)
-
-    elif controller.state == AppState.INITIAL:
-        if True:
-            controller.set_state(AppState.INITIAL)
-
-    elif controller.state == AppState.INITIAL:
-        if True:
-            controller.set_state(AppState.INITIAL)
-
-    elif controller.state == AppState.INITIAL:
-        if True:
-            controller.set_state(AppState.INITIAL)
-
-    
