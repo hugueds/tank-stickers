@@ -8,8 +8,9 @@ from logger import logger
 controller = Controller()
 
 while True:
+    controller.get_frame()
     controller.show_circle()
     logger.info('Test')
-    sleep(1)
+    sleep(0.2)
 
 
