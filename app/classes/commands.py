@@ -143,7 +143,7 @@ def open_drain_debug(tank: Tank):
 
 def updateTracker(obj, key, value, index):
     _filter = getattr(obj, key)
-    _filter[index[0]][index[1]] = value    
+    _filter[index[0]][index[1]] = value
     setattr(obj, key, _filter)
 
 def update_camera_config(camera: Camera, key, value):
@@ -177,7 +177,7 @@ def open_tracker(camera: Camera, tank: Tank):
         cv.createTrackbar("STICKER_LB", "config", tank.sticker_lab[0][2], 255,  lambda value, key='sticker_lab', index=(0,2):  updateTracker(tank, key, value, index))
         cv.createTrackbar("STICKER_HB", "config", tank.sticker_lab[1][2], 255, lambda value, key='sticker_lab', index=(1,2): updateTracker(tank, key, value, index))
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-        
+
     else:
         cv.destroyWindow('config')
 
@@ -185,9 +185,11 @@ def open_tracker(camera: Camera, tank: Tank):
 
 
 def update_camera_config(camera: Camera, key, value):
-    print(value)
     setattr(camera, key, value)
-    camera.set_hardware_threaded()
+    if camera.rpi_camera:
+        camera.set_hardware_rpi()
+    else:
+        camera.set_hardware_threaded()
 
 def open_camera_tracker(camera: Camera):
 
@@ -217,8 +219,9 @@ def open_camera_tracker(camera: Camera):
         cv.createTrackbar("BRIGHTNESS", "camera_tracker",  camera.brightness, 255, lambda value, key='brightness':  update_camera_config(camera, key, value))
         cv.createTrackbar("CONTRAST",   "camera_tracker",  camera.contrast,   255, lambda value, key='contrast':    update_camera_config(camera, key, value))
         cv.createTrackbar("SATURATION", "camera_tracker",  camera.saturation, 255, lambda value,  key='saturation':  update_camera_config(camera, key, value))
+        cv.createTrackbar("SHARPNESS", "camera_tracker",  camera.sharpness, 255, lambda value,  key='sharpness':  update_camera_config(camera, key, value))
         cv.createTrackbar("WHITE_BALANCE", "camera_tracker", camera.white_balance, 255, lambda value, key='white_balance': update_camera_config(camera, key, value))
-        # cv.createTrackbar("EXPOSURE", "camera_tracker",    camera.hue, 255, lambda value,  key='hue':  update_camera_config(camera, key, value))
+        # cv.createTrackbar("EXPOSURE", "camera_tracker",    camera.hue, 255, lambda value,  key='exposure':  update_camera_config(camera, key, value))
         # cv.createTrackbar("HUE", "camera_tracker", 127, 255, lambda value, key='HUE': updateTracker(camera, key, value))
         # cv.createTrackbar("FOCUS", "camera_tracker", 0, 255, lambda value, key='FOCUS': updateTracker(camera, key, value))
 
@@ -233,6 +236,6 @@ def set_full_screen(camera: Camera):
     full_screen = not full_screen
     if full_screen:
         cv.setWindowProperty(camera.window_name, cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
-    else:        
+    else:
         cv.resizeWindow(camera.window_name, camera.monitor_display)
 

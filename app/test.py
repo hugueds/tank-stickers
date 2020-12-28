@@ -5,7 +5,7 @@ import cv2 as cv
 from logger import logger
 
 
-controller = Controller(True)
+controller = Controller()
 
 # controller.read_file('../test.jpg')
 
