@@ -78,7 +78,7 @@ def draw_drain(frame: np.ndarray, tank: Tank):
     dx, dy, dw, dh = tank.drain_x, tank.drain_y, tank.drain_w, tank.drain_h
     cv.rectangle(frame, (dx, dy), (dx+dw, dy+dh), dark_yellow, 2)
     point = (10, 100)
-    font_size = (0.001 * x)
+    font_size = (0.0007 * x)
     text = f"DRAIN X: {tank.drain_rel_x} Y: {tank.drain_rel_y}, AREA: {tank.drain_area_found}"
     cv.putText(frame,text, point, font, font_size, color ,2)
     return frame
@@ -100,8 +100,8 @@ def draw_sticker(frame: np.ndarray, camera: Camera, tank: Tank):
         text += f"REL_X: {s.relative_x} REL_Y: {s.relative_y}"
         text += f"AREA: {s.area} W: {s.w} H: {s.h}"
         cv.rectangle(frame, (s.x, s.y), (s.x + s.w, s.y + s.h), color, 2)
-        font_size = (camera.height / camera.width)
-        x = int(0.25 * camera.width)
+        font_size = (0.0008 * frame.shape[1])
+        x = 20
         y = camera.height - (20 * i)
         cv.putText(frame, text, (x, y), font , font_size, color, 2)
         i += 1

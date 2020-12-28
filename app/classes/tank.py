@@ -164,7 +164,7 @@ class Tank:
                 if len(poly) == 4:
                     (x, y, w, h) = cv.boundingRect(c)
                     ar = w / float(h)
-                    cond = ar >= 0.92 and ar <= 1.08
+                    cond = ar >= 0.94 and ar <= 1.06
                     cond = h >= self.sticker_size['min']
                     cond = cond and h <= self.sticker_size['max']
                     cond = cond and w >= self.sticker_size['min']
@@ -177,9 +177,10 @@ class Tank:
                         zero_y = self.h // 2
                         sticker.relative_x = x - zero_x + (w // 2)
                         sticker.relative_y = (-1) * (y - zero_y) - (h // 2)
+                        # TODO: put this methods inside sticker and calculate the quadrant
                         self.stickers.append(sticker)
 
-    def get_sticker_position(self, frame):
+    def get_sticker_position(self, frame: np.ndarray):
 
         threshold_min = 172  # param
         tank = frame[self.y: self.y + self.h, self.x: self.x + self.w]
