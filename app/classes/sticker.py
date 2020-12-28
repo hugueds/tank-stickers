@@ -1,5 +1,5 @@
 import numpy as np
-from classes.tank import Tank
+from .tank import Tank
 
 class Sticker:
 
