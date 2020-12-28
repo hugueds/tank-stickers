@@ -135,7 +135,7 @@ class Tank:
         self.found = self.h >= self.min_height
         self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
-    def get_sticker_position_lab(self, frame: np.ndarray):
+    def get_sticker_position_lab(self, frame: np.ndarray): # merge into the other method
 
         if not self.x:
             tank = frame.copy()
@@ -220,7 +220,7 @@ class Tank:
                         sticker.relative_y = (-1) * (y - zero_y) - (h // 2)
                         self.stickers.append(sticker)
 
-    def get_drain(self, frame: np.ndarray):
+    def get_drain(self, frame: np.ndarray): # merge into another method
 
         cam_config = self.config['camera']
         c_width, c_height = cam_config['resolution']

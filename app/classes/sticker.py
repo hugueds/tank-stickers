@@ -26,6 +26,7 @@ class Sticker:
         else:
             self.position = 90
 
+
     def calc_quadrant(self, tank):
         temp_x = 0
         temp_y = 0
