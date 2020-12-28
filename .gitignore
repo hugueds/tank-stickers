@@ -27,7 +27,9 @@ machine_learning/train
 machine-learning/training/
 utils/
 utils/*
-
+logs/fit
+logs/fit/*
+machine-learning/logs/
 keras_models
 token.txt
 stamps*
