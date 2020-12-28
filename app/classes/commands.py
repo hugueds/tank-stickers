@@ -123,7 +123,6 @@ def reload_config(camera: Camera, tank: Tank):
     config_file = 'config.yml'
     with open(config_file) as file:
         config = yaml.safe_load(file)
-    camera.load_config(config["camera"])
     tank.load_config(config["tank"])
     tank.load_sticker_config(config["sticker"])
     tank.load_drain_config(config["drain"])
