@@ -13,6 +13,7 @@ class Tank:
     found = False
     image: np.ndarray = 0
     x, y, w, h = 0, 0, 0, 0
+    circle: List[int] = []
     radius = 0
     sticker_count = 0
     stickers: List[Sticker] = []
@@ -60,6 +61,11 @@ class Tank:
     def get_tank_image(self, frame: np.ndarray):
         self.color_image = frame[self.y: self.y + self.h, self.x: self.x + self.w, :]
         return self.color_image
+
+    def find_circle(self, frame: np.ndarray):
+        g_frame = cv.cvtColor(frame, cv.COLOR_BAYER_BG2GRAY)
+        circle = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.5, 100)
+        self.circle = np.round(circle[0, :]).astype("int")
 
     def find(self, frame: np.ndarray):
 
@@ -359,10 +365,7 @@ class Tank:
         #         # self.drain_rel_y = zero_y - y
 
 
-    def find_circle(self, frame: np.ndarray):
-        g_frame = cv.cvtColor(frame, cv.COLOR_BAYER_BG2GRAY)
-        circle = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.5, 100)
-        self.circle = np.round(circle[0, :]).astype("int")
+
 
 
 

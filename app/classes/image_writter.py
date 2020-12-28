@@ -64,7 +64,8 @@ def draw_tank_rectangle(frame: np.ndarray, tank: Tank):
     return frame
 
 def draw_tank_circle(frame: np.ndarray, tank: Tank):
-    pass
+    cv.circle(frame, (tank.circle[0], tank.circle[1]), tank.circle[2], (0,255,0), 2)
+    return frame
 
 def draw_drain(frame: np.ndarray, tank: Tank):
     x, y = frame.shape[1], frame.shape[0]
