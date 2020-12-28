@@ -47,7 +47,7 @@ class Controller:
             self.img_frame = self.frame
 
     def show_circle(self):
-        frame = self.frame
+        frame = self.frame.copy()
         self.tank.find_circle(frame)
         frame = draw_tank_circle(frame, self.tank)
         self.camera.show(frame)

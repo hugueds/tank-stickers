@@ -10,6 +10,7 @@ controller = Controller(True)
 # controller.read_file('../test.jpg')
 
 while True:
+    controller.get_frame()
     controller.show_circle()
     controller.get_command()
 
