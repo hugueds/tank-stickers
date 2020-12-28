@@ -10,7 +10,7 @@ controller = Controller()
 while True:
     controller.get_frame()
     controller.show_circle()
-    logger.info('Test')
-    sleep(0.2)
+    controller.get_command()
+
 
 
