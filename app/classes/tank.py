@@ -165,8 +165,8 @@ class Tank:
                     (x, y, w, h) = cv.boundingRect(c)
                     ar = w / float(h)
                     cond = ar >= 0.94 and ar <= 1.06
-                    cond = h / frame.shape[0] >= self.sticker_size['min']
-                    cond = cond and h / frame.shape[0] <= self.sticker_size['max']
+                    cond = h / frame.shape[1] >= self.sticker_size['min']
+                    cond = cond and h / frame.shape[1] <= self.sticker_size['max']
                     cond = cond and w / frame.shape[1] >= self.sticker_size['min']
                     cond = cond and w / frame.shape[1] <= self.sticker_size['max']
                     if cond:
@@ -205,8 +205,8 @@ class Tank:
                     (x, y, w, h) = cv.boundingRect(c)
                     ar = w / float(h)
                     cond = ar >= 0.94 and ar <= 1.06
-                    cond = h / frame.shape[0] >= self.sticker_size['min']
-                    cond = cond and h / frame.shape[0] <= self.sticker_size['max']
+                    cond = h / frame.shape[1] >= self.sticker_size['min']
+                    cond = cond and h / frame.shape[1] <= self.sticker_size['max']
                     cond = cond and w / frame.shape[1] >= self.sticker_size['min']
                     cond = cond and w / frame.shape[1] <= self.sticker_size['max']
                     if cond:
