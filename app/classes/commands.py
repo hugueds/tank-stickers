@@ -1,5 +1,6 @@
 from classes.tank import Tank
 from classes.camera import Camera
+import yaml
 from models.camera_constants import CameraConstants
 import logging
 import cv2 as cv
@@ -119,12 +120,13 @@ def pause(camera: Camera):
 
 def reload_config(camera: Camera, tank: Tank):
     logging.info("Reloading configuration")
-    config = ConfigParser()
-    config.read("config.ini")
-    camera.load_config(config["CAMERA"])
-    tank.load_config(config["TANK"])
-    tank.load_sticker_config(config["STICKER"])
-    tank.load_drain_config(config["DRAIN"])
+    config_file = 'config.yml'
+    with open(config_file) as file:
+        config = yaml.safe_load(file)
+    camera.load_config(config["camera"])
+    tank.load_config(config["tank"])
+    tank.load_sticker_config(config["sticker"])
+    tank.load_drain_config(config["drain"])
 
 
 def open_sticker_debug(tank: Tank):

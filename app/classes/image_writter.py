@@ -96,8 +96,8 @@ def draw_sticker(frame: np.ndarray, camera: Camera, tank: Tank):
     i = 1
     for s in tank.stickers:
         color = color_list[s.label_index]
-        text =  f"STICKER {s.label} X: {s.x} Y: {s.y}"
-        text += f"REL_X: {s.relative_x} REL_Y: {s.relative_y}"
+        text =  f"STICKER [{s.label}] X {s.x} Y: {s.y}  "
+        text += f"R_X {s.relative_x} R_Y {s.relative_y}  "
         text += f"AREA: {s.area} W: {s.w} H: {s.h}"
         cv.rectangle(frame, (s.x, s.y), (s.x + s.w, s.y + s.h), color, 2)
         font_size = (0.0008 * frame.shape[1])
