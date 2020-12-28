@@ -63,9 +63,8 @@ class Tank:
         return self.color_image
 
     def find_circle(self, frame: np.ndarray):
-        g_frame = cv.cvtColor(frame, cv.COLOR_BAYER_BG2GRAY)
-        circle = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.5, 100)
-        self.circle = np.round(circle[0, :]).astype("int")
+        g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.5, 100)
 
     def find(self, frame: np.ndarray):
 
