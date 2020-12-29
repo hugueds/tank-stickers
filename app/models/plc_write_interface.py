@@ -10,6 +10,7 @@ class PLCWriteInterface:
         self.inc_sticker = 0
         self.position_inc_sticker = 0
         self.position_inc_drain = 0
+        self.inc_angle = 0
         self.size = size
 
     def get_bytearray(self) -> bytearray:
