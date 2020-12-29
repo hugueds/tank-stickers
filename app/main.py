@@ -7,7 +7,7 @@ from classes import Controller, Camera
 
 controller = Controller()
 controller.set_state(AppState.INITIAL)
-controller.set_state(AppState.PREDICTING_STICKERS)
+# controller.set_state(AppState.PREDICTING_STICKERS)
 
 while True:
 

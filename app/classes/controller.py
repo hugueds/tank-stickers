@@ -140,21 +140,21 @@ class Controller:
         self.state = state
 
     def update_plc(self):
-        last_life_beat = -1
+        last_life_beat = 0
         while self.plc.enabled:
             read_data = self.plc.read()
             self.read_plc = PLCInterface(read_data)
-            self.write_plc.update_life_beat()
-            data = self.write_plc.get_bytearray()
-            self.plc.write(data)
             if self.read_plc.life_beat == last_life_beat:
                 logger.error('PLC is not responding... Trying to reconnect')
                 self.plc.disconnect()
-                sleep(1)
+                sleep(5)
                 self.plc.connect()
             else:
                 last_life_beat = self.read_plc.life_beat
-            sleep(self.plc.update_time)
+                self.write_plc.update_life_beat()
+                data = self.write_plc.get_bytearray()
+                self.plc.write(data)
+                sleep(self.plc.update_time)
         else:
             logger.warning('PLC is not Enabled')
 

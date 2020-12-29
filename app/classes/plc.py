@@ -47,7 +47,7 @@ class PLC:
                 self.online = True
                 logging.info(f"PLC Connected to {self.ip} Rack {self.rack} Slot {self.slot}")
             except Exception as e:
-                logging.error(f"connect::Failed to connect to PLC {self.ip} " + str(e))
+                logging.exception(f"connect::Failed to connect to PLC {self.ip} " + str(e))
 
     def read(self):
         try:

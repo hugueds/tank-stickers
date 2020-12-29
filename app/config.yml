@@ -4,7 +4,7 @@ app:
 camera:
     number: 1
     debug: False
-    rpi_camera: True
+    rpi_camera: False
     threaded: True
     resolution: [640,480]
     display: [640,480]
@@ -24,7 +24,7 @@ camera:
     white_balance: 4200
 plc:
     debug: True
-    enabled: False
+    enabled: True
     ip: "192.27.6.172"
     rack: 0
     slot: 2
