@@ -101,13 +101,13 @@ class Controller:
             return
         sticker = self.tank.stickers[0]
         if self.read_plc.sticker != sticker.label:
-            logger.error(f'Wrong Label, expected: {}, received: {}')
+            logger.error('Wrong Label, expected: {}, received: {}')
             self.write_plc.inc_sticker = sticker.label
         if self.read_plc.sticker_angle != sticker.angle:
-            logger.error(f'Wrong Label Angle, expected: {}, received: {}')
+            logger.error('Wrong Label Angle, expected: {}, received: {}')
             self.write_plc.inc_angle = sticker.angle
         if self.read_plc.sticker_position != sticker.quadrant:
-            logger.error(f'Wrong Label Angle, expected: {}, received: {}')
+            logger.error('Wrong Label Angle, expected: {}, received: {}')
             self.write_plc.position_inc_sticker = sticker.quadrant
 
         self.result = True
@@ -161,7 +161,7 @@ class Controller:
             now = datetime.now()
             file = f'{now.strftime("%Y%m%d-%H%M%S")}_{self.read_plc.parameter}.jpg'
             path = f'../results/{now.year}/{now.month}/{now.day}/{self.read_plc.popid}/{file}'
-            logger.info(f'Saving results to {path}')
+            logger.info('Saving results to {path}')
             # log to a different result path
             cv.imwrite(path, self.frame)
         except Exception as e:
