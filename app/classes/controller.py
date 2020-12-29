@@ -142,7 +142,8 @@ class Controller:
     def update_plc(self):
         last_life_beat = -1
         while self.plc.enabled:
-            self.read_plc = self.plc.read()
+            read_data = self.plc.read()
+            self.read_plc = PLCInterface(read_data)
             self.write_plc.update_life_beat()
             data = self.write_plc.get_bytearray()
             self.plc.write(data)

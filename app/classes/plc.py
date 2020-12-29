@@ -49,11 +49,10 @@ class PLC:
             except Exception as e:
                 logging.error(f"connect::Failed to connect to PLC {self.ip} " + str(e))
 
-    def read(self) -> PLCInterface:
+    def read(self):
         try:
             db = self.db
-            data = self.client.db_read(db['number'], db['start'], db['size'])
-            return PLCInterface(data)
+            return self.client.db_read(db['number'], db['start'], db['size'])
         except Exception as e:
             logger.exception(e)
 
