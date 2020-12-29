@@ -103,7 +103,7 @@ def draw_drain(frame: np.ndarray, tank: Tank):
 
 def draw_plc_status(frame: np.ndarray, plc: PLC, read_plc: PLCInterface, write_plc: PLCWriteInterface):
     x, y = frame.shape[1], frame.shape[0]
-    start = int(0.5, x)
+    start = int(0.5 * x)
     color = mid_blue
     font_size = (0.0007 * x)
     o = 25

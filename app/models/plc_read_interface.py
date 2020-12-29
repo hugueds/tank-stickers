@@ -3,6 +3,14 @@ from snap7.util import *
 class PLCInterface:
 
     read_request = False
+    life_beat = 0
+    sticker = 0
+    drain_position = 0
+    sticker_angle = 0
+    sticker_position = 0
+    popid = ''
+    parameter = ''
+    tank = ''
 
     def __init__(self, data=None):
         if data is None:
