@@ -11,7 +11,9 @@ controller = Controller()
 
 while True:
     controller.get_frame()
-    controller.show_circle()
+    # controller.show_circle()
+    controller.process()
+    controller.show()
     controller.get_command()
 
 

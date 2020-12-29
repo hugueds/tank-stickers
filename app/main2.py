@@ -9,14 +9,14 @@ from classes import Controller, Camera
 controller = Controller()
 controller.set_state(AppState.INITIAL)
 sleep(1)
-controller.set_state(AppState.WAITING_REQUEST)
+controller.set_state(AppState.PREDICTING_STICKERS)
 
 while True:
 
     controller.get_frame()
 
-    if controller.state == AppState.WAITING_REQUEST:
-        if controller.read_plc.read_request:
+    if controller.state == AppState.INITIAL:
+        if True:
             controller.set_state(AppState.PROCESSING_IMAGE)
 
     elif controller.state == AppState.PROCESSING_IMAGE:

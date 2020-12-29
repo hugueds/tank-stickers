@@ -12,11 +12,18 @@ class Sticker:
     debug = False
     image: np.ndarray = 0
 
-    def __init__(self, x=0, y=0, w=0, h=0):
+    def __init__(self, x=0, y=0, w=0, h=0, area=0):
         self.x = x
         self.y = y
         self.w = w
         self.h = h
+        self.area = area
+
+    def set_relative(self, tank):
+        zero_x, zero_y = tank.w // 2, tank.h // 2
+        self.relative_x = self.x - zero_x + (self.w // 2)
+        self.relative_y = (-1) * (self.y - zero_y) - (self.h // 2)
+
 
     def update_position(self):
         if self.label_index <= 3:

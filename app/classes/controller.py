@@ -70,11 +70,18 @@ class Controller:
             frame = self.frame
         if self.camera.number != 0:
             self.tank.find_circle(frame)
+            if self.tank.found:
+                self.tank.get_sticker_position_lab(frame)
+                for sticker in self.tank.stickers:
+                    # check if it is only one sticker, if it is required and if it is on right quadrant based on the drain if it is superior
+                    sticker.label_index, sticker.label = self.model.predict(sticker.image)
+                    sticker.update_position()
         else:
             self.tank.find(frame)
             if self.tank.found:
                 self.tank.get_drain_lab(frame)
                 self.tank.get_sticker_position_lab(frame) # count how many times sticker is the same before proceed (e.g 10x)
+                # self.tank.get_sticker_position(frame) # count how many times sticker is the same before proceed (e.g 10x)
                 for sticker in self.tank.stickers:
                     # check if it is only one sticker, if it is required and if it is on right quadrant based on the drain if it is superior
                     sticker.label_index, sticker.label = self.model.predict(sticker.image)
@@ -124,7 +131,7 @@ class Controller:
             logger.exception(e)
 
 
-    def update_camera_setting(self):
+    def calculate_quadrant(self):
         pass
 
 

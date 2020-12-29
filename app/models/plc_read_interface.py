@@ -2,7 +2,11 @@ from snap7.util import *
 
 class PLCInterface:
 
-    def __init__(self, data):
+    read_request = False
+
+    def __init__(self, data=None):
+        if data is None:
+            return
         self.read_request = get_bool(data, 0, 0)
         self.sticker_camera = get_bool(data, 0, 1)
         self.drain_camera = get_bool(data, 0, 2)

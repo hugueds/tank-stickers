@@ -60,7 +60,8 @@ def plc_thread():
     while True:
         try:
             if tank.found:
-                plc.write(tank)
+                pass
+                # plc.write(tank)
             else:
                 plc.clean_values()
             if counter % 50 == 0:
@@ -119,7 +120,7 @@ if __name__ == "__main__":
                 draw_sticker(frame, camera, tank)
 
             draw_camera_info(frame, camera)
-            draw_plc_status(frame, camera, plc)
+            # draw_plc_status(frame, camera, plc)
 
             if camera.recording:
                 camera.output.write(cv.resize(orig, (1280, 720)))
