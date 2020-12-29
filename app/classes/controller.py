@@ -59,11 +59,12 @@ class Controller:
             frame = draw_tank_center_axis(frame, self.tank)
             frame = draw_tank_rectangle(frame, self.tank)
             frame = draw_sticker(frame, self.camera, self.tank)
+            frame = draw_drain(frame, self.tank)
 
-        frame = draw_camera_info(frame, self.camera)
-        frame = draw_plc_status(frame, self.plc, self.read_plc, self.write_plc)
         frame = draw_roi_lines(frame, self.camera)
         frame = draw_center_axis(frame, self.camera)
+        frame = draw_camera_info(frame, self.camera)
+        frame = draw_plc_status(frame, self.plc, self.read_plc, self.write_plc)
         self.camera.show(frame)
         self.camera.update_frame_counter()
 
@@ -163,7 +164,7 @@ class Controller:
             now = datetime.now()
             file = f'{now.strftime("%Y%m%d-%H%M%S")}_{self.read_plc.parameter}.jpg'
             path = f'../results/{now.year}/{now.month}/{now.day}/{self.read_plc.popid}/{file}'
-            logger.info('Saving results to {path}')
+            logger.info(f'Saving results to {path}')
             # log to a different result path
             cv.imwrite(path, self.frame)
         except Exception as e:

@@ -17,10 +17,10 @@ def draw_roi_lines(frame: np.ndarray, camera: Camera):
     y_start = int(camera.height * camera.roi['y'][0] // 100)
     y_end = int(camera.height * camera.roi['y'][1] // 100)
 
-    cv.line(frame, (x_start, 0), (x_start, y), color, 2)
-    cv.line(frame, (x_end, 0), (x_end, y), color, 2)
-    cv.line(frame, (0, y_start), (x, y_start), color, 2)
-    cv.line(frame, (0, y_end), (x, y_end), color, 2)
+    cv.line(frame, (x_start, 0), (x_start, y), color, 1)
+    cv.line(frame, (x_end, 0), (x_end, y), color, 1)
+    cv.line(frame, (0, y_start), (x, y_start), color, 1)
+    cv.line(frame, (0, y_end), (x, y_end), color, 1)
     return frame
 
 
