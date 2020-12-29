@@ -75,7 +75,7 @@ class Tank:
         # if find_circle hide the roi lines
         self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1, minDist=self.min_dist, minRadius=self.min_radius)  # parametrizar o segundo valor
         if self.circles is not None:
-            circles = np.round(self.circles[0, :]).astype("int")
+            circles = np.uint16(np.around(self.circles))
             for x, y, r in circles[0, :]:
                     self.x = int(x - r) if (x - r) > 0 else 0
                     self.y = int(y - r) if (y - r) > 0 else 0
