@@ -15,7 +15,7 @@ class Controller:
     state: AppState = AppState.INITIAL
     camera: Camera
     plc: PLC
-    read_plc: PLCInterface
+    read_plc: PLCInterface = PLCInterface()
     write_plc: PLCWriteInterface
     start_time = datetime.now()
     tank: Tank = Tank()
@@ -33,6 +33,7 @@ class Controller:
         self.camera.start()
         self.is_picture = is_picture
         self.plc = PLC()
+        self.write_plc = PLCWriteInterface(self.plc.db['size'])
         self.model = TFModel()
 
     def get_frame(self):
