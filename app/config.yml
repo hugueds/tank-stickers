@@ -4,7 +4,7 @@ app:
 camera:
     number: 1
     debug: False
-    rpi_camera: False
+    rpi_camera: True
     threaded: True
     resolution: [640,480]
     display: [640,480]
@@ -39,6 +39,8 @@ tank:
     size: [[700, 1100], [250, 500]]
     area: [0,99999]
     blur: [9,9]
+    min_radius: 100
+    min_dist: 200
 sticker:
     threshold: 172
     area:

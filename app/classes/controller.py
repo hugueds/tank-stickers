@@ -27,13 +27,13 @@ class Controller:
     is_picture = True
 
     def __init__(self, is_picture=False):
-        # self.plc = PLC()
         self.start_time = datetime.now()
         self.tank = Tank()
         self.camera = Camera()
         self.camera.start()
-        self.model = TFModel()
         self.is_picture = is_picture
+        # self.plc = PLC()
+        self.model = TFModel()
 
     def get_frame(self):
         if not self.is_picture:

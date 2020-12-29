@@ -47,6 +47,8 @@ class Tank:
         self.max_width = width[1]
         self.min_height = height[0]
         self.max_height = height[1]
+        self.min_radius = config['min_radius']
+        self.min_dist = config['min_radius']
 
     def load_sticker_config(self, config):
         self.sticker_thresh = config["threshold"]
@@ -70,11 +72,10 @@ class Tank:
 
     def find_circle(self, frame: np.ndarray):
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        # self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.0, minDist=100, minRadius=100, maxRadius=1000)  # parametrizar o segundo valor
         # if find_circle hide the roi lines
-        self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.2, minDist=100, minRadius=100)  # parametrizar o segundo valor
+        self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1, minDist=self.min_dist, minRadius=self.min_radius)  # parametrizar o segundo valor
         if self.circles is not None:
-            circles = np.uint16(np.around(self.circles))
+            circles = np.round(self.circles[0, :]).astype("int")
             for x, y, r in circles[0, :]:
                     self.x = int(x - r) if (x - r) > 0 else 0
                     self.y = int(y - r) if (y - r) > 0 else 0

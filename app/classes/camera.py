@@ -107,13 +107,6 @@ class Camera:
         self.cap.stream.set(cv.CAP_PROP_BRIGHTNESS, self.brightness) # # min: 0 max: 255 increment:1
         self.cap.stream.set(cv.CAP_PROP_CONTRAST, self.contrast)  # min: 0 max: 255 increment:1
         self.cap.stream.set(cv.CAP_PROP_SATURATION, self.saturation) #  min: 0 max: 255 increment:1
-        # self.cap.stream.set(cv.CAP_PROP_HUE, self.hue)  # hue
-        # self.cap.stream.set(cv.CAP_PROP_GAIN, 127)  # min: 0 max: 127 increment:1
-        # self.cap.stream.set(cv.CAP_PROP_EXPOSURE, 0)  # min: -13 max: -1 increment:1
-        # # min: 4000 max: 7000 increment:1
-        # self.cap.stream.set(cv.CAP_WHITE, self.white_balance)
-        # # focus          min: 0   , max: 255 , increment:5
-        # self.cap.stream.set(CameraConstants.FOCUS.value, 0)
 
     def set_hardware_rpi(self):
         # search for minimum and maximus
@@ -123,7 +116,7 @@ class Camera:
         self.cap.stream.camera.contrast = self._scale(self.contrast,0 ,200)
         self.cap.stream.camera.saturation = self._scale(self.saturation, 0, 200)
         self.cap.stream.camera.sharpness = self._scale(self.sharpness,0,200)
-        # self.cap.stream.camera.exposure_comp = self._scale(self.sharpness)
+        # self.cap.stream.camera.exposure_comp = self._scale(self.exposure_comp)
 
     def _scale(self, x, y0, y1):
         x0, x1 = 0, 255
