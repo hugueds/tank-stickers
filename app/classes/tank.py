@@ -349,15 +349,15 @@ class Tank:
                 temp_y = (y - self.y) / self.h
                 if temp_x <= 0.3:
                     col = 0
-                elif temp_x <= 0.3 and temp_x <= 0.7:
+                elif temp_x >= 0.3 and temp_x <= 0.7:
                     col = 1
                 elif temp_x > 0.7:
                     col = 2
                 if temp_y <= 0.2:
                     row = 0
-                elif temp_y <= 0.2 and temp_y <= 0.8:
+                elif temp_y >= 0.2 and temp_y <= 0.92:
                     row = 1
-                elif temp_y <= 0.8:
+                elif temp_y > 0.92:
                     row = 2
                 self.drain_position = quad_list[row][col]
 
