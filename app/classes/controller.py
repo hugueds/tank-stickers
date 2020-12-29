@@ -61,6 +61,7 @@ class Controller:
             frame = draw_sticker(frame, self.camera, self.tank)
             frame = draw_drain(frame, self.tank)
 
+
         frame = draw_roi_lines(frame, self.camera)
         frame = draw_center_axis(frame, self.camera)
         frame = draw_camera_info(frame, self.camera)

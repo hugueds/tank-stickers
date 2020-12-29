@@ -91,6 +91,8 @@ def draw_sticker(frame: np.ndarray, camera: Camera, tank: Tank):
     return frame
 
 def draw_drain(frame: np.ndarray, tank: Tank):
+    if not tank.drain_found:
+        return frame
     x, y = frame.shape[1], frame.shape[0]
     color = dark_yellow
     dx, dy, dw, dh = tank.drain_x, tank.drain_y, tank.drain_w, tank.drain_h

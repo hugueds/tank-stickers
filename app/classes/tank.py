@@ -286,8 +286,8 @@ class Tank:
         # crop_mask[0: int(self.y - (self.h * 0.10)), :] = 0
 
         # Cortar o centro mais % para cima e para baixo
-        y_center = self.y + (self.h // 2)
-        crop_mask[int(y_center - self.h * 0.4) : int(y_center + self.h * 0.34), :] = 0
+        # y_center = self.y + (self.h // 2)
+        # crop_mask[int(y_center - self.h * 0.4) : int(y_center + self.h * 0.34), :] = 0
 
         croped_img = cv.bitwise_and(frame, frame, mask=crop_mask)
 
@@ -323,6 +323,7 @@ class Tank:
 
         self.drain_found = False
         self.drain_area_found = 0
+        self.drain_position = 0
         self.drain_x, self.drain_y, self.drain_w, self.drain_h = 0, 0, 0, 0
 
         sorted_cnts = sorted(cnt, key=lambda cnt: cv.contourArea(cnt))
@@ -342,6 +343,23 @@ class Tank:
                 self.drain_rel_x = x - zero_x + (w // 2)
                 self.drain_rel_y = (-1) * (y - zero_y) - (h // 2)
                 self.drain_area_found = area
+                row, col = -1,-1
+                quad_list = [[6,7,8],[9,10,11],[12,13,14]]
+                temp_x = (x - self.x) / self.w
+                temp_y = (y - self.y) / self.h
+                if temp_x <= 0.3:
+                    col = 0
+                elif temp_x <= 0.3 and temp_x <= 0.7:
+                    col = 1
+                elif temp_x > 0.7:
+                    col = 2
+                if temp_y <= 0.2:
+                    row = 0
+                elif temp_y <= 0.2 and temp_y <= 0.8:
+                    row = 1
+                elif temp_y <= 0.8:
+                    row = 2
+                self.drain_position = quad_list[row][col]
 
         # for c in cnt:
         #     area = cv.contourArea(c)
