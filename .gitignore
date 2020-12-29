@@ -45,3 +45,6 @@ app/results/*
 logs/fit
 logs/*.*
 test.jpg
+app/logs/app.log.20201228
+error.log.*
+app.log.*
