@@ -103,23 +103,23 @@ def draw_drain(frame: np.ndarray, tank: Tank):
 
 def draw_plc_status(frame: np.ndarray, plc: PLC, read_plc: PLCInterface, write_plc: PLCWriteInterface):
     x, y = frame.shape[1], frame.shape[0]
-    start = int(0.5 * x)
+    start = int(0.7 * x)
     color = mid_blue
-    font_size = (0.0007 * x)
-    o = 25
+    font_size = (0.0006 * x)
+    o = 20
 
     text = f"PLC STATUS {plc.online}, LIFEBIT: {read_plc.life_beat}"
-    cv.putText(frame, text, (start, 1 * o), font, font_size, color, 2)
+    cv.putText(frame, text, (start, 1 * o), font, font_size, color, 1)
     text = f"POPID {read_plc.popid}, TANK: {read_plc.tank}, PAR: {read_plc.parameter}"
-    cv.putText(frame, text, (start, 2 * o), font, font_size, color, 2)
+    cv.putText(frame, text, (start, 2 * o), font, font_size, color, 1)
     text = f"DRAIN POSITION {read_plc.drain_position}"
-    cv.putText(frame, text, (start, 3 * o), font, font_size, color, 2)
+    cv.putText(frame, text, (start, 3 * o), font, font_size, color, 1)
     text = f"STICKER {read_plc.sticker_position}"
-    cv.putText(frame, text, (start, 4 * o), font, font_size, color, 2)
+    cv.putText(frame, text, (start, 4 * o), font, font_size, color, 1)
     text = f"STICKER POSITION {read_plc.sticker_position}"
-    cv.putText(frame, text, (start, 5 * o), font, font_size, color, 2)
+    cv.putText(frame, text, (start, 5 * o), font, font_size, color, 1)
     text = f"STICKER ANGLE {read_plc.sticker_position}"
-    cv.putText(frame, text, (start, 6 * o), font, font_size, color, 2)
+    cv.putText(frame, text, (start, 6 * o), font, font_size, color, 1)
     return frame
 
 
