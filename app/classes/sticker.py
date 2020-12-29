@@ -46,14 +46,14 @@ class Sticker:
 
         if temp_x <= 0.75:
             col = 0
-        elif temp_x > 0.75 and temp_x < 0.87:
+        elif temp_x > 0.75 and temp_x < 0.83:
             col = 1
         else:
             col = 2
 
-        if temp_y <= 0.6:
+        if temp_y <= 0.7:
             row = 0
-        elif temp_y > 0.6 and temp_y < 0.87:
+        elif temp_y > 0.7 and temp_y < 0.83:
             row = 1
         else:
             row = 2
