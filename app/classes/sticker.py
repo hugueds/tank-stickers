@@ -23,6 +23,9 @@ class Sticker:
         zero_x, zero_y = int(tank.w // 2), int(tank.h // 2)
         self.relative_x = (self.x - zero_x) - tank.x + (self.w // 2)
         self.relative_y = tank.y - (self.y - zero_y) - (self.h // 2)
+        sticker_x = 100
+        tank.x = 50
+        (sticker_x - tank.x) / tank.w
 
     def update_position(self):
         if self.label_index <= 3:
@@ -41,22 +44,22 @@ class Sticker:
             [7,8,9],
         ]
 
-        temp_x = 1 - (self.x / tank.w)
-        temp_y = 1 - (self.y / tank.h)
+        temp_x = (self.x - tank.x) / tank.w
+        temp_y = (self.y - tank.y) / tank.h
 
-        if temp_x <= 0.75:
+        if temp_x <= 0.3:
             col = 0
-        elif temp_x > 0.75 and temp_x < 0.83:
+        elif temp_x > 0.3 and temp_x < 0.6:
             col = 1
         else:
             col = 2
 
-        if temp_y <= 0.7:
+        if temp_y <= 0.3:
             row = 0
-        elif temp_y > 0.7 and temp_y < 0.83:
+        elif temp_y > 0.3 and temp_y < 0.6:
             row = 1
         else:
             row = 2
 
 
-        self.quadrant = q_list[col][row]
+        self.quadrant = q_list[row][col]
