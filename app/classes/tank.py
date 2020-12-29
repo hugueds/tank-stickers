@@ -30,11 +30,12 @@ class Tank:
 
     def __init__(self, config_file="config.yml"):
         self.config_file = config_file
-        self.load_config()        
+        self.load_config()
 
     def load_config(self):
         with open(self.config_file) as file:
-            config = yaml.safe_load(file)        
+            config = yaml.safe_load(file)
+        self.config = config
         self.load_tank_config(config['tank'])
         self.load_sticker_config(config["sticker"])
         self.load_drain_config(config["drain"])
@@ -69,12 +70,12 @@ class Tank:
 
     def find_circle(self, frame: np.ndarray):
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        # self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.0, minDist=100, minRadius=100, maxRadius=1000)  # parametrizar o segundo valor        
+        # self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.0, minDist=100, minRadius=100, maxRadius=1000)  # parametrizar o segundo valor
         # if find_circle hide the roi lines
-        self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.2, minDist=100, minRadius=100)  # parametrizar o segundo valor           
+        self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.2, minDist=100, minRadius=100)  # parametrizar o segundo valor
         if self.circles is not None:
             circles = np.uint16(np.around(self.circles))
-            for x, y, r in circles[0, :]:                    
+            for x, y, r in circles[0, :]:
                     self.x = int(x - r) if (x - r) > 0 else 0
                     self.y = int(y - r) if (y - r) > 0 else 0
                     self.w, self.h = 2*r, 2*r
@@ -83,7 +84,7 @@ class Tank:
         else:
             self.found = False
             self.x, self.y, self.w, self.h = 0,0,0,0
-        
+
 
     def find(self, frame: np.ndarray):
 
@@ -95,11 +96,11 @@ class Tank:
 
         image = frame.copy()
         image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-        image[:y_offset_start, :] = 255  
-        
-        
+        image[:y_offset_start, :] = 255
+
+
         image = cv.blur(image, (9, 9), cv.BORDER_WRAP)
-        _, image = cv.threshold(image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)        
+        _, image = cv.threshold(image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
 
         mid_x = image.shape[1] // 2
         mid_y = image.shape[0] // 2
@@ -145,7 +146,7 @@ class Tank:
                 x2 = mid_x - i
                 self.w = (image.shape[1] - self.x) - x2
                 break
-        
+
         self.found = self.h >= self.min_height
         self.image = frame[self.y : self.y + self.h, self.x : self.x + self.w]
 
@@ -158,7 +159,7 @@ class Tank:
 
         if tank.size == 0:
             return
-        
+
         kernel = np.ones((5, 5), np.uint8)  # GET the kernel from config
         lab = cv.cvtColor(tank, cv.COLOR_BGR2LAB)
         lower = np.array(self.sticker_lab[0], np.uint8)
@@ -191,7 +192,7 @@ class Tank:
                     if cond:
                         sticker = Sticker(self.x + x, self.y + y, w, h, area)
                         sticker.image = tank[y : y + h, x : x + w]
-                        sticker.set_relative(self)                        
+                        sticker.set_relative(self)
                         self.stickers.append(sticker)
 
     def get_sticker_position(self, frame: np.ndarray):
