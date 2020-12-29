@@ -92,13 +92,11 @@ class Tank:
 
         image = frame.copy()
         image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-        image[:y_offset_start, :] = 255  # CONFIG TABLE OFFSET
-
-        # image = cv.GaussianBlur(image, (7,7), 0)
+        image[:y_offset_start, :] = 255  
+        
+        
         image = cv.blur(image, (9, 9), cv.BORDER_WRAP)
-        _, image = cv.threshold(image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
-        # cv.threshold
-        # _, image = cv.threshold(image, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)  # Test
+        _, image = cv.threshold(image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)        
 
         mid_x = image.shape[1] // 2
         mid_y = image.shape[0] // 2
