@@ -21,7 +21,7 @@ class Sticker:
 
     def set_relative(self, tank):
         zero_x, zero_y = int(tank.w // 2), int(tank.h // 2)
-        self.relative_x = tank.x - (self.x - zero_x) + (self.w // 2)
+        self.relative_x = (self.x - zero_x) - tank.x + (self.w // 2)
         self.relative_y = tank.y - (self.y - zero_y) - (self.h // 2)
 
     def update_position(self):

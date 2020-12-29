@@ -155,6 +155,7 @@ class Tank:
 
         if self.x <= 0:
             tank = frame.copy()
+            return
         else:
             tank = frame[self.y : self.y + self.h, self.x : self.x + self.w]
 
