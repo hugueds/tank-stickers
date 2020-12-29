@@ -1,11 +1,11 @@
+import cv2 as cv
+import yaml
+from datetime import datetime
 from classes.tank import Tank
 from classes.camera import Camera
-import yaml
 from models.camera_constants import CameraConstants
-import logging
-import cv2 as cv
 from configparser import ConfigParser
-from datetime import datetime
+from logger import logger
 
 help_window = False
 tracker_window = False
@@ -20,7 +20,7 @@ full_screen = False
 def key_pressed(key, camera: Camera, tank: Tank):
 
     if key > 0 and chr(key) != "ÿ":
-        logging.info('Key Pressed ' + chr(key))
+        logger.info('Key Pressed ' + chr(key))
     else:
         return
 
@@ -74,12 +74,12 @@ def save_image(camera: Camera, gray=False):
     file_name = f"SCREENSHOT_{str_date}.jpg"
     path = "../captures/" + file_name
     cv.imwrite(path, frame)
-    logging.info(f"Screenshot saved in " + path)
+    logger.info(f"Screenshot saved in " + path)
 
 
 def record(camera: Camera):
     if not camera.recording:
-        logging.info("START RECORDING...")
+        logger.info("START RECORDING...")
         camera.recording = True
         now = datetime.now()
         str_date = now.strftime("%Y-%m-%d_%H%M%S")
@@ -88,7 +88,7 @@ def record(camera: Camera):
         writter = cv.VideoWriter_fourcc("M", "J", "P", "G")
         camera.output = cv.VideoWriter(path, writter, 10, (1280, 720))
     else:
-        logging.info("STOP RECORDING")
+        logger.info("STOP RECORDING")
         camera.recording = False
         camera.output.release()
 
@@ -98,14 +98,14 @@ def close():
 
 
 def skip_frames(camera: Camera):
-    logging.info("Adding frames")
+    logger.info("Adding frames")
     current_frame = camera.cap.get(cv.CAP_PROP_POS_FRAMES)
     frame = current_frame + camera.SKIP_FRAMES
     camera.cap.set(cv.CAP_PROP_POS_FRAMES, frame)
 
 
 def rewind_frames(camera: Camera):
-    logging.info("Subtracting frames")
+    logger.info("Subtracting frames")
     current_frame = camera.cap.get(cv.CAP_PROP_POS_FRAMES)
     if current_frame > camera.SKIP_FRAMES:
         frame = current_frame - camera.SKIP_FRAMES
@@ -115,18 +115,12 @@ def rewind_frames(camera: Camera):
 def pause(camera: Camera):
     camera.pause = not camera.pause
     status = "Pause" if camera.pause else "Play"
-    logging.info(status + " Video Stream")
+    logger.info(status + " Video Stream")
 
 
 def reload_config(camera: Camera, tank: Tank):
-    logging.info("Reloading configuration")
-    config_file = 'config.yml'
-    with open(config_file) as file:
-        config = yaml.safe_load(file)
-    tank.load_config(config["tank"])
-    tank.load_sticker_config(config["sticker"])
-    tank.load_drain_config(config["drain"])
-
+    logger.info("Reloading configuration")    
+    tank.load_config()
 
 def open_sticker_debug(tank: Tank):
     if tank.debug_sticker:
