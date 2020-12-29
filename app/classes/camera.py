@@ -26,11 +26,12 @@ class Camera:
     multiple_monitors = False
     monitor_counter = 0
 
-    def __init__(self, config='config.yml'):
-        self.load_config(config)
+    def __init__(self, config_file='config.yml'):
+        self.config_file = config_file
+        self.load_config()
 
-    def load_config(self, config_file="config.yml"):
-        with open(config_file) as file:
+    def load_config(self):
+        with open(self.config_file) as file:
             config = yaml.safe_load(file)['camera']
         self.debug = config['debug']
         self.number = config['number']
