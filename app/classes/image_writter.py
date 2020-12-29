@@ -48,12 +48,6 @@ def draw_camera_info(frame: np.ndarray, camera: Camera):
     return frame
 
 
-def draw_job_info(self):
-    # display POPID, Parameter, Quadrant, LT, Sticker Label, Angle
-    # display POPID, Parameter, Quadrant, LT, Sticker Label, Angle
-    pass
-
-
 def draw_tank_center_axis(frame: np.ndarray, tank: Tank):
     x, y, w, h = tank.x, tank.y, tank.w, tank.h
     cv.line(frame, (x, y + (h // 2)), (x + w, y + (h // 2)), red, 1)
@@ -65,7 +59,6 @@ def draw_tank_rectangle(frame: np.ndarray, tank: Tank):
     color = tank_color
     x, y, w, h = tank.x, tank.y, tank.w, tank.h
     text = f"TANK X: {x}, Y: {y} - W: {w}, H: {h}"
-    # x,y = 0,0
     font_size = (frame.shape[1] * 0.0007)
     cv.putText(frame, text, (10, 75), font, font_size, tank_color, 2)
     cv.rectangle(frame, (x, y), (x + w, y + h), color, 2)
@@ -81,6 +74,21 @@ def draw_tank_circle(frame: np.ndarray, tank: Tank):
             cv.line(frame, (x-r, y), (x+r, y), (0, 0, 255), 1)
     return frame
 
+def draw_sticker(frame: np.ndarray, camera: Camera, tank: Tank):
+    i = 1
+    for s in tank.stickers:
+        color = color_list[s.label_index]
+        text = f"STICKER [{s.label}] X {s.x} Y: {s.y}  "
+        text += f"R_X {s.relative_x} R_Y {s.relative_y}  "
+        text += f"AREA: {s.area} W: {s.w} H: {s.h} "
+        text += f"QUAD: {s.quadrant} "
+        cv.rectangle(frame, (s.x, s.y), (s.x + s.w, s.y + s.h), color, 2)
+        font_size = (0.0007 * frame.shape[1])
+        x = 10
+        y = camera.height - (20 * i)
+        cv.putText(frame, text, (x, y), font, font_size, color, 1)
+        i += 1
+    return frame
 
 def draw_drain(frame: np.ndarray, tank: Tank):
     x, y = frame.shape[1], frame.shape[0]
@@ -92,7 +100,6 @@ def draw_drain(frame: np.ndarray, tank: Tank):
     text = f"DRAIN X: {tank.drain_rel_x} Y: {tank.drain_rel_y}, AREA: {tank.drain_area_found}"
     cv.putText(frame, text, point, font, font_size, color, 2)
     return frame
-
 
 def draw_plc_status(frame: np.ndarray, plc: PLC, read_plc: PLCInterface, write_plc: PLCWriteInterface):
     x, y = frame.shape[1], frame.shape[0]
@@ -116,20 +123,7 @@ def draw_plc_status(frame: np.ndarray, plc: PLC, read_plc: PLCInterface, write_p
     return frame
 
 
-def draw_sticker(frame: np.ndarray, camera: Camera, tank: Tank):
-    i = 1
-    for s in tank.stickers:
-        color = color_list[s.label_index]
-        text = f"STICKER [{s.label}] X {s.x} Y: {s.y}  "
-        text += f"R_X {s.relative_x} R_Y {s.relative_y}  "
-        text += f"AREA: {s.area} W: {s.w} H: {s.h}"
-        cv.rectangle(frame, (s.x, s.y), (s.x + s.w, s.y + s.h), color, 2)
-        font_size = (0.0008 * frame.shape[1])
-        x = 20
-        y = camera.height - (20 * i)
-        cv.putText(frame, text, (x, y), font, font_size, color, 2)
-        i += 1
-    return frame
+
 
 
 def draw_gradient(frame: np.ndarray):

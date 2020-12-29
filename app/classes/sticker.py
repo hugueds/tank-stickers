@@ -34,25 +34,29 @@ class Sticker:
 
 
     def calc_quadrant(self, tank):
-        temp_x = 0
-        temp_y = 0
-        res = 0
-        quad_list = [5, 10, 15, 7, 14, 21, 11, 22, 33]
+        row, col = -1, -1
+        q_list = [
+            [1,2,3],
+            [4,5,6],
+            [7,8,9],
+        ]
 
-        if self.x < tank.w * 0.33:
-            temp_x = 1
-        elif self.x < tank.w * 0.66 and self.x > 0.33:
-            temp_x = 2
-        elif self.x >= tank.w * 0.66:
-            temp_x = 3
+        temp_x = 1 - (tank.x / self.x)
+        temp_y = 1 - (tank.y / self.y)
 
-        if self.y < tank.h * 0.33:
-            temp_y = 5
-        elif self.y < tank.h * 0.66 and self.y > 0.33:
-            temp_y = 7
-        elif self.y >= tank.h * 0.66:
-            temp_y = 11
+        if temp_x <= 0.75:
+            col = 0
+        elif temp_x > 0.75 and temp_x < 0.87:
+            col = 1
+        else:
+            col = 2
 
-        res = temp_x * temp_y
+        if temp_x <= 0.75:
+            row = 0
+        elif temp_x > 0.75 and temp_x < 0.87:
+            row = 1
+        else:
+            row = 2
 
-        self.quadrant = quad_list.index(res) + 1
+
+        self.quadrant = q_list[col][row]

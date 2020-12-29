@@ -87,6 +87,11 @@ class Controller:
                     sticker.label_index, sticker.label = self.model.predict(sticker.image)
                     sticker.update_position()
 
+    def analyse(self):
+        # compare if requested PLC info matches processed image
+        pass
+
+
     def get_command(self):
         key = cv.waitKey(1) & 0xFF
         key_pressed(key, self.camera, self.tank)
@@ -130,9 +135,6 @@ class Controller:
         except Exception as e:
             logger.exception(e)
 
-
-    def calculate_quadrant(self):
-        pass
 
 
 

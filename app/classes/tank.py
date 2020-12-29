@@ -195,7 +195,12 @@ class Tank:
                         sticker = Sticker(self.x + x, self.y + y, w, h, area)
                         sticker.image = tank[y : y + h, x : x + w]
                         sticker.set_relative(self)
+                        sticker.calc_quadrant(self)
                         self.stickers.append(sticker)
+        if len(self.stickers) == 1:
+            self.sticker_quadrant = self.stickers[0].quadrant
+        else:
+            self.sticker_quadrant = 99
 
     def get_sticker_position(self, frame: np.ndarray):
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
