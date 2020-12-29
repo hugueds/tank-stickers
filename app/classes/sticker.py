@@ -41,8 +41,8 @@ class Sticker:
             [7,8,9],
         ]
 
-        temp_x = 1 - (tank.x / self.x)
-        temp_y = 1 - (tank.y / self.y)
+        temp_x = 1 - (self.x / tank.w)
+        temp_y = 1 - (self.y / tank.h)
 
         if temp_x <= 0.75:
             col = 0
