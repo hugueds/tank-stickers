@@ -153,7 +153,7 @@ class Tank:
 
     def get_sticker_position_lab(self, frame: np.ndarray):  # merge into the other method
 
-        if self.x <= 0 or self.y <= 0:
+        if self.x <= 0:
             tank = frame.copy()
         else:
             tank = frame[self.y : self.y + self.h, self.x : self.x + self.w]

@@ -64,7 +64,7 @@ def draw_tank_center_axis(frame: np.ndarray, tank: Tank):
 def draw_tank_rectangle(frame: np.ndarray, tank: Tank):
     color = tank_color
     x, y, w, h = tank.x, tank.y, tank.w, tank.h
-    text = f"TANK WIDTH {w}, HEIGHT {h}"
+    text = f"TANK X: {x}, Y: {y} - W: {w}, H: {h}"
     # x,y = 0,0
     font_size = (frame.shape[1] * 0.0007)
     cv.putText(frame, text, (10, 75), font, font_size, tank_color, 2)

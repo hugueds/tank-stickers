@@ -20,10 +20,9 @@ class Sticker:
         self.area = area
 
     def set_relative(self, tank):
-        zero_x, zero_y = tank.w // 2, tank.h // 2
-        self.relative_x = self.x - zero_x + (self.w // 2)
+        zero_x, zero_y = int(tank.w // 2), int(tank.h // 2)
+        self.relative_x = (self.x - zero_x) + (self.w // 2)
         self.relative_y = (-1) * (self.y - zero_y) - (self.h // 2)
-
 
     def update_position(self):
         if self.label_index <= 3:
