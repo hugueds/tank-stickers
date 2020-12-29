@@ -45,12 +45,12 @@ sticker:
     threshold: 172
     area:
         min: 3000
-        max: 8000
+        max: 10000
     size:
-        min: 50
-        max: 80
+        min: 30
+        max: 120
     hsv_filter: [[0, 0, 0], [179, 255, 255]]
-    lab_filter: [[200, 115, 100], [255, 145, 140]]
+    lab_filter: [[70, 115, 100], [255, 145, 140]]
 drain:
     arc: 100
     blur: [7, 7]

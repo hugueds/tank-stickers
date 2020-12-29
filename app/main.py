@@ -7,7 +7,6 @@ from classes import Controller, Camera
 
 controller = Controller()
 controller.set_state(AppState.INITIAL)
-
 controller.set_state(AppState.PREDICTING_STICKERS)
 
 while True:
@@ -15,18 +14,24 @@ while True:
     controller.get_frame()
     controller.process()
 
-
     if controller.state == AppState.INITIAL:
         if True:
+            controller.start_plc()
+            controller.set_state(AppState.WAITING_REQUEST)
+
+    elif controller.state == AppState.WAITING_REQUEST:
+        if controller.read_plc.read_request:
+            controller.confirm_request()
             controller.set_state(AppState.PROCESSING_IMAGE)
 
     elif controller.state == AppState.PROCESSING_IMAGE:
-        controller.process() # input number of processed images
-        if True:
-            controller.set_state(AppState.INITIAL)
+        controller.analyse()
+        if controller.result:
+            controller.set_state(AppState.SAVING_RESULTS)
 
-    elif controller.state == AppState.INITIAL:
-        pass
+    elif controller.state == AppState.SAVING_RESULTS:
+        controller.save_result()
+        controller.set_state(AppState.WAITING_REQUEST)
 
     controller.show()
     controller.get_command()

@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Sticker:
 
     label = ""
@@ -23,9 +24,6 @@ class Sticker:
         zero_x, zero_y = int(tank.w // 2), int(tank.h // 2)
         self.relative_x = (self.x - zero_x) - tank.x + (self.w // 2)
         self.relative_y = tank.y - (self.y - zero_y) - (self.h // 2)
-        sticker_x = 100
-        tank.x = 50
-        (sticker_x - tank.x) / tank.w
 
     def update_position(self):
         if self.label_index <= 3:
@@ -35,13 +33,13 @@ class Sticker:
         else:
             self.position = 90
 
-
     def calc_quadrant(self, tank):
         row, col = -1, -1
+
         q_list = [
-            [1,2,3],
-            [4,5,6],
-            [7,8,9],
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
         ]
 
         temp_x = (self.x - tank.x) / tank.w
@@ -60,6 +58,5 @@ class Sticker:
             row = 1
         else:
             row = 2
-
 
         self.quadrant = q_list[row][col]

@@ -23,7 +23,7 @@ class PLC:
 
     def __init__(self, config_file='config.yml'):
         self.load_config(config_file)
-        # self.client = Client()
+        self.client = Client()
 
     def load_config(self, config_file='config.yml'):
         with open(config_file) as file:
@@ -36,7 +36,6 @@ class PLC:
         self.update_time = config['update_time']
         self.debug = config['debug']
 
-
     def connect(self):
 
         if not self.enabled:
@@ -47,9 +46,26 @@ class PLC:
                 self.client.connect(self.ip, self.rack, self.slot)
                 self.online = True
                 logging.info(f"PLC Connected to {self.ip} Rack {self.rack} Slot {self.slot}")
-
             except Exception as e:
                 logging.error(f"connect::Failed to connect to PLC {self.ip} " + str(e))
+
+    def read(self) -> PLCInterface:
+        try:
+            db = self.db
+            data = self.client.db_read(db['number'], db['start'], db['size'])
+            return PLCInterface(data)
+        except Exception as e:
+            logger.exception(e)
+
+    def write(self, data: PLCWriteInterface):
+        try:
+            self.client.db_write(self.db['number'], self.db['start'], self.db['size'], data)
+        except Exception as e:
+            logger.exception(e)
+
+    def disconnect(self):
+        self.client.disconnect()
+
 
     def write_old(self, tank: Tank):
 
@@ -180,22 +196,6 @@ class PLC:
             self.disconnect()
             self.connect()
 
-    def read(self) -> PLCInterface:
-        try:
-            db = self.db
-            data = self.client.db_read(db['number'], db['start'], db['size'])
-            return PLCInterface(data)
-        except Exception as e:
-            logger.exception(e)
-
-    def write(self, data: PLCWriteInterface):
-        try:
-            self.client.db_write(self.db['number'], self.db['start'], self.db['size'], data)
-        except Exception as e:
-            logger.exception(e)
-
-    def disconnect(self):
-        self.client.disconnect()
 
 
 

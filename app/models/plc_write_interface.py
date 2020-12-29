@@ -1,5 +1,5 @@
 class PLCWriteInterface:
-    
+
     _bytearray: bytearray
 
     def __init__(self, size):
@@ -23,6 +23,7 @@ class PLCWriteInterface:
         _bytearray[5] = self.position_inc_sticker
         _bytearray[6] = self.position_inc_drain
         _bytearray[7] = self.inc_sticker
+        _bytearray[8] = self.inc_angle
 
         self._bytearray = _bytearray
         return _bytearray

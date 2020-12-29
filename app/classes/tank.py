@@ -21,7 +21,7 @@ class Tank:
     sticker_quadrant = 0
     drain: Drain
     drain_found = False
-    drain_quadrant = 0
+    drain_position = 0
     drain_x, drain_y, drain_w, drain_h = 0, 0, 0, 0
     drain_rel_x, drain_rel_y = 0, 0
     debug_tank = False

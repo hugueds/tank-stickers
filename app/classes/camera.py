@@ -53,17 +53,6 @@ class Camera:
         self.monitor_display = tuple(config['display'])
         self.hue = 0
 
-    def load_hardware_config(self, config):
-        self.BRIGHTNESS = int(config["BRIGHTNESS"])
-        self.CONTRAST = int(config["CONTRAST"])
-        self.SATURATION = int(config["SATURATION"])
-        self.HUE = int(config["HUE"])
-        self.GAIN = int(config["GAIN"])
-        self.EXPOSURE = int(config["EXPOSURE"])
-        self.WHITE_BALANCE = int(config["WHITE_BALANCE"])
-        self.FOCUS = int(config["FOCUS"])
-        self.SHARPNESS = int(config["SHARPNESS"])
-
     def start(self):
         logger.info('Starting Camera')
         if self.rpi_camera:
@@ -132,13 +121,9 @@ class Camera:
             logging.info(f'Moving window to {x}, {y}')
             cv.moveWindow(self.window_name, x, y)
 
-    def write_on_image(self):
-        pass
-
     def update_frame_counter(self):
         if self.frame_counter % 200 == 0:
             logging.info("Keep Alive Camera Message")
-
         self.frame_counter = self.frame_counter + \
             1 if not self.pause else self.frame_counter
         self.frame_counter = 0 if self.frame_counter >= 1000 else self.frame_counter
@@ -147,9 +132,6 @@ class Camera:
         if self.threaded:
             return True, self.cap.read()
         return self.cap.read()
-
-    def update(self):
-        print('Starting update')
 
     def set_alpha(self, image):
         # loop over the alpha transparency values

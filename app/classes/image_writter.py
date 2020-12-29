@@ -124,8 +124,6 @@ def draw_plc_status(frame: np.ndarray, plc: PLC, read_plc: PLCInterface, write_p
 
 
 
-
-
 def draw_gradient(frame: np.ndarray):
     _, frame = cv.threshold(frame, 127, 255, cv.THRESH_BINARY)
     blur = cv.GaussianBlur(frame, (5, 5), 0)

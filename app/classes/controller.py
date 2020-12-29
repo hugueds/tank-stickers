@@ -4,7 +4,7 @@ from datetime import datetime
 from time import sleep
 from threading import Thread
 from models import AppState, PLCInterface, PLCWriteInterface
-from classes import Tank, Sticker, PLC, Camera
+from classes import Tank, PLC, Camera
 from classes.commands import *
 from classes.image_writter import *
 from classes.tf_model import TFModel
@@ -12,19 +12,19 @@ from logger import logger
 
 class Controller:
 
-    camera_side = 0 # 0 = Middle, 1 = Right, 2 = Left
     state: AppState = AppState.INITIAL
     camera: Camera
     plc: PLC
     read_plc: PLCInterface
     write_plc: PLCWriteInterface
     start_time = datetime.now()
-    tank: Tank
+    tank: Tank = Tank()
     camera_enabled = True
     start_time: datetime
     frame: np.ndarray = None
     img_frame = None
     is_picture = True
+    result = False
 
     def __init__(self, is_picture=False):
         self.start_time = datetime.now()
@@ -32,7 +32,7 @@ class Controller:
         self.camera = Camera()
         self.camera.start()
         self.is_picture = is_picture
-        # self.plc = PLC()
+        self.plc = PLC()
         self.model = TFModel()
 
     def get_frame(self):
@@ -60,15 +60,16 @@ class Controller:
             frame = draw_sticker(frame, self.camera, self.tank)
 
         frame = draw_camera_info(frame, self.camera)
-        # frame = draw_plc_status(frame, self.plc, self.read_plc, self.write_plc)
+        frame = draw_plc_status(frame, self.plc, self.read_plc, self.write_plc)
         frame = draw_roi_lines(frame, self.camera)
         frame = draw_center_axis(frame, self.camera)
         self.camera.show(frame)
+        self.camera.update_frame_counter()
 
     def process(self, frame: np.ndarray = 0):
         if not frame:
             frame = self.frame
-        if self.camera.number != 0:
+        if self.camera.number != 1:
             self.tank.find_circle(frame)
             if self.tank.found:
                 self.tank.get_sticker_position_lab(frame)
@@ -89,8 +90,39 @@ class Controller:
 
     def analyse(self):
         # compare if requested PLC info matches processed image
-        pass
+        if self.read_plc.drain_camera and self.read_plc.drain_position != self.tank.drain_position:
+            logger.error('Drain on Wrong Position')
+            return
+        if len(self.tank.stickers) > 1:
+            logger.error('There are more stickers than needed')
+            return
+        if len(self.tank.stickers) == 0 and self.read_plc.sticker_camera:
+            logger.error('Sticker not found')
+            return
+        sticker = self.tank.stickers[0]
+        if self.read_plc.sticker != sticker.label:
+            logger.error(f'Wrong Label, expected: {}, received: {}')
+            self.write_plc.inc_sticker = sticker.label
+        if self.read_plc.sticker_angle != sticker.angle:
+            logger.error(f'Wrong Label Angle, expected: {}, received: {}')
+            self.write_plc.inc_angle = sticker.angle
+        if self.read_plc.sticker_position != sticker.quadrant:
+            logger.error(f'Wrong Label Angle, expected: {}, received: {}')
+            self.write_plc.position_inc_sticker = sticker.quadrant
 
+        self.result = True
+        self.write_plc.cam_status = 1
+
+
+    def confirm_request(self):
+        self.result = False
+        self.write_plc.request_ack = True
+        self.write_plc.job_status = 1
+        self.write_plc.cam_status = 0
+        self.write_plc.position_inc_drain = 0
+        self.write_plc.position_inc_sticker = 0
+        self.write_plc.inc_sticker = 0
+        self.write_plc.inc_angle = 0
 
     def get_command(self):
         key = cv.waitKey(1) & 0xFF
