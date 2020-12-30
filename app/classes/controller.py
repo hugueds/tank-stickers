@@ -4,7 +4,7 @@ from datetime import datetime
 from time import sleep
 from threading import Thread
 from pathlib import Path
-from classes import Tank, PLC, Camera
+from classes import Tank, PLC, Camera, Sticker
 from classes.commands import *
 from classes.image_writter import *
 from classes.tf_model import TFModel
@@ -80,6 +80,7 @@ class Controller:
 
     def analyse(self):
         # compare if requested PLC info matches processed image
+        sticker = Sticker()
         if self.read_plc.drain_camera and self.read_plc.drain_position != self.tank.drain_position:
             logger.error('Drain on Wrong Position')
             return
@@ -89,7 +90,9 @@ class Controller:
         if len(self.tank.stickers) == 0 and self.read_plc.sticker_camera:
             logger.error('Sticker not found')
             return
-        sticker = self.tank.stickers[0]
+        if len(self.tank.stickers):
+            sticker = self.tank.stickers[0]
+            return
         if self.read_plc.sticker != sticker.label:
             logger.error('Wrong Label, expected: {}, received: {}')
             self.write_plc.inc_sticker = sticker.label
@@ -106,6 +109,7 @@ class Controller:
 
     def confirm_request(self):
         self.result = False
+        self.read_plc.read_request = False
         self.write_plc.request_ack = True
         self.write_plc.job_status = 1
         self.write_plc.cam_status = 0
@@ -117,6 +121,8 @@ class Controller:
     def get_command(self):
         key = cv.waitKey(1) & 0xFF
         key_pressed(key, self.camera, self.tank)
+        if key == ord('n'):
+            self.read_plc.read_request = True
 
     def start_plc(self):
         logger.info('Starting PLC Thread')
