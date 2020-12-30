@@ -33,7 +33,7 @@ class Sticker:
         else:
             self.position = 90
 
-    def calc_quadrant(self, tank):
+    def calc_quadrant(self, tank_x, tank_y, tank_w, tank_h):
         row, col = -1, -1
 
         q_list = [
@@ -42,8 +42,8 @@ class Sticker:
             [7, 8, 9],
         ]
 
-        temp_x = (self.x - tank.x) / tank.w
-        temp_y = (self.y - tank.y) / tank.h
+        temp_x = (self.x - tank_x) / tank_w
+        temp_y = (self.y - tank_y) / tank_h
 
         if temp_x <= 0.3:
             col = 0

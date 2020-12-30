@@ -25,7 +25,8 @@ def key_pressed(key, camera: Camera, tank: Tank):
         return
 
     if key == ord("h") or key == ord("H"):
-        open_help()
+        pass
+        # open_help()
     elif key == ord('q'):
         quit(0)
     elif key == ord("p"):

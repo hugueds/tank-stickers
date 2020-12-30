@@ -3,12 +3,14 @@ import numpy as np
 from datetime import datetime
 from time import sleep
 from threading import Thread
-from models import AppState, PLCInterface, PLCWriteInterface
+from pathlib import Path
 from classes import Tank, PLC, Camera
 from classes.commands import *
 from classes.image_writter import *
 from classes.tf_model import TFModel
-from logger import logger
+from models import AppState, PLCInterface, PLCWriteInterface
+from models.quadrants import get_quadrant
+from logger import logger, results_logger
 
 class Controller:
 
@@ -22,36 +24,25 @@ class Controller:
     camera_enabled = True
     start_time: datetime
     frame: np.ndarray = None
-    img_frame = None
-    is_picture = True
+    file_frame = None    
+    result_array = []
     result = False
 
     def __init__(self, is_picture=False):
         self.start_time = datetime.now()
         self.tank = Tank()
         self.camera = Camera()
-        self.camera.start()
-        self.is_picture = is_picture
-        self.plc = PLC()
-        self.write_plc = PLCWriteInterface(self.plc.db['size'])
+        self.camera.start()        
+        self.plc = PLC()        
         self.model = TFModel()
 
-    def get_frame(self):
-        if not self.is_picture:
-            success, self.frame = self.camera.read()
-        else:
-            self.frame = self.img_frame
+    def get_frame(self):        
+        success, self.frame = self.camera.read()        
 
     def read_file(self, file):
         if self.frame is None:
             self.frame = cv.imread(file)
-            self.img_frame = self.frame
-
-    def show_circle(self):
-        frame = self.frame.copy()
-        self.tank.find_circle(frame)
-        frame = draw_tank_circle(frame, self.tank)
-        self.camera.show(frame)
+            self.file_frame = self.frame
 
     def show(self):
         frame = self.frame.copy()
@@ -60,8 +51,6 @@ class Controller:
             frame = draw_tank_rectangle(frame, self.tank)
             frame = draw_sticker(frame, self.camera, self.tank)
             frame = draw_drain(frame, self.tank)
-
-
         frame = draw_roi_lines(frame, self.camera)
         frame = draw_center_axis(frame, self.camera)
         frame = draw_camera_info(frame, self.camera)
@@ -72,24 +61,22 @@ class Controller:
     def process(self, frame: np.ndarray = 0):
         if not frame:
             frame = self.frame
-        if self.camera.number != 1:
-            self.tank.find_circle(frame)
-            if self.tank.found:
-                self.tank.get_sticker_position_lab(frame)
-                for sticker in self.tank.stickers:
-                    # check if it is only one sticker, if it is required and if it is on right quadrant based on the drain if it is superior
-                    sticker.label_index, sticker.label = self.model.predict(sticker.image)
-                    sticker.update_position()
-        else:
+
+        if self.camera.number == 1:
             self.tank.find(frame)
-            if self.tank.found:
+        else:
+            self.tank.find_in_circle(frame)
+
+        if self.tank.found:
+
+            if self.camera.number == 1:
                 self.tank.get_drain_lab(frame)
-                self.tank.get_sticker_position_lab(frame) # count how many times sticker is the same before proceed (e.g 10x)
-                # self.tank.get_sticker_position(frame) # count how many times sticker is the same before proceed (e.g 10x)
-                for sticker in self.tank.stickers:
-                    # check if it is only one sticker, if it is required and if it is on right quadrant based on the drain if it is superior
+
+            self.tank.get_sticker_position_lab(frame)
+            for sticker in self.tank.stickers:                    
                     sticker.label_index, sticker.label = self.model.predict(sticker.image)
                     sticker.update_position()
+  
 
     def analyse(self):
         # compare if requested PLC info matches processed image
@@ -134,7 +121,7 @@ class Controller:
     def start_plc(self):
         logger.info('Starting PLC Thread')
         self.plc.connect()
-        self.write_plc = PLCWriteInterface(self.plc.db['size'])
+        self.write_plc = PLCWriteInterface(self.plc.db_write['size'])
         Thread(name='thread_plc', target=self.update_plc, daemon=True).start()
 
     def set_state(self, state: AppState):
@@ -142,10 +129,10 @@ class Controller:
         self.state = state
 
     def update_plc(self):
-        last_life_beat = 0
+        last_life_beat = -1
         while self.plc.enabled:
             read_data = self.plc.read()
-            self.read_plc = PLCInterface(read_data)
+            self.read_plc.update(read_data)
             if self.read_plc.life_beat == last_life_beat:
                 logger.error('PLC is not responding... Trying to reconnect')
                 self.plc.disconnect()
@@ -153,9 +140,8 @@ class Controller:
                 self.plc.connect()
             else:
                 last_life_beat = self.read_plc.life_beat
-                self.write_plc.update_life_beat()
-                data = self.write_plc.get_bytearray()
-                self.plc.write(data)
+                self.write_plc.update_life_beat()                
+                self.plc.write(self.write_plc)
                 sleep(self.plc.update_time)
         else:
             logger.warning('PLC is not Enabled')
@@ -163,11 +149,12 @@ class Controller:
     def save_result(self):
         try:
             now = datetime.now()
-            file = f'{now.strftime("%Y%m%d-%H%M%S")}_{self.read_plc.parameter}.jpg'
-            path = f'../results/{now.year}/{now.month}/{now.day}/{self.read_plc.popid}/{file}'
+            path = f'../results/{now.year}/{now.month}/{now.day}/{self.read_plc.popid}'
+            Path(path).mkdir(parents=True, exist_ok=True)
+            file = f'{path}/{now.strftime("%H%M%S")}_{self.read_plc.partnumber}.jpg'
             logger.info(f'Saving results to {path}')
-            # log to a different result path
-            cv.imwrite(path, self.frame)
+            cv.imwrite(file, self.frame)
+            results_logger.info(f'{self.read_plc.popid} - {self.read_plc.partnumber} - {self.read_plc.parameter}')
         except Exception as e:
             logger.exception(e)
 

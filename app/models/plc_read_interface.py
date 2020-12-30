@@ -3,16 +3,19 @@ from snap7.util import *
 class PLCInterface:
 
     read_request = False
+    sticker_camera = False
+    drain_camera = False    
     life_beat = 0
     sticker = 0
     drain_position = 0
     sticker_angle = 0
     sticker_position = 0
+    command = 0
     popid = ''
     parameter = ''
-    tank = ''
+    partnumber = ''        
 
-    def __init__(self, data=None):
+    def update(self, data = None):
         if data is None:
             return
         self.read_request = get_bool(data, 0, 0)
@@ -26,5 +29,5 @@ class PLCInterface:
         self.command = int(data[7])
         self.popid = get_string(data, 8, 8)
         self.parameter = get_string(data, 18, 10)
-        self.tank = get_string(data, 30, 8)
+        self.partnumber = get_string(data, 30, 8)
 

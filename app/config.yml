@@ -1,6 +1,9 @@
 app:
     name: "Sticker Tanks"
-    version: 0.1.0
+    version: 0.1.0   
+device:
+    ip: '192.27.X.X'
+    mac: '00-00-00-00-00-00'
 camera:
     number: 1
     debug: False
@@ -28,10 +31,14 @@ plc:
     ip: "192.27.6.172"
     rack: 0
     slot: 2
-    db:
-        number: 16
+    db_read:
+        number: 13
         start: 0
-        size: 30
+        size: 40
+    db_write:
+        number: 14
+        start: 0
+        size: 40
     update_time: 0.2
 tank:
     min: [0, 1]

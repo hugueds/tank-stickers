@@ -13,8 +13,7 @@ from logger import logger
 class PLC:
 
     online = False
-    reading = False
-    life_bit = False
+    reading = False    
     lock = False
     debug = False
     read_bytes: bytearray
@@ -32,7 +31,8 @@ class PLC:
         self.ip = config['ip']
         self.rack = config['rack']
         self.slot = config['slot']
-        self.db: dict = config['db']
+        self.db_read: dict = config['db_read']
+        self.db_write: dict = config['db_write']
         self.update_time = config['update_time']
         self.debug = config['debug']
 
@@ -51,14 +51,16 @@ class PLC:
 
     def read(self):
         try:
-            db = self.db
+            db = self.db_read
             return self.client.db_read(db['number'], db['start'], db['size'])
         except Exception as e:
             logger.exception(e)
 
     def write(self, data: PLCWriteInterface):
         try:
-            self.client.db_write(self.db['number'], self.db['start'], self.db['size'], data)
+            _bytearray = data.get_bytearray()
+            db = self.db_write                        
+            self.client.db_write(db['number'], db['start'], _bytearray)
         except Exception as e:
             logger.exception(e)
 

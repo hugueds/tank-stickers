@@ -3,11 +3,10 @@ from models import AppState
 from classes import Controller, Camera
 
 
-# TODO: Take a picture when requested instead of process the image all the time or take 10 pictures
+# TODO: Take a picture when requested instead of process the image all the time or take e.g 10 pictures
 
 controller = Controller()
 controller.set_state(AppState.INITIAL)
-# controller.set_state(AppState.PREDICTING_STICKERS)
 
 while True:
 

@@ -1,4 +1,4 @@
-quadrants = {
+positions = {
     "left": [
         [2, 2, 2],
         [1, 5, 3],
@@ -13,3 +13,17 @@ quadrants = {
         [18, 18, 18]
     ]
 }
+
+
+def get_quadrant(camera, quadrant):
+    position = [] 
+    if camera == 0:
+        position = positions['left']
+    elif camera == 1:
+        position = positions['up']
+    elif camera == 2:
+        position = positions['right']
+
+    flatten = sum(position, [])
+    return flatten[quadrant - 1]
+    

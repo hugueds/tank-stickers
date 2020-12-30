@@ -14,7 +14,6 @@ brown = (0, 50, 100)
 golden_rod = (32, 165, 128)
 teal = (128, 0, 0)
 
-
 tank_color = (100, 230, 0)
 drain_color = (50, 200, 230)
 

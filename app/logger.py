@@ -7,6 +7,10 @@ path = 'logs'
 logname = 'app.log'
 error_logname = 'error.log'
 
+results_logger = logging.getLogger('results_logger')
+results_logger.setLevel(logging.INFO)
+
+
 logger = logging.getLogger('tank_sticker_app')
 logger.setLevel(logging.INFO)
 
@@ -27,3 +31,6 @@ streamHandler.setFormatter(formatter)
 logger.addHandler(logHandler)
 logger.addHandler(errorLogHandler)
 logger.addHandler(streamHandler)
+
+logHandler = TimedRotatingFileHandler(f'{path}/results/results.log', when='midnight', interval=1)
+results_logger.addHandler(logHandler)

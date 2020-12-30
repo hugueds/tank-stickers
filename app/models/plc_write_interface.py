@@ -14,6 +14,7 @@ class PLCWriteInterface:
         self.size = size
 
     def get_bytearray(self) -> bytearray:
+        
         _bytearray = bytearray(self.size)
 
         _bytearray[0] = (self.request_ack << 0)

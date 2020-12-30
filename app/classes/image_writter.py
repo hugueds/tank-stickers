@@ -8,6 +8,7 @@ from classes.colors import *
 font = cv.FONT_HERSHEY_SIMPLEX
 offset = 25
 
+# TODO: Put active time
 
 def draw_roi_lines(frame: np.ndarray, camera: Camera):
     color = cyan
@@ -112,7 +113,7 @@ def draw_plc_status(frame: np.ndarray, plc: PLC, read_plc: PLCInterface, write_p
 
     text = f"PLC STATUS {plc.online}, LIFEBIT: {read_plc.life_beat}"
     cv.putText(frame, text, (start, 1 * o), font, font_size, color, 1)
-    text = f"POPID {read_plc.popid}, TANK: {read_plc.tank}, PAR: {read_plc.parameter}"
+    text = f"POPID {read_plc.popid}, TANK: {read_plc.partnumber}, PAR: {read_plc.parameter}"
     cv.putText(frame, text, (start, 2 * o), font, font_size, color, 1)
     text = f"DRAIN POSITION {read_plc.drain_position}"
     cv.putText(frame, text, (start, 3 * o), font, font_size, color, 1)
@@ -123,7 +124,6 @@ def draw_plc_status(frame: np.ndarray, plc: PLC, read_plc: PLCInterface, write_p
     text = f"STICKER ANGLE {read_plc.sticker_position}"
     cv.putText(frame, text, (start, 6 * o), font, font_size, color, 1)
     return frame
-
 
 
 def draw_gradient(frame: np.ndarray):

@@ -18,6 +18,7 @@ class Tank:
     radius = 0
     sticker_count = 0
     stickers: List[Sticker] = []
+    quantity = 0
     sticker_quadrant = 0
     drain: Drain
     drain_found = False
@@ -70,7 +71,7 @@ class Tank:
         self.color_image = frame[self.y : self.y + self.h, self.x : self.x + self.w, :]
         return self.color_image
 
-    def find_circle(self, frame: np.ndarray):
+    def find_in_circle(self, frame: np.ndarray):
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         # if find_circle hide the roi lines
         self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1, minDist=self.min_dist, minRadius=self.min_radius)  # parametrizar o segundo valor
@@ -84,7 +85,7 @@ class Tank:
                     self.image = frame[self.y : self.y + self.h, self.x : self.x + self.w]
         else:
             self.found = False
-            self.x, self.y, self.w, self.h = 0,0,0,0
+            self.x, self.y, self.w, self.h = 0, 0, 0, 0
 
 
     def find(self, frame: np.ndarray):
@@ -98,7 +99,6 @@ class Tank:
         image = frame.copy()
         image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
         image[:y_offset_start, :] = 255
-
 
         image = cv.blur(image, (9, 9), cv.BORDER_WRAP)
         _, image = cv.threshold(image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
@@ -174,6 +174,16 @@ class Tank:
         if self.debug_sticker:
             cv.imshow("debug_tank_sticker", mask)
 
+    def get_sticker_position(self, frame: np.ndarray):
+        g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        tank = g_frame[self.y : self.y + self.h, self.x : self.x + self.w]
+        blur = cv.blur(tank, (5, 5), cv.BORDER_CONSTANT)  # Get kernel from config
+        _, thresh = cv.threshold(blur, self.sticker_thresh, 255, cv.THRESH_BINARY)
+        contour, hier = cv.findContours(thresh, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
+        self.append_stickers(contour, tank)
+        if self.debug_sticker:
+            cv.imshow("debug_tank_sticker", thresh)
+    
     def append_stickers(self, contour, tank):
         self.stickers = []
         for c in contour:
@@ -195,22 +205,15 @@ class Tank:
                         sticker = Sticker(self.x + x, self.y + y, w, h, area)
                         sticker.image = tank[y : y + h, x : x + w]
                         sticker.set_relative(self)
-                        sticker.calc_quadrant(self)
+                        sticker.calc_quadrant(self.x, self.y, self.w, self.h)
                         self.stickers.append(sticker)
-        if len(self.stickers) == 1:
+        self.quantity = len(self.stickers)
+        if self.quantity == 1:
             self.sticker_quadrant = self.stickers[0].quadrant
         else:
             self.sticker_quadrant = 99
 
-    def get_sticker_position(self, frame: np.ndarray):
-        g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        tank = g_frame[self.y : self.y + self.h, self.x : self.x + self.w]
-        blur = cv.blur(tank, (5, 5), cv.BORDER_CONSTANT)  # Get kernel from config
-        _, thresh = cv.threshold(blur, self.sticker_thresh, 255, cv.THRESH_BINARY)
-        contour, hier = cv.findContours(thresh, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
-        self.append_stickers(contour, tank)
-        if self.debug_sticker:
-            cv.imshow("debug_tank_sticker", thresh)
+    
 
     def get_drain(self, frame: np.ndarray):  # merge into another method
 
@@ -285,7 +288,7 @@ class Tank:
         # Eixo Y
         # crop_mask[0: int(self.y - (self.h * 0.10)), :] = 0
 
-        # Cortar o centro mais % para cima e para baixo
+        # Cortar o centro mais % para cima e para baixo (ver possibilidade)
         # y_center = self.y + (self.h // 2)
         # crop_mask[int(y_center - self.h * 0.4) : int(y_center + self.h * 0.34), :] = 0
 
@@ -360,18 +363,3 @@ class Tank:
                 elif temp_y > 0.92:
                     row = 2
                 self.drain_position = quad_list[row][col]
-
-        # for c in cnt:
-        #     area = cv.contourArea(c)
-        #     cond = area >= int(self.DRAIN_AREA_MIN) and area <= self.DRAIN_AREA_MAX
-        #     if cond:
-        #         self.drain_found = True
-        #         (x, y, w, h) = cv.boundingRect(c)
-        #         self.drain_x, self.drain_y, self.drain_w, self.drain_h = x, y, w, h
-        #         self.drain_area = area
-        #         zero_x = self.x + self.w // 2
-        #         zero_y = self.y + self.h // 2
-        #         self.drain_rel_x = x - zero_x + (w // 2)
-        #         self.drain_rel_y = (-1) * (y - zero_y) - (h // 2)
-        #         # self.drain_rel_y = zero_y - y
-
