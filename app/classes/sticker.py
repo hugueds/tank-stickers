@@ -3,8 +3,9 @@ from models.quadrants import get_quadrant
 
 class Sticker:
 
-    label = ""
+    label = ''
     label_index = 0
+    label_char = ''
     position = 255
     angle = 999
     area = 0
@@ -25,23 +26,25 @@ class Sticker:
         self.relative_x = (self.x - zero_x) - tank.x + (self.w // 2)
         self.relative_y = tank.y - (self.y - zero_y) - (self.h // 2)
 
-    def update_position(self):
+    def update_label_info(self):
+        self.label_char = self.label.split('_')[0]
+        self.update_label_angle()
         if self.label_index <= 3:
             self.position = 0
         elif self.label_index >= 4 and self.label_index < 7:
-            self.position = 180
+            self.position = 1
         else:
-            self.position = 90
+            self.position = 2
 
-    def update_position_2(self):
+    def update_label_angle(self):
         split = self.label.split('_')
         if len(split) == 1:
-            self.position = 0
+            self.angle = 0
         else:
             if split[1] == 180:
-                self.position = 1
+                self.angle = 180
             else:
-                self.position = 2
+                self.angle = 90
 
     def calc_quadrant(self, tank_x:int, tank_y:int, tank_w:int, tank_h:int, camera: int):
         row, col = -1, -1

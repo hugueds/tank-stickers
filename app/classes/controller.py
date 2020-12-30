@@ -79,7 +79,7 @@ class Controller:
             self.tank.get_sticker_position_lab(frame)
             for sticker in self.tank.stickers:
                     sticker.label_index, sticker.label = self.model.predict(sticker.image)
-                    sticker.update_position()
+                    sticker.update_label_info()
 
 
     def analyse(self):
@@ -98,15 +98,15 @@ class Controller:
         if len(self.tank.stickers):
             sticker = self.tank.stickers[0]
         if self.read_plc.sticker != sticker.label:
-            logger.error('Wrong Label Label, expected:' + self.read_plc.sticker + ', received: ' + sticker.label)
+            logger.error('Wrong Label Label, expected:' + str(self.read_plc.sticker) + ', received: ' + str(sticker.label))
             self.write_plc.inc_sticker = sticker.label
             return
         if self.read_plc.sticker_angle != sticker.angle:
-            logger.error('Wrong Label Angle, expected:' + self.read_plc.sticker_angle + ', received: ' + sticker.angle)
+            logger.error('Wrong Label Angle, expected:' + str(self.read_plc.sticker_angle) + ', received: ' + str(sticker.angle))
             self.write_plc.inc_angle = sticker.angle
             return
         if self.read_plc.sticker_position != sticker.quadrant:
-            logger.error('Wrong Label Position, expected:' + self.read_plc.sticker_position + ', received: ' + sticker.quadrant)
+            logger.error('Wrong Label Position, expected:' + str(self.read_plc.sticker_position) + ', received: ' + str(sticker.quadrant))
             self.write_plc.position_inc_sticker = sticker.quadrant
             return
 
