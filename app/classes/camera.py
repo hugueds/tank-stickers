@@ -48,6 +48,7 @@ class Camera:
         self.saturation = config['saturation']
         self.sharpness = config['sharpness']
         self.exposure = config['exposure']
+        self.exposure_comp = config['exposure']
         self.white_balance = config['white_balance']
         self.threaded = config['threaded']
         self.monitor_display = tuple(config['display'])
@@ -101,10 +102,12 @@ class Camera:
         # search for minimum and maximus
         self.cap.stream.camera.iso = 100
         self.cap.stream.camera.exposure_mode = 'off'
+        self.cap.stream.camera.awb_mode = 'off'
+        self.cap.stream.camera.exposure_compensation = self._scale(self.exposure_comp, 0, 50) - 25
         self.cap.stream.camera.brightness = self._scale(self.brightness, 0, 100)
-        self.cap.stream.camera.contrast = self._scale(self.contrast,0 ,200)
-        self.cap.stream.camera.saturation = self._scale(self.saturation, 0, 200)
-        self.cap.stream.camera.sharpness = self._scale(self.sharpness,0,200)
+        self.cap.stream.camera.contrast = self._scale(self.contrast,0 ,200) - 100
+        self.cap.stream.camera.saturation = self._scale(self.saturation, 0, 200) - 100
+        self.cap.stream.camera.sharpness = self._scale(self.sharpness,0,200) - 100
         # self.cap.stream.camera.exposure_comp = self._scale(self.exposure_comp)
 
     def _scale(self, x, y0, y1):
