@@ -16,7 +16,7 @@ positions = {
 
 
 def get_quadrant(camera, quadrant):
-    position = [] 
+    position = []
     if camera == 0:
         position = positions['left']
     elif camera == 1:
@@ -26,4 +26,4 @@ def get_quadrant(camera, quadrant):
 
     flatten = sum(position, [])
     return flatten[quadrant - 1]
-    
+

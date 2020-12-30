@@ -1,5 +1,5 @@
 import numpy as np
-
+from models.quadrants import get_quadrant
 
 class Sticker:
 
@@ -33,7 +33,7 @@ class Sticker:
         else:
             self.position = 90
 
-    def calc_quadrant(self, tank_x, tank_y, tank_w, tank_h):
+    def calc_quadrant(self, tank_x:int, tank_y:int, tank_w:int, tank_h:int, camera: int):
         row, col = -1, -1
 
         q_list = [
@@ -59,4 +59,7 @@ class Sticker:
         else:
             row = 2
 
-        self.quadrant = q_list[row][col]
+        quad = q_list[row][col]
+        self.quadrant = get_quadrant(camera, quad)
+
+

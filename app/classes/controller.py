@@ -24,7 +24,7 @@ class Controller:
     camera_enabled = True
     start_time: datetime
     frame: np.ndarray = None
-    file_frame = None    
+    file_frame = None
     result_array = []
     result = False
 
@@ -32,12 +32,12 @@ class Controller:
         self.start_time = datetime.now()
         self.tank = Tank()
         self.camera = Camera()
-        self.camera.start()        
-        self.plc = PLC()        
+        self.camera.start()
+        self.plc = PLC()
         self.model = TFModel()
 
-    def get_frame(self):        
-        success, self.frame = self.camera.read()        
+    def get_frame(self):
+        success, self.frame = self.camera.read()
 
     def read_file(self, file):
         if self.frame is None:
@@ -70,13 +70,14 @@ class Controller:
         if self.tank.found:
 
             if self.camera.number == 1:
-                self.tank.get_drain_lab(frame)
+                # self.tank.get_drain_lab(frame)
+                self.tank.get_drain_2(frame, mode='lab')
 
             self.tank.get_sticker_position_lab(frame)
-            for sticker in self.tank.stickers:                    
+            for sticker in self.tank.stickers:
                     sticker.label_index, sticker.label = self.model.predict(sticker.image)
                     sticker.update_position()
-  
+
 
     def analyse(self):
         # compare if requested PLC info matches processed image
@@ -146,7 +147,7 @@ class Controller:
                 self.plc.connect()
             else:
                 last_life_beat = self.read_plc.life_beat
-                self.write_plc.update_life_beat()                
+                self.write_plc.update_life_beat()
                 self.plc.write(self.write_plc)
                 sleep(self.plc.update_time)
         else:

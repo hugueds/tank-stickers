@@ -102,13 +102,11 @@ class Camera:
         # search for minimum and maximus
         self.cap.stream.camera.iso = 100
         self.cap.stream.camera.exposure_mode = 'off'
-        self.cap.stream.camera.awb_mode = 'off'
         self.cap.stream.camera.exposure_compensation = self._scale(self.exposure_comp, 0, 50) - 25
         self.cap.stream.camera.brightness = self._scale(self.brightness, 0, 100)
         self.cap.stream.camera.contrast = self._scale(self.contrast,0 ,200) - 100
         self.cap.stream.camera.saturation = self._scale(self.saturation, 0, 200) - 100
         self.cap.stream.camera.sharpness = self._scale(self.sharpness,0,200) - 100
-        # self.cap.stream.camera.exposure_comp = self._scale(self.exposure_comp)
 
     def _scale(self, x, y0, y1):
         x0, x1 = 0, 255
@@ -146,26 +144,3 @@ class Camera:
         background[:, :, 2] = 200
         added_image = cv.addWeighted(background, alpha, image, beta, gamma)
         return added_image
-
-    def update_window_position(self):
-        pass
-        # if platform.system() == 'Windows':
-        #     if GetSystemMetrics(78) == 3200 and not self.multiple_monitors:
-        #         self.multiple_monitors = True
-        #         self.move_window(self.MONITOR_LIMIT + 1, 0)
-        #     elif GetSystemMetrics(78) <= 1920 and self.multiple_monitors:
-        #         self.multiple_monitors = False
-
-        # if self.multiple_monitors and platform.system() == 'Windows':
-        #     cv.imshow(self.window_name, main_frame)
-        #     if self.monitor_counter == 50:
-        #         self.move_window(self.MONITOR_LIMIT + 1, 0)
-        #     if self.monitor_counter < 50 + 1:
-        #         self.monitor_counter += 1
-
-        # elif platform.system() == 'Linux':
-        #     cv.imshow(self.window_name, main_frame)
-
-        # else:
-        #     self.monitor_counter = 0
-        #     cv.destroyWindow(self.window_name)
