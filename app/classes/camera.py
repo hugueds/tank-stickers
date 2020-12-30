@@ -73,7 +73,7 @@ class Camera:
 
         cv.namedWindow(self.window_name, cv.WINDOW_NORMAL)
         cv.resizeWindow(self.window_name, self.monitor_display)
-        # cv.setWindowProperty(self.window_name, cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
+        cv.setWindowProperty(self.window_name, cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
 
     def stop(self):
         if self.threaded or self.rpi_camera:

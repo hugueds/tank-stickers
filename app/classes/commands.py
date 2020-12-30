@@ -142,9 +142,6 @@ def updateTracker(obj, key, value, index):
     _filter[index[0]][index[1]] = value
     setattr(obj, key, _filter)
 
-def update_camera_config(camera: Camera, key, value):
-    setattr(camera, key, value)
-
 def open_tracker(camera: Camera, tank: Tank):
     global tracker_window
     if not tracker_window:
@@ -199,7 +196,9 @@ def open_camera_tracker(camera: Camera):
         cv.createTrackbar("CONTRAST",   "camera_tracker",  camera.contrast,   255, lambda value, key='contrast':    update_camera_config(camera, key, value))
         cv.createTrackbar("SATURATION", "camera_tracker",  camera.saturation, 255, lambda value,  key='saturation':  update_camera_config(camera, key, value))
         cv.createTrackbar("SHARPNESS", "camera_tracker",  camera.sharpness, 255, lambda value,  key='sharpness':  update_camera_config(camera, key, value))
-        cv.createTrackbar("WHITE_BALANCE", "camera_tracker", camera.white_balance, 255, lambda value, key='white_balance': update_camera_config(camera, key, value))
+        cv.createTrackbar("EXPOSURE", "camera_tracker",    camera.exposure_comp, 255, lambda value,  key='exposure_comp':  update_camera_config(camera, key, value))
+
+        # cv.createTrackbar("WHITE_BALANCE", "camera_tracker", camera.white_balance, 255, lambda value, key='white_balance': update_camera_config(camera, key, value))
         # cv.createTrackbar("EXPOSURE", "camera_tracker",    camera.hue, 255, lambda value,  key='exposure':  update_camera_config(camera, key, value))
         # cv.createTrackbar("HUE", "camera_tracker", 127, 255, lambda value, key='HUE': updateTracker(camera, key, value))
         # cv.createTrackbar("FOCUS", "camera_tracker", 0, 255, lambda value, key='FOCUS': updateTracker(camera, key, value))
