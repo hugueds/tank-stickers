@@ -86,7 +86,7 @@ def record(camera: Camera):
         file_name = f"RECORDING_{str_date}.avi"
         path = "../captures/" + file_name
         writter = cv.VideoWriter_fourcc("M", "J", "P", "G")
-        camera.output = cv.VideoWriter(path, writter, 10, (1280, 720))
+        camera.output = cv.VideoWriter(path, writter, 10, (1080, 720))
     else:
         logger.info("STOP RECORDING")
         camera.recording = False

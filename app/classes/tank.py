@@ -214,14 +214,84 @@ class Tank:
                         sticker = Sticker(self.x + x, self.y + y, w, h, area)
                         sticker.image = tank[y: y + h, x: x + w]
                         sticker.set_relative(self)
-                        sticker.calc_quadrant(
-                            self.x, self.y, self.w, self.h, camera)
+                        sticker.calc_quadrant(self.x, self.y, self.w, self.h, camera)
                         self.stickers.append(sticker)
         self.quantity = len(self.stickers)
         if self.quantity == 1:
             self.sticker_quadrant = self.stickers[0].quadrant
         else:
             self.sticker_quadrant = 99
+
+    def get_drain_2(self, frame: np.ndarray, mode='lab'):
+
+        self.drain_found = False
+        self.drain_area_found = 0
+        self.drain_position = 0
+        self.drain_x, self.drain_y, self.drain_w, self.drain_h = 0, 0, 0, 0
+        cam_config = self.config["camera"]
+        c_width, c_height = cam_config["resolution"]
+        roi = cam_config["roi"]
+        crop_mask = np.ones((c_height, c_width), np.uint8)
+        crop_mask[:, 0: self.x + 10] = 0
+        crop_mask[:, self.x + self.w - 10:] = 0
+        croped_img = cv.bitwise_and(frame, frame, mask=crop_mask)
+        _filter: np.ndarray = 0
+
+        if mode == 'lab':
+            # _filter = cv.cvtColor(croped_img, cv.COLOR_BGR2LAB)  # LAB
+            _filter = cv.cvtColor(croped_img, cv.COLOR_RGB2LAB)  # LAB
+            lower = np.array(self.drain_lab[0], np.uint8)
+            higher = np.array(self.drain_lab[1], np.uint8)
+        else:
+            _filter = cv.cvtColor(croped_img, cv.COLOR_BGR2HSV)  # HSV
+            lower = np.array(self.drain_hsv[0], np.uint8)
+            higher = np.array(self.drain_hsv[1], np.uint8)
+
+        blur = cv.GaussianBlur(_filter, self.drain_blur, 1)
+
+        mask = cv.inRange(blur, lower, higher)
+        kernel = np.ones(self.drain_kernel, np.uint8)
+        mask = cv.morphologyEx(mask, cv.MORPH_OPEN, kernel, iterations=2)
+
+        if self.debug_drain:
+            cv.imshow("debug_drain", mask)
+
+        cnt, _ = cv.findContours(mask, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
+
+        sorted_cnts = sorted(cnt, key=lambda cnt: cv.contourArea(cnt))
+
+        if len(sorted_cnts):
+            c = sorted_cnts[-1]
+            area = cv.contourArea(c)
+            cond = area >= self.drain_area["min"]
+            cond = cond and area <= self.drain_area["max"]
+            if cond:
+                (x, y, w, h) = cv.boundingRect(c)
+                self.drain_found = True
+                self.drain = Drain(x, y, w, h, area)
+                self.drain_x, self.drain_y, self.drain_w, self.drain_h = x, y, w, h
+                zero_x = self.x + (self.w // 2)
+                zero_y = self.y + (self.h // 2)
+                self.drain_rel_x = x - zero_x + (w // 2)
+                self.drain_rel_y = (-1) * (y - zero_y) - (h // 2)
+                self.drain_area_found = area
+                row, col = -1, -1
+                quad_list = [[6, 7, 8], [9, 10, 11], [12, 13, 14]]
+                temp_x = (x - self.x) / self.w
+                temp_y = (y - self.y) / self.h
+                if temp_x <= 0.3:
+                    col = 0
+                elif temp_x >= 0.3 and temp_x <= 0.7:
+                    col = 1
+                elif temp_x > 0.7:
+                    col = 2
+                if temp_y <= 0.2:
+                    row = 0
+                elif temp_y >= 0.2 and temp_y <= 0.92:
+                    row = 1
+                elif temp_y > 0.92:
+                    row = 2
+                self.drain_position = quad_list[row][col]
 
     def get_drain(self, frame: np.ndarray):  # merge into another method
 
@@ -374,72 +444,4 @@ class Tank:
                     row = 2
                 self.drain_position = quad_list[row][col]
 
-    def get_drain_2(self, frame: np.ndarray, mode='lab'):
 
-        self.drain_found = False
-        self.drain_area_found = 0
-        self.drain_position = 0
-        self.drain_x, self.drain_y, self.drain_w, self.drain_h = 0, 0, 0, 0
-        cam_config = self.config["camera"]
-        c_width, c_height = cam_config["resolution"]
-        roi = cam_config["roi"]
-        crop_mask = np.ones((c_height, c_width), np.uint8)
-        crop_mask[:, 0: self.x + 10] = 0
-        crop_mask[:, self.x + self.w - 10:] = 0
-        croped_img = cv.bitwise_and(frame, frame, mask=crop_mask)
-        _filter: np.ndarray = 0
-
-        if mode == 'lab':
-            _filter = cv.cvtColor(croped_img, cv.COLOR_BGR2LAB)  # LAB
-            lower = np.array(self.drain_lab[0], np.uint8)
-            higher = np.array(self.drain_lab[1], np.uint8)
-        else:
-            _filter = cv.cvtColor(croped_img, cv.COLOR_BGR2HSV)  # HSV
-            lower = np.array(self.drain_hsv[0], np.uint8)
-            higher = np.array(self.drain_hsv[1], np.uint8)
-
-        blur = cv.GaussianBlur(_filter, self.drain_blur, 1)
-
-        mask = cv.inRange(blur, lower, higher)
-        kernel = np.ones(self.drain_kernel, np.uint8)
-        mask = cv.morphologyEx(mask, cv.MORPH_OPEN, kernel, iterations=2)
-
-        if self.debug_drain:
-            cv.imshow("debug_drain", mask)
-
-        cnt, _ = cv.findContours(mask, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
-
-        sorted_cnts = sorted(cnt, key=lambda cnt: cv.contourArea(cnt))
-
-        if len(sorted_cnts):
-            c = sorted_cnts[-1]
-            area = cv.contourArea(c)
-            cond = area >= self.drain_area["min"]
-            cond = cond and area <= self.drain_area["max"]
-            if cond:
-                (x, y, w, h) = cv.boundingRect(c)
-                self.drain_found = True
-                self.drain = Drain(x, y, w, h, area)
-                self.drain_x, self.drain_y, self.drain_w, self.drain_h = x, y, w, h
-                zero_x = self.x + (self.w // 2)
-                zero_y = self.y + (self.h // 2)
-                self.drain_rel_x = x - zero_x + (w // 2)
-                self.drain_rel_y = (-1) * (y - zero_y) - (h // 2)
-                self.drain_area_found = area
-                row, col = -1, -1
-                quad_list = [[6, 7, 8], [9, 10, 11], [12, 13, 14]]
-                temp_x = (x - self.x) / self.w
-                temp_y = (y - self.y) / self.h
-                if temp_x <= 0.3:
-                    col = 0
-                elif temp_x >= 0.3 and temp_x <= 0.7:
-                    col = 1
-                elif temp_x > 0.7:
-                    col = 2
-                if temp_y <= 0.2:
-                    row = 0
-                elif temp_y >= 0.2 and temp_y <= 0.92:
-                    row = 1
-                elif temp_y > 0.92:
-                    row = 2
-                self.drain_position = quad_list[row][col]

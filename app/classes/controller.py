@@ -4,7 +4,10 @@ from datetime import datetime
 from time import sleep
 from threading import Thread
 from pathlib import Path
-from classes import Tank, PLC, Camera, Sticker
+from classes.camera import Camera
+from classes.plc import PLC
+from classes.tank import Tank
+from classes.sticker import Sticker
 from classes.commands import *
 from classes.image_writter import *
 from classes.tf_model import TFModel
@@ -39,7 +42,7 @@ class Controller:
     def get_frame(self):
         success, self.frame = self.camera.read()
 
-    def read_file(self, file):
+    def open_file(self, file):
         if self.frame is None:
             self.frame = cv.imread(file)
             self.file_frame = self.frame
@@ -97,16 +100,26 @@ class Controller:
         if self.read_plc.sticker != sticker.label:
             logger.error('Wrong Label, expected: {}, received: {}')
             self.write_plc.inc_sticker = sticker.label
+            return
         if self.read_plc.sticker_angle != sticker.angle:
             logger.error('Wrong Label Angle, expected: {}, received: {}')
             self.write_plc.inc_angle = sticker.angle
+            return
         if self.read_plc.sticker_position != sticker.quadrant:
             logger.error('Wrong Label Angle, expected: {}, received: {}')
             self.write_plc.position_inc_sticker = sticker.quadrant
+            return
 
         self.result = True
         self.write_plc.cam_status = 1
 
+
+    def get_fake_parameters(self):
+        self.read_plc.read_request = True
+        self.read_plc.sticker = '1'
+        self.read_plc.sticker_angle = 180
+        self.read_plc.sticker_position = 4
+        self.read_plc.drain_position = 0
 
     def confirm_request(self):
         self.result = False
@@ -123,7 +136,8 @@ class Controller:
         key = cv.waitKey(1) & 0xFF
         key_pressed(key, self.camera, self.tank)
         if key == ord('n'):
-            self.read_plc.read_request = True
+            self.get_fake_parameters()
+
 
     def start_plc(self):
         logger.info('Starting PLC Thread')

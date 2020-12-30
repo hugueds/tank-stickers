@@ -33,6 +33,16 @@ class Sticker:
         else:
             self.position = 90
 
+    def update_position_2(self):
+        split = self.label.split('_')
+        if len(split) == 1:
+            self.position = 0
+        else:
+            if split[1] == 180:
+                self.position = 1
+            else:
+                self.position = 2
+
     def calc_quadrant(self, tank_x:int, tank_y:int, tank_w:int, tank_h:int, camera: int):
         row, col = -1, -1
 

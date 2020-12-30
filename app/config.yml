@@ -1,11 +1,11 @@
 app:
     name: "Sticker Tanks"
-    version: 0.1.0   
+    version: 0.1.0
 device:
     ip: '192.27.X.X'
     mac: '00-00-00-00-00-00'
 camera:
-    number: 1
+    number: 0
     debug: False
     rpi_camera: False
     threaded: True
@@ -27,7 +27,7 @@ camera:
     white_balance: 4200
 plc:
     debug: True
-    enabled: True
+    enabled: False
     ip: "192.27.6.172"
     rack: 0
     slot: 2

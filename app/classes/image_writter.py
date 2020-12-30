@@ -37,10 +37,10 @@ def draw_center_axis(frame: np.ndarray, camera: Camera):
 def draw_camera_info(frame: np.ndarray, camera: Camera):
     text = f"Resolution {camera.width}x{camera.height} "
     color = navy_blue
-    font_size = (frame.shape[1] * 0.0007)
-    cv.putText(frame, text, (10, 25), font, font_size, color, 2)
+    font_size = (frame.shape[1] * 0.0006)
+    cv.putText(frame, text, (10, 15), font, font_size, color, 1)
     text = f"FPS: {camera.fps}, COUNTER: {camera.frame_counter}"
-    cv.putText(frame, text, (10, 50), font, font_size, color, 2)
+    cv.putText(frame, text, (10, 30), font, font_size, color, 1)
     if camera.recording:
         text = f" -- RECORDING --"
         color = red
@@ -61,7 +61,7 @@ def draw_tank_rectangle(frame: np.ndarray, tank: Tank):
     x, y, w, h = tank.x, tank.y, tank.w, tank.h
     text = f"TANK X: {x}, Y: {y} - W: {w}, H: {h}"
     font_size = (frame.shape[1] * 0.0007)
-    cv.putText(frame, text, (10, 75), font, font_size, tank_color, 2)
+    cv.putText(frame, text, (10, 45), font, font_size, tank_color, 1)
     cv.rectangle(frame, (x, y), (x + w, y + h), color, 2)
     return frame
 
@@ -82,9 +82,9 @@ def draw_sticker(frame: np.ndarray, camera: Camera, tank: Tank):
         text = f"STICKER [{s.label}] X {s.x} Y: {s.y}  "
         text += f"R_X {s.relative_x} R_Y {s.relative_y}  "
         text += f"AREA: {s.area} W: {s.w} H: {s.h} "
-        text += f"QUAD: {s.quadrant} "
+        text += f"Q: {s.quadrant} "
         cv.rectangle(frame, (s.x, s.y), (s.x + s.w, s.y + s.h), color, 2)
-        font_size = (0.0007 * frame.shape[1])
+        font_size = (0.0006 * frame.shape[1])
         x = 10
         y = camera.height - (20 * i)
         cv.putText(frame, text, (x, y), font, font_size, color, 1)
@@ -106,10 +106,10 @@ def draw_drain(frame: np.ndarray, tank: Tank):
 
 def draw_plc_status(frame: np.ndarray, plc: PLC, read_plc: PLCInterface, write_plc: PLCWriteInterface):
     x, y = frame.shape[1], frame.shape[0]
-    start = int(0.7 * x)
+    start = int(0.65 * x)
     color = mid_blue
     font_size = (0.0006 * x)
-    o = 20
+    o = 15
 
     text = f"PLC STATUS {plc.online}, LIFEBIT: {read_plc.life_beat}"
     cv.putText(frame, text, (start, 1 * o), font, font_size, color, 1)
@@ -117,11 +117,11 @@ def draw_plc_status(frame: np.ndarray, plc: PLC, read_plc: PLCInterface, write_p
     cv.putText(frame, text, (start, 2 * o), font, font_size, color, 1)
     text = f"DRAIN POSITION {read_plc.drain_position}"
     cv.putText(frame, text, (start, 3 * o), font, font_size, color, 1)
-    text = f"STICKER {read_plc.sticker_position}"
+    text = f"STICKER {read_plc.sticker}"
     cv.putText(frame, text, (start, 4 * o), font, font_size, color, 1)
     text = f"STICKER POSITION {read_plc.sticker_position}"
     cv.putText(frame, text, (start, 5 * o), font, font_size, color, 1)
-    text = f"STICKER ANGLE {read_plc.sticker_position}"
+    text = f"STICKER ANGLE {read_plc.sticker_angle}"
     cv.putText(frame, text, (start, 6 * o), font, font_size, color, 1)
     return frame
 
