@@ -91,22 +91,22 @@ class Controller:
         if len(self.tank.stickers) > 1:
             logger.error('There are more stickers than needed')
             return
+        # Condition if found and not requested
         if len(self.tank.stickers) == 0 and self.read_plc.sticker_camera:
             logger.error('Sticker not found')
             return
         if len(self.tank.stickers):
             sticker = self.tank.stickers[0]
-            return
         if self.read_plc.sticker != sticker.label:
-            logger.error('Wrong Label, expected: {}, received: {}')
+            logger.error('Wrong Label Label, expected:' + self.read_plc.sticker + ', received: ' + sticker.label)
             self.write_plc.inc_sticker = sticker.label
             return
         if self.read_plc.sticker_angle != sticker.angle:
-            logger.error('Wrong Label Angle, expected: {}, received: {}')
+            logger.error('Wrong Label Angle, expected:' + self.read_plc.sticker_angle + ', received: ' + sticker.angle)
             self.write_plc.inc_angle = sticker.angle
             return
         if self.read_plc.sticker_position != sticker.quadrant:
-            logger.error('Wrong Label Angle, expected: {}, received: {}')
+            logger.error('Wrong Label Position, expected:' + self.read_plc.sticker_position + ', received: ' + sticker.quadrant)
             self.write_plc.position_inc_sticker = sticker.quadrant
             return
 
