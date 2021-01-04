@@ -51,6 +51,7 @@ class Tank:
         self.max_height = height[1]
         self.min_radius = config['min_radius']
         self.min_dist = config['min_radius']
+        self.params = config['params']
         self.table_hsv = config['table_filter']
 
     def load_sticker_config(self, config):
@@ -78,8 +79,8 @@ class Tank:
         g_frame = cv.cvtColor(frame, cv.COLOR_RGB2GRAY)
         # if find_circle hide the roi lines
         self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.2,
-                                        param1=120,
-                                        param2=120,
+                                        param1=self.params[0],
+                                        param2=self.params[1],
                                         minDist=self.min_dist,
                                         minRadius=self.min_radius)  # parametrizar o segundo valor
         if self.circles is not None:
