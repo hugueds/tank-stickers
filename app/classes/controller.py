@@ -84,6 +84,7 @@ class Controller:
 
     def analyse(self):
         # compare if requested PLC info matches processed image
+        # define error priority
         sticker = Sticker()
         if self.read_plc.drain_camera and self.read_plc.drain_position != self.tank.drain_position:
             logger.error('Drain on Wrong Position')
