@@ -5,7 +5,7 @@ device:
     ip: '192.27.X.X'
     mac: '00-00-00-00-00-00'
 camera:
-    number: 0
+    number: 1
     debug: False
     rpi_camera: False
     threaded: True
@@ -18,11 +18,11 @@ camera:
         x: [6.2, 92.0]
         y: [10.0, 87.0]
     fps: 15
-    src: 0
-    brightness: 120
+    src: 1
+    brightness: 150
     contrast: 127
-    saturation: 127
-    sharpness: 127
+    saturation: 180
+    sharpness: 255
     exposure: -4
     white_balance: 4200
 plc:
