@@ -101,7 +101,7 @@ class Camera:
     def set_hardware_rpi(self):
         # search for minimum and maximus
         self.cap.stream.camera.iso = 100
-        self.cap.stream.camera.exposure_mode = 'off'
+        self.cap.stream.camera.exposure_mode = 'auto'
         self.cap.stream.camera.exposure_compensation = self._scale(self.exposure_comp, 0, 50) - 25
         self.cap.stream.camera.brightness = self._scale(self.brightness, 0, 100)
         self.cap.stream.camera.contrast = self._scale(self.contrast,0 ,200) - 100

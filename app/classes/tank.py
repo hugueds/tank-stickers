@@ -76,8 +76,8 @@ class Tank:
         g_frame = cv.cvtColor(frame, cv.COLOR_RGB2GRAY)
         # if find_circle hide the roi lines
         self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.2,
-                                        param1=100,
-                                        param2=100,
+                                        param1=120,
+                                        param2=120,
                                         minDist=self.min_dist,
                                         minRadius=self.min_radius)  # parametrizar o segundo valor
         if self.circles is not None:
