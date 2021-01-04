@@ -6,6 +6,7 @@ class Sticker:
     label = ''
     label_index = 0
     label_char = ''
+    label_char_index = -1
     position = 255
     angle = 999
     area = 0
@@ -28,6 +29,8 @@ class Sticker:
 
     def update_label_info(self):
         self.label_char = self.label.split('_')[0]
+        sticker_chars = ['1', '2', 'P', 'T']
+        self.label_char_index = sticker_chars.index(self.label_char)
         self.update_label_angle()
         if self.label_index <= 3:
             self.position = 0
@@ -42,9 +45,9 @@ class Sticker:
             self.angle = 0
         else:
             if split[1] == '180':
-                self.angle = 180
+                self.angle = 2
             else:
-                self.angle = 90
+                self.angle = 3
 
     def calc_quadrant(self, tank_x:int, tank_y:int, tank_w:int, tank_h:int, camera: int):
         row, col = -1, -1

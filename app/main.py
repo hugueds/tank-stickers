@@ -28,7 +28,7 @@ while True:
         if controller.result:
             controller.set_state(AppState.SAVING_RESULTS)
         else:
-            print('Redoing operation')
+            print('Trying again...')
             sleep(0.1)
 
     elif controller.state == AppState.SAVING_RESULTS:
