@@ -75,8 +75,11 @@ class Tank:
     def find_in_circle(self, frame: np.ndarray):
         g_frame = cv.cvtColor(frame, cv.COLOR_RGB2GRAY)
         # if find_circle hide the roi lines
-        self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.2, minDist=self.min_dist,
-                                       minRadius=self.min_radius)  # parametrizar o segundo valor
+        self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.2,
+                                        param1=100,
+                                        param2=100,
+                                        minDist=self.min_dist,
+                                        minRadius=self.min_radius)  # parametrizar o segundo valor
         if self.circles is not None:
             circles = np.uint16(np.around(self.circles))
             for x, y, r in circles[0, :]:
