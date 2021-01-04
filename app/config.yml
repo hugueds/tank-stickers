@@ -5,7 +5,7 @@ device:
     ip: '192.27.X.X'
     mac: '00-00-00-00-00-00'
 camera:
-    number: 0
+    number: 1
     debug: False
     rpi_camera: True
     threaded: True

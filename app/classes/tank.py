@@ -1,3 +1,4 @@
+from numpy.core.defchararray import lower
 import yaml
 from typing import List
 import numpy as np
@@ -107,8 +108,7 @@ class Tank:
         image[:y_offset_start, :] = 255
 
         image = cv.blur(image, (9, 9), cv.BORDER_WRAP)
-        _, image = cv.threshold(
-            image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
+        _, image = cv.threshold(image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
 
         mid_x = image.shape[1] // 2
         mid_y = image.shape[0] // 2
@@ -130,8 +130,6 @@ class Tank:
         self.y = np.where(vector_y == 0)[0][0]  # Get the first black pixel
 
         center_y = (self.y + self.h) // 2
-        c_width, c_height = cam_config["resolution"]
-        roi = cam_config["roi"]
         off1 = int(roi["x"][0] * c_width // 100)
         off2 = int(roi["x"][1] * c_width // 100)
 
@@ -187,9 +185,8 @@ class Tank:
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         tank = g_frame[self.y: self.y + self.h, self.x: self.x + self.w]
         # Get kernel from config
-        blur = cv.blur(tank, (5, 5), cv.BORDER_CONSTANT)
-        _, thresh = cv.threshold(
-            blur, self.sticker_thresh, 255, cv.THRESH_BINARY)
+        _, thresh = cv.threshold(tank, self.sticker_thresh, 255, cv.THRESH_BINARY)
+        blur = cv.blur(thresh, (5, 5), cv.BORDER_CONSTANT) # test updated
         contour, hier = cv.findContours(
             thresh, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
         self.append_stickers(contour, tank)
@@ -451,4 +448,58 @@ class Tank:
                 self.drain_position = quad_list[row][col]
 
     def find_2(self, frame):
-        pass
+
+        hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+        blur = cv.GaussianBlur(hsv, (5,5), 1.0)
+        lower = np.array(self.table_hsv[0][0], self.table_hsv[0][1], self.table_hsv[0][2])
+        higher = np.array(self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2])
+        mask = cv.inRange(blur, lower, higher)
+
+        cam_config = self.config["camera"]
+        c_width, c_height = cam_config["resolution"]
+        roi = cam_config["roi"]
+
+        mid_x = frame.shape[1] // 2
+
+        x_center_offset = int(cam_config["center_x_offset"] * c_width // 100)
+        vector_y = mask[:, mid_x + x_center_offset]
+        roi_vector_y = vector_y[:]
+        roi_vector_y = roi_vector_y[roi_vector_y == 0]
+
+        if roi_vector_y.size > int(self.min_height):
+            self.h = roi_vector_y.size
+        else:
+            self.h = 0
+            self.found = False
+            return False
+
+        self.y = np.where(vector_y == 0)[0][0]  # Get the first black pixel
+
+        center_y = (self.y + self.h) // 2
+        off1 = int(roi["x"][0] * c_width // 100)
+        off2 = int(roi["x"][1] * c_width // 100)
+
+        adj_y1 = int(self.y + (self.h * 0.22))  # SET IN CONFIG
+        adj_y2 = int(center_y + (self.h * 0.3))
+
+        # Create lines for adj_y
+        vector_x1 = mask[adj_y1, off1:mid_x]
+        vector_x2 = mask[adj_y2, mid_x:off2]
+
+        for i in range(len(vector_x1)):
+            if vector_x1[i] == 0:
+                self.x = i + off1
+                break
+
+        vector_x2 = mask[adj_y2, mid_x:off2]
+
+        for i in range(len(vector_x2) - 1, -1, -1):
+            if vector_x2[i] == 0:
+                x2 = mid_x - i
+                self.w = (mask.shape[1] - self.x) - x2
+                break
+
+        self.found = self.h >= self.min_height
+        self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
+
+        cv.imshow('debug_tank', mask)
