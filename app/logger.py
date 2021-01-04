@@ -1,11 +1,17 @@
 import logging
+from pathlib import Path
 from logging.handlers import TimedRotatingFileHandler, RotatingFileHandler
+
 
 FORMAT = ('%(asctime)-15s %(threadName)-15s %(levelname)-8s %(module)-15s:%(lineno)-8s %(message)s')
 
 path = 'logs'
 logname = 'app.log'
 error_logname = 'error.log'
+
+Path.mkdir('logs', parents=True, exist_ok=True)
+Path.mkdir('logs/error', parents=True, exist_ok=True)
+Path.mkdir('logs/results', parents=True, exist_ok=True)
 
 results_logger = logging.getLogger('results_logger')
 results_logger.setLevel(logging.INFO)
