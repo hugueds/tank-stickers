@@ -29,7 +29,7 @@ while True:
             controller.set_state(AppState.SAVING_RESULTS)
         else:
             print('Redoing operation')
-            sleep(1)
+            sleep(0.1)
 
     elif controller.state == AppState.SAVING_RESULTS:
         controller.save_result()

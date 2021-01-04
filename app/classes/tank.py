@@ -73,9 +73,9 @@ class Tank:
         return self.color_image
 
     def find_in_circle(self, frame: np.ndarray):
-        g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        g_frame = cv.cvtColor(frame, cv.COLOR_RGB2GRAY)
         # if find_circle hide the roi lines
-        self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1, minDist=self.min_dist,
+        self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.2, minDist=self.min_dist,
                                        minRadius=self.min_radius)  # parametrizar o segundo valor
         if self.circles is not None:
             circles = np.uint16(np.around(self.circles))
@@ -205,8 +205,8 @@ class Tank:
                 if len(poly) == 4:
                     (x, y, w, h) = cv.boundingRect(c)
                     ar = w / float(h)
-                    cond = ar >= 0.95 and ar <= 1.05
-                    cond = (h) >= self.sticker_size["min"]
+                    cond = ar >= 0.9 and ar <= 1.1
+                    cond = cond and (h) >= self.sticker_size["min"]
                     cond = cond and (h) <= self.sticker_size["max"]
                     cond = cond and (w) >= self.sticker_size["min"]
                     cond = cond and (w) <= self.sticker_size["max"]
@@ -222,7 +222,7 @@ class Tank:
         else:
             self.sticker_quadrant = 99
 
-    def get_drain_2(self, frame: np.ndarray, mode='lab'):
+    def get_drain_2(self, frame: np.ndarray, mode='lab', rgb=False):
 
         self.drain_found = False
         self.drain_area_found = 0
@@ -239,10 +239,12 @@ class Tank:
 
         if mode == 'lab':
             # _filter = cv.cvtColor(croped_img, cv.COLOR_BGR2LAB)  # LAB
-            _filter = cv.cvtColor(croped_img, cv.COLOR_RGB2LAB)  # LAB
+            scheme = cv.COLOR_RGB2LAB if rgb else cv.COLOR_BGR2LAB
+            _filter = cv.cvtColor(croped_img, scheme)  # LAB
             lower = np.array(self.drain_lab[0], np.uint8)
             higher = np.array(self.drain_lab[1], np.uint8)
         else:
+            scheme = cv.COLOR_RGB2HSV if rgb else cv.COLOR_BGR2HSV
             _filter = cv.cvtColor(croped_img, cv.COLOR_BGR2HSV)  # HSV
             lower = np.array(self.drain_hsv[0], np.uint8)
             higher = np.array(self.drain_hsv[1], np.uint8)
