@@ -48,6 +48,7 @@ tank:
     blur: [9,9]
     min_radius: 100
     min_dist: 200
+    table_filter: [[100,200],[100, 200],[100,200]]
 sticker:
     threshold: 172
     area:

@@ -50,6 +50,7 @@ class Tank:
         self.max_height = height[1]
         self.min_radius = config['min_radius']
         self.min_dist = config['min_radius']
+        self.table_hsv = config['table_filter']
 
     def load_sticker_config(self, config):
         self.sticker_thresh = config["threshold"]
@@ -449,4 +450,5 @@ class Tank:
                     row = 2
                 self.drain_position = quad_list[row][col]
 
-
+    def find_2(self, frame):
+        pass

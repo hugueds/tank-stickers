@@ -28,8 +28,8 @@ class Sticker:
         self.relative_y = tank.y - (self.y - zero_y) - (self.h // 2)
 
     def update_label_info(self):
-        self.label_char = self.label.split('_')[0]
-        sticker_chars = ['1', '2', 'P', 'T']
+        self.label_char = (self.label.split('_')[0]).lower()
+        sticker_chars = ['1', '2', 'p', 't']
         self.label_char_index = sticker_chars.index(self.label_char)
         self.update_label_angle()
         if self.label_index <= 3:
