@@ -13,7 +13,7 @@ class TFModel:
 
     def __init__(self, config_file='config.yml', model_name='sticker'):
         with open(config_file) as file:
-            config = yaml.safe_load(file)['model'][model_name]                
+            config = yaml.safe_load(file)['model'][model_name]
 
         self.size = config['size']
         self.channels = config['channels']
@@ -21,13 +21,13 @@ class TFModel:
         self.labels = config['default_labels']
 
     def predict(self, image: np.ndarray):
-        processed_image = self.preprocess(image)
+        processed_image = self.__preprocess(image)
         prediction = self.graph.predict(processed_image)
         index = int(prediction.argmax(axis=1)[0])
         label = self.labels[index]
         return (index, label)
 
-    def preprocess(self, image: np.ndarray):
+    def __preprocess(self, image: np.ndarray):
         if self.channels == 1:
             image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 

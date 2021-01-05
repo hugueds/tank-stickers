@@ -37,8 +37,8 @@ class Controller:
         self.camera = Camera()
         self.camera.start()
         self.plc = PLC()
-        self.model = TFModel()
-        # self.drain_model = TFModel(model_name='drain') # to be implemented
+        self.model = TFModel(model_name='sticker')
+        self.drain_model = TFModel(model_name='drain') # to be implemented
 
     def get_frame(self):
         success, self.frame = self.camera.read()
@@ -54,7 +54,8 @@ class Controller:
             frame = draw_tank_center_axis(frame, self.tank)
             frame = draw_tank_rectangle(frame, self.tank)
             frame = draw_sticker(frame, self.camera, self.tank)
-            frame = draw_drain(frame, self.tank) # remove after ML implementation
+            # frame = draw_drain(frame, self.tank) # remove after ML implementation
+            frame = draw_drain_ml(frame, self.tank) # remove after ML implementation
         frame = draw_roi_lines(frame, self.camera)
         frame = draw_center_axis(frame, self.camera)
         frame = draw_camera_info(frame, self.camera)
@@ -66,7 +67,8 @@ class Controller:
             frame = self.frame
 
         if self.camera.number == 1:
-            self.tank.find(frame)
+            # self.tank.find(frame)
+            self.tank.find_2(frame)
         else:
             self.tank.find_in_circle(frame)
 
@@ -90,7 +92,7 @@ class Controller:
         # make 5 times loop and only if the tank is found
         result = False
         sticker = Sticker()
-        if not self.tank.found:                                    
+        if not self.tank.found:
             return
         if self.read_plc.drain_camera and self.read_plc.drain_position != self.tank.drain_position:
             logger.error('Drain on Wrong Position')
@@ -116,8 +118,6 @@ class Controller:
             logger.error('Wrong Label Position, expected:' + str(self.read_plc.sticker_position) + ', received: ' + str(sticker.quadrant))
             self.write_plc.position_inc_sticker = sticker.quadrant
             return
-
-
 
         self.final_result = True
         self.write_plc.cam_status = 1

@@ -189,8 +189,7 @@ class Tank:
         # Get kernel from config
         _, thresh = cv.threshold(tank, self.sticker_thresh, 255, cv.THRESH_BINARY)
         blur = cv.blur(thresh, (5, 5), cv.BORDER_CONSTANT) # test updated
-        contour, hier = cv.findContours(
-            thresh, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
+        contour, hier = cv.findContours(blur, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
         self.append_stickers(contour, tank)
         if self.debug_sticker:
             cv.imshow("debug_tank_sticker", thresh)
@@ -230,7 +229,7 @@ class Tank:
         self.drain_found = False
         self.drain_area_found = 0
         self.drain_position = 0
-        self.drain_x, self.drain_y, self.drain_w, self.drain_h = 0, 0, 0, 0         
+        self.drain_x, self.drain_y, self.drain_w, self.drain_h = 0, 0, 0, 0
         cam_config = self.config["camera"]
         c_width, c_height = cam_config["resolution"]
         roi = cam_config["roi"]
@@ -305,10 +304,10 @@ class Tank:
         crop_mask = np.ones((c_height, c_width), np.uint8)
         crop_mask[:, 0: self.x + 10] = 0
         crop_mask[:, self.x + self.w - 10:] = 0
-        croped_img = cv.bitwise_and(frame, frame, mask=crop_mask)        
+        croped_img = cv.bitwise_and(frame, frame, mask=crop_mask)
         index, label = model.predict(croped_img)
         self.drain_position = int(label)
-        
+
 
     def get_drain(self, frame: np.ndarray):  # merge into another method
 
@@ -461,13 +460,16 @@ class Tank:
                     row = 2
                 self.drain_position = quad_list[row][col]
 
-    def find_2(self, frame):
+    def find_2(self, frame: np.ndarray):
 
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         blur = cv.GaussianBlur(hsv, (5,5), 1.0)
-        lower = np.array(self.table_hsv[0][0], self.table_hsv[0][1], self.table_hsv[0][2])
-        higher = np.array(self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2])
+        lower =  np.array( (self.table_hsv[0][0], self.table_hsv[0][1], self.table_hsv[0][2]), np.uint8)
+        higher = np.array( (self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2]), np.uint8)
         mask = cv.inRange(blur, lower, higher)
+
+        if self.debug_tank:
+            cv.imshow('debug_tank', mask)
 
         cam_config = self.config["camera"]
         c_width, c_height = cam_config["resolution"]
@@ -515,5 +517,4 @@ class Tank:
         self.found = self.h >= self.min_height
         self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
-        if debug_tank:
-            cv.imshow('debug_tank', mask)
+
