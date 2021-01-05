@@ -297,8 +297,17 @@ class Tank:
                     row = 2
                 self.drain_position = quad_list[row][col]
 
-    def get_drain_ml(self, frame: np.ndarray):
-        pass
+    def get_drain_ml(self, frame: np.ndarray, model: TFModel):
+        cam_config = self.config["camera"]
+        c_width, c_height = cam_config["resolution"]
+        roi = cam_config["roi"]
+        crop_mask = np.ones((c_height, c_width), np.uint8)
+        crop_mask[:, 0: self.x + 10] = 0
+        crop_mask[:, self.x + self.w - 10:] = 0
+        croped_img = cv.bitwise_and(frame, frame, mask=crop_mask)        
+        index, label = model.predict(croped_img)
+        self.drain_position = int(label)
+        
 
     def get_drain(self, frame: np.ndarray):  # merge into another method
 

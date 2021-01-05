@@ -76,6 +76,7 @@ class Controller:
                 # self.tank.get_drain_lab(frame)
                 # check the position of the drain using machine learning
                 self.tank.get_drain_2(frame, mode='lab')
+                # self.tank.get_drain_ml(frame, model)
 
             self.tank.get_sticker_position_lab(frame)
             for sticker in self.tank.stickers:
@@ -89,6 +90,8 @@ class Controller:
         # make 5 times loop and only if the tank is found
         result = False
         sticker = Sticker()
+        if not self.tank.found:                                    
+            return
         if self.read_plc.drain_camera and self.read_plc.drain_position != self.tank.drain_position:
             logger.error('Drain on Wrong Position')
             return
@@ -113,6 +116,8 @@ class Controller:
             logger.error('Wrong Label Position, expected:' + str(self.read_plc.sticker_position) + ', received: ' + str(sticker.quadrant))
             self.write_plc.position_inc_sticker = sticker.quadrant
             return
+
+
 
         self.final_result = True
         self.write_plc.cam_status = 1
