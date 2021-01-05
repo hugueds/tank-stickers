@@ -114,13 +114,14 @@ class Camera:
     def show(self, frame: np.ndarray = np.ones((400, 400, 1))):
         frame = cv.resize(frame, self.display)
         cv.imshow(self.window_name, frame)
+        self.__update_frame_counter()
 
     def move_window(self, x, y):
         if self.MAX_MONITORS == 2:
             logging.info(f'Moving window to {x}, {y}')
             cv.moveWindow(self.window_name, x, y)
 
-    def update_frame_counter(self):
+    def __update_frame_counter(self):
         if self.frame_counter % 200 == 0:
             logging.info("Keep Alive Camera Message")
         self.frame_counter = self.frame_counter + \
