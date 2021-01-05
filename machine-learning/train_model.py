@@ -22,8 +22,8 @@ TRAIN_PATH = PATH + "train"
 TEST_PATH = PATH + "test"
 IMG_SIZE = 32
 CHANNELS = 1
-LABEL_FILE = "labels.txt"
-CLASS = 'sticker'
+MODEL = 'sticker'
+LABEL_FILE = MODEL + "_labels.txt"
 
 ### Get the labels from file
 labels = []
@@ -40,11 +40,11 @@ dataset = []
 input_shape = (IMG_SIZE, IMG_SIZE, CHANNELS)
 for folder in labels:
     counter = 0
-    files = os.listdir(f'./images/{CLASS}/{labels[i]}')
+    files = os.listdir(f'./images/{MODEL}/{labels[i]}')
     for file in files:
         ext = file.split('.')[-1]
         if ext in ['jpg', 'png']:
-            img = cv.imread(f'./images/{CLASS}/{labels[i]}/{file}')
+            img = cv.imread(f'./images/{MODEL}/{labels[i]}/{file}')
             if CHANNELS == 1:
                 img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
             img = cv.resize(img, input_shape[:2])
@@ -132,7 +132,7 @@ print(classification_report(y_test, pred))
 # Model write to file
 now = datetime.now()
 str_date = now.strftime("%Y-%m-%d_%H%M%S")
-file_name = f"models/{CLASS}_{IMG_SIZE}x{IMG_SIZE}.h5"
+file_name = f"models/{MODEL}_{IMG_SIZE}x{IMG_SIZE}.h5"
 
 model.save(file_name)
 

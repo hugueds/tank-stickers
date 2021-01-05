@@ -58,6 +58,7 @@ class Camera:
             self.cap = VideoStream(
                 src=self.src, usePiCamera=True, resolution=(self.width, self.height), framerate=self.fps)
             self.cap.start()
+            self.set_hardware_rpi()
         elif self.threaded:
             self.cap = WebcamVideoStream(self.src, name='cam', resolution=(self.width, self.height))
             self.cap.start()
@@ -98,13 +99,16 @@ class Camera:
 
     def set_hardware_rpi(self):
         # search for minimum and maximus
-        self.cap.stream.camera.iso = 100
-        self.cap.stream.camera.exposure_mode = 'auto'
-        self.cap.stream.camera.exposure_compensation = self._scale(self.exposure_comp, 0, 50)
+        self.cap.stream.camera.iso = 0 # 100, 200, 320, 400, 500, 640, 800.
+        self.cap.stream.camera.awb_mode = 'auto'
+        # 'off', 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
+        self.cap.stream.camera.exposure_mode = 'off' # snow, beach, spotlight
+        # self.cap.stream.camera.image_effect = 'colorbalance'
+        self.cap.stream.camera.exposure_compensation = self._scale(self.exposure_comp, -25, 25)
         self.cap.stream.camera.brightness = self._scale(self.brightness, 0, 100)
-        self.cap.stream.camera.contrast = self._scale(self.contrast,0 ,200) - 100
-        self.cap.stream.camera.saturation = self._scale(self.saturation, 0, 200) - 100
-        self.cap.stream.camera.sharpness = self._scale(self.sharpness,0,200) - 100
+        self.cap.stream.camera.contrast = self._scale(self.contrast, -100 , 100)
+        self.cap.stream.camera.saturation = self._scale(self.saturation, -100, 100)
+        self.cap.stream.camera.sharpness = self._scale(self.sharpness, -100, 100)
 
     def _scale(self, x, y0, y1):
         x0, x1 = 0, 255
