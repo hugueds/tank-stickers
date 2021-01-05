@@ -101,7 +101,7 @@ class Camera:
         # search for minimum and maximus
         self.cap.stream.camera.iso = 0 # 100, 200, 320, 400, 500, 640, 800.
         self.cap.stream.camera.awb_mode = 'auto'
-        # 'off', 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
+        #awb_modes: 'off', 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
         self.cap.stream.camera.exposure_mode = 'off' # snow, beach, spotlight
         # self.cap.stream.camera.image_effect = 'colorbalance'
         self.cap.stream.camera.exposure_compensation = self._scale(self.exposure_comp, -25, 25)
