@@ -35,7 +35,8 @@ class Controller:
         self.start_time = datetime.now()
         self.tank = Tank()
         self.camera = Camera()
-        self.camera.start()
+        if not is_picture:
+            self.camera.start()
         self.plc = PLC()
         self.model = TFModel(model_name='sticker')
         self.drain_model = TFModel(model_name='drain') # to be implemented
@@ -77,8 +78,8 @@ class Controller:
             if self.camera.number == 1:
                 # self.tank.get_drain_lab(frame)
                 # check the position of the drain using machine learning
-                self.tank.get_drain_2(frame, mode='lab')
-                # self.tank.get_drain_ml(frame, model)
+                # self.tank.get_drain_2(frame, mode='lab')
+                self.tank.get_drain_ml(frame, self.drain_model)
 
             self.tank.get_sticker_position_lab(frame)
             for sticker in self.tank.stickers:

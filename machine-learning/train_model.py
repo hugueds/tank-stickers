@@ -20,9 +20,9 @@ ROOT = '.'
 PATH = ROOT + "/machine-learning/"
 TRAIN_PATH = PATH + "train"
 TEST_PATH = PATH + "test"
-IMG_SIZE = 32
+IMG_SIZE = 100
 CHANNELS = 1
-MODEL = 'sticker'
+MODEL = 'drain'
 LABEL_FILE = MODEL + "_labels.txt"
 
 ### Get the labels from file
@@ -132,7 +132,7 @@ print(classification_report(y_test, pred))
 # Model write to file
 now = datetime.now()
 str_date = now.strftime("%Y-%m-%d_%H%M%S")
-file_name = f"models/{MODEL}_{IMG_SIZE}x{IMG_SIZE}.h5"
+file_name = f"keras_models/{MODEL}_{IMG_SIZE}x{IMG_SIZE}.h5"
 
 model.save(file_name)
 

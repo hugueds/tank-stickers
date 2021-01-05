@@ -50,3 +50,5 @@ error.log.*
 app.log.*
 app/logs/results/*
 results/*
+drain/
+drain/*
