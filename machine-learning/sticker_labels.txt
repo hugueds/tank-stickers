@@ -1,0 +1,12 @@
+sticker_1
+sticker_2
+sticker_p
+sticker_t
+sticker_1_180
+sticker_2_180
+sticker_p_180
+sticker_t_180
+sticker_1_90
+sticker_2_90
+sticker_p_90
+sticker_t_90
