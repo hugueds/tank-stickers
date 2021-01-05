@@ -5,6 +5,7 @@ import numpy as np
 import cv2 as cv
 from .sticker import Sticker
 from .drain import Drain
+from .tf_model import TFModel
 from .colors import *
 
 font = cv.FONT_HERSHEY_SIMPLEX

@@ -18,7 +18,7 @@ camera:
         x: [6.2, 92.0]
         y: [10.0, 87.0]
     fps: 15
-    src: 1
+    src: 0
     brightness: 150
     contrast: 127
     saturation: 180
