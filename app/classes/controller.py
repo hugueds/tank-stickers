@@ -12,7 +12,6 @@ from classes.commands import *
 from classes.image_writter import *
 from classes.tf_model import TFModel
 from models import AppState, PLCInterface, PLCWriteInterface
-from models.quadrants import get_quadrant
 from logger import logger, results_logger
 
 class Controller:
@@ -41,7 +40,10 @@ class Controller:
         self.model = TFModel(model_name='sticker')
         self.drain_model = TFModel(model_name='drain') # to be implemented
 
-    def get_frame(self):
+    def get_frame(self, picture=False):
+        if picture:
+            self.frame = self.file_frame
+            return
         success, self.frame = self.camera.read()
 
     def open_file(self, file):

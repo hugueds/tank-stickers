@@ -24,7 +24,7 @@ while True:
             controller.set_state(AppState.PROCESSING_IMAGE)
 
     elif controller.state == AppState.PROCESSING_IMAGE:
-        controller.analyse()        
+        controller.analyse()
         if controller.final_result:
             controller.set_state(AppState.SAVING_RESULTS)
         else:
