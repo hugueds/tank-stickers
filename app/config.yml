@@ -70,8 +70,15 @@ drain:
     hsv_filter: [[7, 20, 10], [25, 255, 255]]
     lab_filter: [[100, 120, 140], [255, 140, 180]]
 model:
-    size: 70
-    channels: 1
-    file: "graph.h5"
-    labels_file: "labels.txt"
-    default_labels: ["1","2","P","T","1_180","2_180","P_180","T_180","1_90","2_90","P_90","T_90"]
+    sticker:
+        size: 70
+        channels: 1
+        file: "graph.h5"
+        labels_file: "labels.txt"
+        default_labels: ["1","2","P","T","1_180","2_180","P_180","T_180","1_90","2_90","P_90","T_90"]
+    drain:
+        size: 70
+        channels: 1
+        file: "drain_graph.h5"
+        labels_file: "labels.txt"
+        default_labels: ["6","7", "8", "9", "10", "11", "12", "13", "14"]

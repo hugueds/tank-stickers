@@ -28,8 +28,8 @@ class Controller:
     start_time: datetime
     frame: np.ndarray = None
     file_frame = None
-    result_array = []
-    result = False
+    result_list = []
+    final_result = False
 
     def __init__(self, is_picture=False):
         self.start_time = datetime.now()
@@ -38,6 +38,7 @@ class Controller:
         self.camera.start()
         self.plc = PLC()
         self.model = TFModel()
+        # self.drain_model = TFModel(model_name='drain') # to be implemented
 
     def get_frame(self):
         success, self.frame = self.camera.read()
@@ -53,13 +54,12 @@ class Controller:
             frame = draw_tank_center_axis(frame, self.tank)
             frame = draw_tank_rectangle(frame, self.tank)
             frame = draw_sticker(frame, self.camera, self.tank)
-            frame = draw_drain(frame, self.tank)
+            frame = draw_drain(frame, self.tank) # remove after ML implementation
         frame = draw_roi_lines(frame, self.camera)
         frame = draw_center_axis(frame, self.camera)
         frame = draw_camera_info(frame, self.camera)
         frame = draw_plc_status(frame, self.plc, self.read_plc, self.write_plc)
         self.camera.show(frame)
-        self.camera.update_frame_counter()
 
     def process(self, frame: np.ndarray = 0):
         if not frame:
@@ -114,7 +114,7 @@ class Controller:
             self.write_plc.position_inc_sticker = sticker.quadrant
             return
 
-        self.result = True
+        self.final_result = True
         self.write_plc.cam_status = 1
 
 
@@ -126,7 +126,7 @@ class Controller:
         self.read_plc.drain_position = 0
 
     def confirm_request(self):
-        self.result = False
+        self.final_result = False
         self.read_plc.read_request = False
         self.write_plc.request_ack = True
         self.write_plc.job_status = 1
@@ -141,7 +141,6 @@ class Controller:
         key_pressed(key, self.camera, self.tank)
         if key == ord('n'):
             self.get_fake_parameters()
-
 
     def start_plc(self):
         logger.info('Starting PLC Thread')

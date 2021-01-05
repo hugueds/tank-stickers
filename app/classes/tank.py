@@ -207,7 +207,7 @@ class Tank:
                 if len(poly) == 4:
                     (x, y, w, h) = cv.boundingRect(c)
                     ar = w / float(h)
-                    cond = ar >= 0.9 and ar <= 1.1
+                    cond = ar >= 0.8 and ar <= 1.2
                     cond = cond and (h) >= self.sticker_size["min"]
                     cond = cond and (h) <= self.sticker_size["max"]
                     cond = cond and (w) >= self.sticker_size["min"]
@@ -229,7 +229,7 @@ class Tank:
         self.drain_found = False
         self.drain_area_found = 0
         self.drain_position = 0
-        self.drain_x, self.drain_y, self.drain_w, self.drain_h = 0, 0, 0, 0
+        self.drain_x, self.drain_y, self.drain_w, self.drain_h = 0, 0, 0, 0         
         cam_config = self.config["camera"]
         c_width, c_height = cam_config["resolution"]
         roi = cam_config["roi"]
@@ -461,7 +461,6 @@ class Tank:
         roi = cam_config["roi"]
 
         mid_x = frame.shape[1] // 2
-
         x_center_offset = int(cam_config["center_x_offset"] * c_width // 100)
         vector_y = mask[:, mid_x + x_center_offset]
         roi_vector_y = vector_y[:]
@@ -503,4 +502,5 @@ class Tank:
         self.found = self.h >= self.min_height
         self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
-        cv.imshow('debug_tank', mask)
+        if debug_tank:
+            cv.imshow('debug_tank', mask)

@@ -11,15 +11,14 @@ tf.compat.v1.disable_eager_execution()
 
 class TFModel:
 
-    def __init__(self, config_file='config.yml'):
+    def __init__(self, config_file='config.yml', model_name='sticker'):
         with open(config_file) as file:
-            config = yaml.safe_load(file)['model']                
+            config = yaml.safe_load(file)['model'][model_name]                
 
         self.size = config['size']
         self.channels = config['channels']
         self.graph = load_model(config['file'])
         self.labels = config['default_labels']
-
 
     def predict(self, image: np.ndarray):
         processed_image = self.preprocess(image)

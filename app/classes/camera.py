@@ -97,18 +97,19 @@ class Camera:
         self.cap.stream.set(cv.CAP_PROP_BRIGHTNESS, self.brightness) # # min: 0 max: 255 increment:1
         self.cap.stream.set(cv.CAP_PROP_CONTRAST, self.contrast)  # min: 0 max: 255 increment:1
         self.cap.stream.set(cv.CAP_PROP_SATURATION, self.saturation) #  min: 0 max: 255 increment:1
+        self.cap.stream.set(cv.CAP_PROP_SHARPNESS, self.sharpness) #  min: 0 max: 255 increment:1
 
     def set_hardware_rpi(self):
         # search for minimum and maximus
         self.cap.stream.camera.iso = 100
         self.cap.stream.camera.exposure_mode = 'auto'
-        self.cap.stream.camera.exposure_compensation = self._scale(self.exposure_comp, 0, 50) - 25
-        self.cap.stream.camera.brightness = self._scale(self.brightness, 0, 100)
-        self.cap.stream.camera.contrast = self._scale(self.contrast,0 ,200) - 100
-        self.cap.stream.camera.saturation = self._scale(self.saturation, 0, 200) - 100
-        self.cap.stream.camera.sharpness = self._scale(self.sharpness,0,200) - 100
+        self.cap.stream.camera.exposure_compensation = self.__scale(self.exposure_comp, 0, 50) - 25
+        self.cap.stream.camera.brightness = self.__scale(self.brightness, 0, 100)
+        self.cap.stream.camera.contrast = self.__scale(self.contrast,0 ,200) - 100
+        self.cap.stream.camera.saturation = self.__scale(self.saturation, 0, 200) - 100
+        self.cap.stream.camera.sharpness = self.__scale(self.sharpness,0,200) - 100
 
-    def _scale(self, x, y0, y1):
+    def __scale(self, x, y0, y1):
         x0, x1 = 0, 255
         return int(y0 + ( (y1 -y0) / (x1 - x0) * (x - x0)) )
 
@@ -116,13 +117,15 @@ class Camera:
     def show(self, frame: np.ndarray = np.ones((400, 400, 1))):
         frame = cv.resize(frame, self.display)
         cv.imshow(self.window_name, frame)
+        self.__update_frame_counter()
+
 
     def move_window(self, x, y):
         if self.MAX_MONITORS == 2:
             logging.info(f'Moving window to {x}, {y}')
             cv.moveWindow(self.window_name, x, y)
 
-    def update_frame_counter(self):
+    def __update_frame_counter(self):
         if self.frame_counter % 200 == 0:
             logging.info("Keep Alive Camera Message")
         self.frame_counter = self.frame_counter + \

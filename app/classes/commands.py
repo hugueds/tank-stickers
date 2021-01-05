@@ -44,6 +44,8 @@ def key_pressed(key, camera: Camera, tank: Tank):
         open_sticker_debug(tank)
     elif key == ord('2'):
         open_drain_debug(tank)
+    elif key == ord('3'):
+        open_tank_debug(tank)
     elif key == ord("t"):
         open_tracker(camera, tank)
     elif key == ord("c"):
@@ -127,6 +129,10 @@ def open_sticker_debug(tank: Tank):
         cv.destroyWindow('debug_tank_sticker')
     tank.debug_sticker = not tank.debug_sticker
 
+def open_tank_debug(tank: Tank):
+    if tank.debug_tank:
+        cv.destroyWindow('debug_tank')
+    tank.debug_tank = not tank.debug_tank
 
 def open_drain_debug(tank: Tank):
     if tank.debug_drain:

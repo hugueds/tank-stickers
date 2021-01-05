@@ -126,7 +126,7 @@ if __name__ == "__main__":
                 camera.output.write(cv.resize(orig, (1280, 720)))
                 # camera.output.write(cv.resize(frame, (1280, 720)))
 
-            camera.update_frame_counter()
+            camera.__update_frame_counter()
             camera.show(frame)
 
             # -----------------  Commands -------------------
