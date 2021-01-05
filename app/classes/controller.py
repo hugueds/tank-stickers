@@ -87,7 +87,7 @@ class Controller:
         # compare if requested PLC info matches processed image
         # define error priority
         # make 5 times loop and only if the tank is found
-
+        result = False
         sticker = Sticker()
         if self.read_plc.drain_camera and self.read_plc.drain_position != self.tank.drain_position:
             logger.error('Drain on Wrong Position')

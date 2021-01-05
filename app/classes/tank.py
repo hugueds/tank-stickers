@@ -297,6 +297,9 @@ class Tank:
                     row = 2
                 self.drain_position = quad_list[row][col]
 
+    def get_drain_ml(self, frame: np.ndarray):
+        pass
+
     def get_drain(self, frame: np.ndarray):  # merge into another method
 
         cam_config = self.config["camera"]

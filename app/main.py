@@ -25,11 +25,12 @@ while True:
 
     elif controller.state == AppState.PROCESSING_IMAGE:
         controller.analyse()
-        if controller.final_result:
-            controller.set_state(AppState.SAVING_RESULTS)
-        else:
-            print('Trying again...')
-            sleep(0.1)
+        if len(controller.result_list) == 5:            
+            if controller.final_result:
+                controller.set_state(AppState.SAVING_RESULTS)
+            else:
+                print('Invalid Configuration, redoing operation')
+                sleep(0.1)
 
     elif controller.state == AppState.SAVING_RESULTS:
         controller.save_result()
