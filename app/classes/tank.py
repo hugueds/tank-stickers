@@ -81,7 +81,7 @@ class Tank:
 
         # test with X ROI
         cam_config = self.config["camera"]
-        width, height = g_frame.shape
+        height, width = g_frame.shape
         roi = cam_config["roi"]
         off1 = int(roi["x"][0] * width // 100)
         off2 = int(roi["x"][1] * width // 100)
