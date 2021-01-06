@@ -77,20 +77,20 @@ class Tank:
         return self.color_image
 
     def find_in_circle(self, frame: np.ndarray):
-        g_frame = cv.cvtColor(frame, cv.COLOR_RGB2GRAY)
-
+        g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        blur = cv.GaussianBlur(g_frame, (5,5), 1.0)
         # test with X ROI
-        cam_config = self.config["camera"]
-        height, width = g_frame.shape
-        roi = cam_config["roi"]
-        off1 = int(roi["x"][0] * width // 100)
-        off2 = int(roi["x"][1] * width // 100)
-        crop_mask = np.ones((width, height), np.uint8)
-        crop_mask[:,off1:off2] = 0
-        croped_img = cv.bitwise_and(g_frame, g_frame, mask=crop_mask)
+        # cam_config = self.config["camera"]
+        # height, width = g_frame.shape
+        # roi = cam_config["roi"]
+        # off1 = int(roi["x"][0] * width // 100)
+        # off2 = int(roi["x"][1] * width // 100)
+        # crop_mask = np.ones((width, height), np.uint8)
+
+        # croped_img = cv.bitwise_and(g_frame, g_frame, mask=crop_mask)
 
         # find only inside the roi lines to reduce error
-        self.circles = cv.HoughCircles(croped_img, cv.HOUGH_GRADIENT, 1.2,
+        self.circles = cv.HoughCircles(blur, cv.HOUGH_GRADIENT, 1.2,
                                         param1=self.params[0],
                                         param2=self.params[1],
                                         minDist=self.min_dist,
