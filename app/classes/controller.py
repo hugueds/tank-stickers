@@ -137,7 +137,7 @@ class Controller:
 
     def get_fake_parameters(self):
         self.read_plc.read_request = True
-        self.read_plc.sticker = '1'
+        self.read_plc.sticker = 1
         self.read_plc.sticker_angle = 180
         self.read_plc.sticker_position = 4
         self.read_plc.drain_position = 0
@@ -146,6 +146,9 @@ class Controller:
         self.final_result = False
         self.read_plc.read_request = False
         self.write_plc.request_ack = True
+        self.__clear_plc()
+
+    def __clear_plc(self):
         self.write_plc.job_status = 1
         self.write_plc.cam_status = 0
         self.write_plc.position_inc_drain = 0
