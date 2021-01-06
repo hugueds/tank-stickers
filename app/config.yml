@@ -7,7 +7,7 @@ device:
 camera:
     number: 1
     debug: False
-    rpi_camera: False
+    rpi_camera: True
     threaded: True
     resolution: [640,480]
     display: [640,480]
@@ -38,7 +38,7 @@ plc:
     db_write:
         number: 14
         start: 0
-        size: 40
+        size: 10
     update_time: 0.2
 tank:
     min: [0, 1]
