@@ -14,7 +14,7 @@ class PLCWriteInterface:
         self.size = size
 
     def get_bytearray(self) -> bytearray:
-        
+
         _bytearray = bytearray(self.size)
 
         _bytearray[0] = (self.request_ack << 0)
@@ -24,8 +24,8 @@ class PLCWriteInterface:
         _bytearray[4] = self.inc_sticker
         _bytearray[5] = self.position_inc_sticker
         _bytearray[6] = self.position_inc_drain
-        _bytearray[7] = self.inc_sticker
-        _bytearray[8] = self.inc_angle
+        _bytearray[7] = self.inc_angle
+        _bytearray[8] = self.inc_sticker
 
         self._bytearray = _bytearray
         return _bytearray

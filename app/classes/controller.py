@@ -29,16 +29,16 @@ class Controller:
     file_frame = None
     result_list = []
     final_result = False
+    drain_model: TFModel
 
     def __init__(self, is_picture=False):
         self.start_time = datetime.now()
         self.tank = Tank()
         self.camera = Camera()
+        self.plc = PLC()
         if not is_picture:
             self.camera.start()
-        self.plc = PLC()
         self.model = TFModel(model_name='sticker')
-        self.drain_model = TFModel(model_name='drain') # to be implemented
 
     def get_frame(self, picture=False):
         if picture:
@@ -47,8 +47,8 @@ class Controller:
         success, self.frame = self.camera.read()
 
     def open_file(self, file):
+        self.frame = cv.imread(file)
         if self.frame is None:
-            self.frame = cv.imread(file)
             self.file_frame = self.frame
 
     def show(self):
@@ -78,10 +78,12 @@ class Controller:
         if self.tank.found:
 
             if self.camera.number == 1:
+                if self.drain_model == None:
+                    self.drain_model = TFModel(model_name='drain') # to be implemented
+                self.tank.get_drain_ml(frame, self.drain_model)
                 # self.tank.get_drain_lab(frame)
                 # check the position of the drain using machine learning
                 # self.tank.get_drain_2(frame, mode='lab')
-                self.tank.get_drain_ml(frame, self.drain_model)
 
             self.tank.get_sticker_position_lab(frame)
             for sticker in self.tank.stickers:
@@ -99,31 +101,38 @@ class Controller:
             return
         if self.read_plc.drain_camera and self.read_plc.drain_position != self.tank.drain_position:
             logger.error('Drain on Wrong Position')
+            self.write_plc.cam_status = 2
             return
         if len(self.tank.stickers) > 1:
             logger.error('There are more stickers than needed')
+            self.write_plc.cam_status = 2
             return
         # Condition if found and not requested
         if len(self.tank.stickers) == 0 and self.read_plc.sticker_camera:
             logger.error('Sticker not found')
+            self.write_plc.cam_status = 2
             return
         if len(self.tank.stickers):
             sticker = self.tank.stickers[0]
-        if self.read_plc.sticker != sticker.label: # sticker.label_char_index
+        if self.read_plc.sticker != sticker.label_char_index: # sticker.label_char_index
             logger.error('Wrong Label Label, expected:' + str(self.read_plc.sticker) + ', received: ' + str(sticker.label))
-            self.write_plc.inc_sticker = sticker.label
+            self.write_plc.inc_sticker = sticker.label_char_index
+            self.write_plc.cam_status = 2
             return
         if self.read_plc.sticker_angle != sticker.angle:
             logger.error('Wrong Label Angle, expected:' + str(self.read_plc.sticker_angle) + ', received: ' + str(sticker.angle))
             self.write_plc.inc_angle = sticker.angle
+            self.write_plc.cam_status = 2
             return
         if self.read_plc.sticker_position != sticker.quadrant:
             logger.error('Wrong Label Position, expected:' + str(self.read_plc.sticker_position) + ', received: ' + str(sticker.quadrant))
             self.write_plc.position_inc_sticker = sticker.quadrant
+            self.write_plc.cam_status = 2
             return
 
         self.final_result = True
         self.write_plc.cam_status = 1
+        self.write_plc.job_status = 2
 
 
     def get_fake_parameters(self):

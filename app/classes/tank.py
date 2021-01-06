@@ -24,7 +24,7 @@ class Tank:
     sticker_quadrant = 0
     drain: Drain
     drain_found = False
-    drain_position = 0
+    drain_position: int = 0
     drain_x, drain_y, drain_w, drain_h = 0, 0, 0, 0
     drain_rel_x, drain_rel_y = 0, 0
     debug_tank = False
@@ -78,7 +78,7 @@ class Tank:
 
     def find_in_circle(self, frame: np.ndarray):
         g_frame = cv.cvtColor(frame, cv.COLOR_RGB2GRAY)
-        # if find_circle hide the roi lines
+        # find only inside the roi lines to reduce error
         self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT, 1.2,
                                         param1=self.params[0],
                                         param2=self.params[1],
