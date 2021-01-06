@@ -1,3 +1,4 @@
+from logging import FATAL
 from time import sleep
 from models import AppState
 from classes import Controller, Camera
@@ -19,6 +20,7 @@ while True:
             controller.set_state(AppState.WAITING_REQUEST)
 
     elif controller.state == AppState.WAITING_REQUEST:
+        controller.write_plc.request_ack = False
         if controller.read_plc.read_request:
             controller.confirm_request()
             controller.set_state(AppState.PROCESSING_IMAGE)
