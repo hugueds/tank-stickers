@@ -134,7 +134,6 @@ class Controller:
         self.write_plc.cam_status = 1
         self.write_plc.job_status = 2
 
-
     def get_fake_parameters(self):
         self.read_plc.read_request = True
         self.read_plc.sticker = 1
