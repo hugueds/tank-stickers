@@ -29,7 +29,7 @@ class Controller:
     file_frame = None
     result_list = []
     final_result = False
-    drain_model: TFModel
+    drain_model: TFModel = None
 
     def __init__(self, is_picture=False):
         self.start_time = datetime.now()
