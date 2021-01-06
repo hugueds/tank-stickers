@@ -44,7 +44,7 @@ class Sticker:
         if len(split) == 1:
             self.angle = 0
         else:
-            if split[1] == '180':
+            if split[1] == '90':
                 self.angle = 2
             else:
                 self.angle = 3

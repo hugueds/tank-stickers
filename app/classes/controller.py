@@ -138,7 +138,7 @@ class Controller:
     def get_fake_parameters(self):
         self.read_plc.read_request = True
         self.read_plc.sticker = 1
-        self.read_plc.sticker_angle = 180
+        self.read_plc.sticker_angle = 2
         self.read_plc.sticker_position = 4
         self.read_plc.drain_position = 0
 
