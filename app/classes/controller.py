@@ -101,7 +101,7 @@ class Controller:
             return
         if self.read_plc.drain_camera and self.read_plc.drain_position != self.tank.drain_position:
             logger.error('Drain on Wrong Position')
-            self.write_plc.cam_status = 2
+            self.write_plc.cam_status = 7
             return
         if len(self.tank.stickers) > 1:
             logger.error('There are more stickers than needed')
@@ -110,19 +110,19 @@ class Controller:
         # Condition if found and not requested
         if len(self.tank.stickers) == 0 and self.read_plc.sticker_camera:
             logger.error('Sticker not found')
-            self.write_plc.cam_status = 2
+            self.write_plc.cam_status = 3
             return
         if len(self.tank.stickers):
             sticker = self.tank.stickers[0]
         if self.read_plc.sticker != sticker.label_char_index: # sticker.label_char_index
             logger.error('Wrong Label Label, expected:' + str(self.read_plc.sticker) + ', received: ' + str(sticker.label))
             self.write_plc.inc_sticker = sticker.label_char_index
-            self.write_plc.cam_status = 2
+            self.write_plc.cam_status = 9
             return
         if self.read_plc.sticker_angle != sticker.angle:
             logger.error('Wrong Label Angle, expected:' + str(self.read_plc.sticker_angle) + ', received: ' + str(sticker.angle))
             self.write_plc.inc_angle = sticker.angle
-            self.write_plc.cam_status = 2
+            self.write_plc.cam_status = 8
             return
         if self.read_plc.sticker_position != sticker.quadrant:
             logger.error('Wrong Label Position, expected:' + str(self.read_plc.sticker_position) + ', received: ' + str(sticker.quadrant))
