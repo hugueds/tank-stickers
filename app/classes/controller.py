@@ -115,7 +115,7 @@ class Controller:
         if len(self.tank.stickers):
             sticker = self.tank.stickers[0]
         if self.read_plc.sticker != sticker.label_char_index: # sticker.label_char_index
-            logger.error('Wrong Label Label, expected:' + str(self.read_plc.sticker) + ', received: ' + str(sticker.label))
+            logger.error('Wrong Label, expected:' + str(self.read_plc.sticker) + ', received: ' + str(sticker.label))
             self.write_plc.inc_sticker = sticker.label_char_index
             self.write_plc.cam_status = 9
             return
