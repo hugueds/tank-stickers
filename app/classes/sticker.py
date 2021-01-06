@@ -30,7 +30,7 @@ class Sticker:
     def update_label_info(self):
         self.label_char = (self.label.split('_')[0]).lower()
         sticker_chars = ['1', '2', 'p', 't']
-        self.label_char_index = sticker_chars.index(self.label_char)
+        self.label_char_index = sticker_chars.index(self.label_char) + 1
         self.update_label_angle()
         if self.label_index <= 3:
             self.position = 0
