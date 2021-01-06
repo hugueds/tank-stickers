@@ -85,7 +85,7 @@ class Tank:
         roi = cam_config["roi"]
         off1 = int(roi["x"][0] * width // 100)
         off2 = int(roi["x"][1] * width // 100)
-        crop_mask = np.ones((height, width), np.uint8)
+        crop_mask = np.ones((width, height), np.uint8)
         crop_mask[:,off1:off2] = 0
         croped_img = cv.bitwise_and(g_frame, g_frame, mask=crop_mask)
 
