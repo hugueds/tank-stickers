@@ -8,7 +8,7 @@ class Sticker:
     label_char = ''
     label_char_index = 255
     position = 255
-    angle = 999
+    angle = 255
     area = 0
     quadrant = 0
     found = False
