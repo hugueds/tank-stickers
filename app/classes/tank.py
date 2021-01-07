@@ -78,7 +78,9 @@ class Tank:
 
     def find_in_circle(self, frame: np.ndarray):
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        blur = cv.GaussianBlur(g_frame, (5,5), 1.0)
+        blur = cv.GaussianBlur(g_frame, (5,5), 0)
+
+        # blur = cv.GaussianBlur(g_frame, (5,5), 0)
         # test with X ROI
         # cam_config = self.config["camera"]
         # height, width = g_frame.shape
@@ -317,7 +319,7 @@ class Tank:
         # crop_mask[:, self.x + self.w - 10:] = 0
         # croped_img = cv.bitwise_and(frame, frame, mask=crop_mask)
         if self.found and self.x > 10 and self.y > 10:
-            tank = frame[self.y - 10 :self.y + self.h + 10, self.x : self.x+self.w]
+            tank = frame[self.y - 10 :self.y + self.h, self.x -10: self.x+self.w]
             index, label = model.predict(tank)
             self.drain_position = int(label)
         else:
@@ -478,7 +480,9 @@ class Tank:
     def find_2(self, frame: np.ndarray):
 
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-        blur = cv.GaussianBlur(hsv, (5,5), 1.0)
+        # hsv = cv.cvtColor(frame, cv.COLOR_RGB2HSV)
+        blur = cv.GaussianBlur(hsv,(7,7), 0)
+        # blur = cv.medianBlur(hsv, (5,5))
         lower =  np.array( (self.table_hsv[0][0], self.table_hsv[0][1], self.table_hsv[0][2]), np.uint8)
         higher = np.array( (self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2]), np.uint8)
         mask = cv.inRange(blur, lower, higher)

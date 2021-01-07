@@ -36,6 +36,8 @@ def key_pressed(key, camera: Camera, tank: Tank):
         rewind_frames(camera)
     elif key == ord("s"):
         save_image(camera)
+    elif key == ord("S"):
+        save_image(camera, tank)
     elif key == ord("v"):
         record(camera)
     elif key == ord("r"):
@@ -69,12 +71,14 @@ def open_help():
         cv.destroyWindow("Instructions")
 
 
-def save_image(camera: Camera, gray=False):
+def save_image(camera: Camera, tank: Tank = None, gray=False):
     _, frame = camera.read()
     now = datetime.now()
     str_date = now.strftime("%Y-%m-%d_%H%M%S")
     file_name = f"SCREENSHOT_{str_date}.jpg"
     path = "../captures/" + file_name
+    if tank and tank.found:
+        frame = frame[tank.y + -15: tank.y + tank.h + 15, tank.x - 15: tank.x + tank.w + 15]
     cv.imwrite(path, frame)
     logger.info(f"Screenshot saved in " + path)
 
