@@ -309,14 +309,15 @@ class Tank:
                 self.drain_position = quad_list[row][col]
 
     def get_drain_ml(self, frame: np.ndarray, model: TFModel):
-        cam_config = self.config["camera"]
-        c_width, c_height = cam_config["resolution"]
-        roi = cam_config["roi"]
-        crop_mask = np.ones((c_height, c_width), np.uint8)
-        crop_mask[:, 0: self.x + 10] = 0
-        crop_mask[:, self.x + self.w - 10:] = 0
-        croped_img = cv.bitwise_and(frame, frame, mask=crop_mask)
-        index, label = model.predict(croped_img)
+        # cam_config = self.config["camera"]
+        # c_width, c_height = cam_config["resolution"]
+        # roi = cam_config["roi"]
+        # crop_mask = np.ones((c_height, c_width), np.uint8)
+        # crop_mask[:, 0: self.x + 10] = 0
+        # crop_mask[:, self.x + self.w - 10:] = 0
+        # croped_img = cv.bitwise_and(frame, frame, mask=crop_mask)
+        tank = frame[self.y - 10 :self.y + self.h + 10, self.x : self.x+self.w, :]
+        index, label = model.predict(tank)
         self.drain_position = int(label)
 
 
