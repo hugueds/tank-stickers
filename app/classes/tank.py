@@ -316,9 +316,12 @@ class Tank:
         # crop_mask[:, 0: self.x + 10] = 0
         # crop_mask[:, self.x + self.w - 10:] = 0
         # croped_img = cv.bitwise_and(frame, frame, mask=crop_mask)
-        tank = frame[self.y - 10 :self.y + self.h + 10, self.x : self.x+self.w, :]
-        index, label = model.predict(tank)
-        self.drain_position = int(label)
+        if self.found:
+            tank = frame[self.y - 10 :self.y + self.h + 10, self.x : self.x+self.w]
+            index, label = model.predict(tank)
+            self.drain_position = int(label)
+        else:
+            self.drain_position = 0
 
 
     def get_drain(self, frame: np.ndarray):  # merge into another method
