@@ -22,8 +22,8 @@ class PLCWriteInterface:
         _bytearray[2] = self.job_status
         _bytearray[3] = self.cam_status
         _bytearray[4] = self.inc_sticker
-        _bytearray[5] = self.position_inc_sticker
-        _bytearray[6] = self.position_inc_drain
+        _bytearray[5] = self.position_inc_drain
+        _bytearray[6] = self.position_inc_sticker
         _bytearray[7] = self.inc_angle
         _bytearray[8] = self.inc_sticker
 
