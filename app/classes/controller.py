@@ -95,44 +95,47 @@ class Controller:
         # compare if requested PLC info matches processed image
         # define error priority
         # make 5 times loop and only if the tank is found
-        result = False
+        self.__clear_plc()
+        error = False
         sticker = Sticker()
         if not self.tank.found:
+            self.write_plc.cam_status = 0
             return
         if self.read_plc.drain_camera and self.read_plc.drain_position != self.tank.drain_position:
-            logger.error('Drain on Wrong Position')
+            print('Drain on Wrong Position')
             self.write_plc.cam_status = 7
-            return
+            error = True
         if len(self.tank.stickers) > 1:
-            logger.error('There are more stickers than needed')
+            print('There are more stickers than needed')
             self.write_plc.cam_status = 2
-            return
+            error = True
         # Condition if found and not requested
         if len(self.tank.stickers) == 0 and self.read_plc.sticker_camera:
-            logger.error('Sticker not found')
+            print('Sticker not found')
             self.write_plc.cam_status = 3
-            return
+            error = True
         if len(self.tank.stickers):
             sticker = self.tank.stickers[0]
         if self.read_plc.sticker != sticker.label_char_index: # sticker.label_char_index
-            logger.error('Wrong Label, expected:' + str(self.read_plc.sticker) + ', received: ' + str(sticker.label))
+            print('Wrong Label, expected:' + str(self.read_plc.sticker) + ', received: ' + str(sticker.label))
             self.write_plc.inc_sticker = sticker.label_char_index
             self.write_plc.cam_status = 9
-            return
+            error = True
         if self.read_plc.sticker_angle != sticker.angle:
-            logger.error('Wrong Label Angle, expected:' + str(self.read_plc.sticker_angle) + ', received: ' + str(sticker.angle))
+            print('Wrong Label Angle, expected:' + str(self.read_plc.sticker_angle) + ', received: ' + str(sticker.angle))
             self.write_plc.inc_angle = sticker.angle
             self.write_plc.cam_status = 8
-            return
+            error = True
         if self.read_plc.sticker_position != sticker.quadrant:
-            logger.error('Wrong Label Position, expected:' + str(self.read_plc.sticker_position) + ', received: ' + str(sticker.quadrant))
+            print('Wrong Label Position, expected:' + str(self.read_plc.sticker_position) + ', received: ' + str(sticker.quadrant))
             self.write_plc.position_inc_sticker = sticker.quadrant
             self.write_plc.cam_status = 2
-            return
+            error = True
 
-        self.final_result = True
-        self.write_plc.cam_status = 1
-        self.write_plc.job_status = 2
+        if not error:
+            self.final_result = True
+            self.write_plc.cam_status = 1
+            self.write_plc.job_status = 2
 
     def get_fake_parameters(self):
         self.read_plc.read_request = True
@@ -145,11 +148,11 @@ class Controller:
         self.final_result = False
         self.read_plc.read_request = False
         self.write_plc.request_ack = True
+        self.write_plc.cam_status = 0
+        self.write_plc.job_status = 1
         self.__clear_plc()
 
     def __clear_plc(self):
-        self.write_plc.job_status = 1
-        self.write_plc.cam_status = 0
         self.write_plc.position_inc_drain = 0
         self.write_plc.position_inc_sticker = 0
         self.write_plc.inc_sticker = 0
