@@ -177,7 +177,10 @@ class Tank:
         x_off_end = int(roi["x"][1] * c_width // 100)
 
         roi_mask = np.ones(frame.shape[:2], dtype=np.uint8)
-        roi_mask[y_off_start:y_off_end,x_off_start:x_off_end] = 0
+        roi_mask[0:y_off_start,:] = 255
+        roi_mask[y_off_end:c_height,:] = 255
+        roi_mask[:, 0:x_off_start] = 255
+        roi_mask[:, x_off_end:c_width] = 255
 
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         blur = cv.GaussianBlur(hsv,(7,7), 0)
