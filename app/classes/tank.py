@@ -152,19 +152,32 @@ class Tank:
             self.sticker_quadrant = 99
 
     def get_drain_ml(self, frame: np.ndarray, model: TFModel):
-        cam_config = self.config["camera"]
-        c_width, c_height = cam_config["resolution"]
-        roi = cam_config["roi"]
-        crop_mask = np.ones((c_height, c_width), np.uint8)
-        croped_img = cv.bitwise_and(frame, frame, mask=crop_mask)
-        if self.found and self.x > 10 and self.y > 10:
-            tank = frame[self.y - 10 :self.y + self.h, self.x -10: self.x+self.w]
-            index, label = model.predict(tank)
+        if self.found:
+            cam_config = self.config["camera"]
+            c_width, c_height = cam_config["resolution"]
+            roi = cam_config["roi"]
+            y_off_start = int(c_height * roi["y"][0] // 100)
+            y_off_end = int(c_height * roi["y"][1] // 100)
+            x_off_start = int(roi["x"][0] * c_width // 100)
+            x_off_end = int(roi["x"][1] * c_width // 100)
+            croped_img = frame[y_off_start:y_off_end,x_off_start:x_off_end,:]
+            index, label = model.predict(croped_img)
             self.drain_position = int(label)
         else:
             self.drain_position = 0
 
     def find(self, frame: np.ndarray):
+
+        cam_config = self.config["camera"]
+        c_width, c_height = cam_config["resolution"]
+        roi = cam_config["roi"]
+        y_off_start = int(c_height * roi["y"][0] // 100)
+        y_off_end = int(c_height * roi["y"][1] // 100)
+        x_off_start = int(roi["x"][0] * c_width // 100)
+        x_off_end = int(roi["x"][1] * c_width // 100)
+
+        roi_mask = np.ones(frame.shape[:2], dtype=np.uint8)
+        roi_mask[y_off_start:y_off_end,x_off_start:x_off_end] = 0
 
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         blur = cv.GaussianBlur(hsv,(7,7), 0)
@@ -172,19 +185,10 @@ class Tank:
         higher = np.array( (self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2]), np.uint8)
         mask = cv.inRange(blur, lower, higher)
 
-        mask = cv.bitwise_and(frame, mask)
+        mask = cv.bitwise_and(mask, mask, mask=roi_mask)
 
         if self.debug_tank:
             cv.imshow('debug_tank', mask)
-
-        cam_config = self.config["camera"]
-        c_width, c_height = cam_config["resolution"]
-        roi = cam_config["roi"]
-
-        y_offset_start = int(c_height * roi["y"][0] // 100)
-        y_offset_end = int(c_height * roi["y"][1] // 100)
-
-
 
         mid_x = frame.shape[1] // 2
         x_center_offset = int(cam_config["center_x_offset"] * c_width // 100)
@@ -202,22 +206,21 @@ class Tank:
         self.y = np.where(vector_y == 0)[0][0]  # Get the first black pixel
 
         center_y = (self.y + self.h) // 2
-        off1 = int(roi["x"][0] * c_width // 100)
-        off2 = int(roi["x"][1] * c_width // 100)
+
 
         adj_y1 = int(self.y + (self.h * 0.22))  # SET IN CONFIG
         adj_y2 = int(center_y + (self.h * 0.3))
 
         # Create lines for adj_y
-        vector_x1 = mask[adj_y1, off1:mid_x]
-        vector_x2 = mask[adj_y2, mid_x:off2]
+        vector_x1 = mask[adj_y1, x_off_start:mid_x]
+        vector_x2 = mask[adj_y2, mid_x:x_off_end]
 
         for i in range(len(vector_x1)):
             if vector_x1[i] == 0:
-                self.x = i + off1
+                self.x = i + x_off_start
                 break
 
-        vector_x2 = mask[adj_y2, mid_x:off2]
+        vector_x2 = mask[adj_y2, mid_x:x_off_end]
 
         for i in range(len(vector_x2) - 1, -1, -1):
             if vector_x2[i] == 0:

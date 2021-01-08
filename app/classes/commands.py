@@ -78,7 +78,13 @@ def save_image(camera: Camera, tank: Tank = None, gray=False):
     file_name = f"SCREENSHOT_{str_date}.jpg"
     path = "../captures/" + file_name
     if tank and tank.found:
-        frame = frame[tank.y + -15: tank.y + tank.h + 15, tank.x - 15: tank.x + tank.w + 15]
+        c_width, c_height = camera.width, camera.height
+        roi = camera.roi
+        y_off_start = int(c_height * roi["y"][0] // 100)
+        y_off_end = int(c_height * roi["y"][1] // 100)
+        x_off_start = int(roi["x"][0] * c_width // 100)
+        x_off_end = int(roi["x"][1] * c_width // 100)
+        frame = frame[y_off_start:y_off_end,x_off_start:x_off_end,:]
     cv.imwrite(path, frame)
     logger.info(f"Screenshot saved in " + path)
 
