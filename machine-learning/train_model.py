@@ -7,12 +7,14 @@ from datetime import datetime
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 
+
 ## New version of Keras (Tensorflow)
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Activation, Dense, Flatten, Conv2D, MaxPool2D, Dropout
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 ### Path and model variables
 
@@ -78,6 +80,14 @@ X_test -= x_train_mean
 y_cat_train = to_categorical(y_train, num_classes)
 y_cat_test = to_categorical(y_test, num_classes)
 
+datagen = ImageDataGenerator(
+    rotation_range=10,
+    width_shift_range=0.15,
+    height_shift_range=0.15
+)
+
+datagen.fit(X_train)
+
 # Create the CNN
 model = Sequential()
 
@@ -114,11 +124,15 @@ model.compile(loss='categorical_crossentropy',
         metrics=['accuracy']
 )
 
-batch_size = 4
-epochs = 10
+batch_size = 32
+epochs = 100
 callbacks = [EarlyStopping(patience=2), board]
 
-model.fit(X_train, y_cat_train, batch_size=batch_size, epochs=epochs, callbacks=callbacks, validation_split=0.1, )
+
+
+model.fit(datagen.flow(X_train, y_cat_train, batch_size=32), validation_data=(X_test, y_cat_test),   epochs=epochs)
+
+# model.fit(X_train, y_cat_train, batch_size=batch_size, epochs=epochs, callbacks=callbacks, validation_split=0.1, )
 
 # Model evaluation
 loss, acc = model.evaluate(X_test, y_cat_test)
