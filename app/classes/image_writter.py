@@ -8,8 +8,6 @@ from classes.colors import *
 font = cv.FONT_HERSHEY_SIMPLEX
 offset = 25
 
-# TODO: Put active time
-
 def draw_roi_lines(frame: np.ndarray, camera: Camera):
     color = cyan
     (y, x) = frame.shape[:2]
@@ -118,19 +116,19 @@ def draw_plc_status(frame: np.ndarray, plc: PLC, read_plc: PLCInterface, write_p
     color = mid_blue
     font_size = (0.0006 * x)
     o = 15
-
     text = f"PLC STATUS {plc.online}, LIFEBIT: {read_plc.life_beat}"
     cv.putText(frame, text, (start, 1 * o), font, font_size, color, 1)
-    text = f"POPID {read_plc.popid}, TANK: {read_plc.partnumber}, PAR: {read_plc.parameter}"
-    cv.putText(frame, text, (start, 2 * o), font, font_size, color, 1)
-    text = f"DRAIN POSITION {read_plc.drain_position}"
-    cv.putText(frame, text, (start, 3 * o), font, font_size, color, 1)
-    text = f"STICKER {read_plc.sticker}"
-    cv.putText(frame, text, (start, 4 * o), font, font_size, color, 1)
-    text = f"STICKER POSITION {read_plc.sticker_position}"
-    cv.putText(frame, text, (start, 5 * o), font, font_size, color, 1)
-    text = f"STICKER ANGLE {read_plc.sticker_angle}"
-    cv.putText(frame, text, (start, 6 * o), font, font_size, color, 1)
+    if write_plc.job_status == 1:
+        text = f"POPID {read_plc.popid}, TANK: {read_plc.partnumber}"
+        cv.putText(frame, text, (start, 2 * o), font, font_size, color, 1)
+        text = f"DRAIN POSITION {read_plc.drain_position}"
+        cv.putText(frame, text, (start, 3 * o), font, font_size, color, 1)
+        text = f"STICKER {read_plc.sticker}"
+        cv.putText(frame, text, (start, 4 * o), font, font_size, color, 1)
+        text = f"STICKER POSITION {read_plc.sticker_position}"
+        cv.putText(frame, text, (start, 5 * o), font, font_size, color, 1)
+        text = f"STICKER ANGLE {read_plc.sticker_angle}"
+        cv.putText(frame, text, (start, 6 * o), font, font_size, color, 1)
     return frame
 
 

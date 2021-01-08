@@ -172,6 +172,8 @@ class Tank:
         higher = np.array( (self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2]), np.uint8)
         mask = cv.inRange(blur, lower, higher)
 
+        mask = cv.bitwise_and(frame, mask)
+
         if self.debug_tank:
             cv.imshow('debug_tank', mask)
 
@@ -181,6 +183,8 @@ class Tank:
 
         y_offset_start = int(c_height * roi["y"][0] // 100)
         y_offset_end = int(c_height * roi["y"][1] // 100)
+
+
 
         mid_x = frame.shape[1] // 2
         x_center_offset = int(cam_config["center_x_offset"] * c_width // 100)
