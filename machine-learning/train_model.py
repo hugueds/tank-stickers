@@ -22,7 +22,7 @@ ROOT = '.'
 PATH = ROOT + "/machine-learning/"
 TRAIN_PATH = PATH + "train"
 TEST_PATH = PATH + "test"
-IMG_SIZE = 100
+IMG_SIZE = 50
 CHANNELS = 1
 MODEL = 'drain'
 LABEL_FILE = MODEL + "_labels.txt"
@@ -82,8 +82,8 @@ y_cat_test = to_categorical(y_test, num_classes)
 
 datagen = ImageDataGenerator(
     rotation_range=10,
-    width_shift_range=0.15,
-    height_shift_range=0.15
+    height_shift_range=0.3,
+    width_shift_range=0.3
 )
 
 datagen.fit(X_train)
@@ -125,12 +125,12 @@ model.compile(loss='categorical_crossentropy',
 )
 
 batch_size = 32
-epochs = 100
+epochs = 50
 callbacks = [EarlyStopping(patience=2), board]
 
 
 
-model.fit(datagen.flow(X_train, y_cat_train, batch_size=32), validation_data=(X_test, y_cat_test),   epochs=epochs)
+model.fit(datagen.flow(X_train, y_cat_train, batch_size=16), validation_data=(X_test, y_cat_test),  epochs=epochs)
 
 # model.fit(X_train, y_cat_train, batch_size=batch_size, epochs=epochs, callbacks=callbacks, validation_split=0.1, )
 
