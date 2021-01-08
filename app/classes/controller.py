@@ -70,26 +70,20 @@ class Controller:
             frame = self.frame
 
         if self.camera.number == 1:
-            # self.tank.find(frame)
-            self.tank.find_2(frame)
+            self.tank.find(frame)
         else:
             self.tank.find_in_circle(frame)
 
         if self.tank.found:
-
             if self.camera.number == 1:
                 if self.drain_model == None:
                     self.drain_model = TFModel(model_name='drain') # to be implemented
                 self.tank.get_drain_ml(frame, self.drain_model)
-                # self.tank.get_drain_lab(frame)
-                # check the position of the drain using machine learning
-                # self.tank.get_drain_2(frame, mode='lab')
 
             self.tank.get_sticker_position_lab(frame)
             for sticker in self.tank.stickers:
                     sticker.label_index, sticker.label = self.model.predict(sticker.image)
                     sticker.update_label_info()
-
 
     def analyse(self):
         # compare if requested PLC info matches processed image
