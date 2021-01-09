@@ -31,7 +31,6 @@ def draw_center_axis(frame: np.ndarray, camera: Camera):
     cv.line(frame, (0, y // 2), (x, y // 2), color)
     return frame
 
-
 def draw_camera_info(frame: np.ndarray, camera: Camera):
     text = f"Resolution {camera.width}x{camera.height} "
     color = navy_blue

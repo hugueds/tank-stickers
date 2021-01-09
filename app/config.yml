@@ -11,7 +11,7 @@ camera:
     threaded: True
     resolution: [640,480]
     display: [640,480]
-    center_x_offset: -7.5
+    center_x_offset: 7.0
     monitor_limit: 1920
     max_monitors: 1
     roi:
@@ -81,4 +81,4 @@ model:
         channels: 1
         file: "drain_graph.h5"
         labels_file: "labels.txt"
-        default_labels: ["6","7", "8", "9", "10", "11", "12", "13", "14"]
+        default_labels: ["6","8", "9", "11", "12","14"]

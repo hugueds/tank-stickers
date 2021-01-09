@@ -37,7 +37,7 @@ def key_pressed(key, camera: Camera, tank: Tank):
     elif key == ord("s"):
         save_image(camera)
     elif key == ord("S"):
-        save_image(camera, tank)
+        save_image(camera, roi=True)
     elif key == ord("v"):
         record(camera)
     elif key == ord("r"):
@@ -71,20 +71,20 @@ def open_help():
         cv.destroyWindow("Instructions")
 
 
-def save_image(camera: Camera, tank: Tank = None, gray=False):
+def save_image(camera: Camera, roi = False, gray=False):
     _, frame = camera.read()
     now = datetime.now()
     str_date = now.strftime("%Y-%m-%d_%H%M%S")
     file_name = f"SCREENSHOT_{str_date}.jpg"
     path = "../captures/" + file_name
-    if tank and tank.found:
+    if roi:
         c_width, c_height = camera.width, camera.height
         roi = camera.roi
         y_off_start = int(c_height * roi["y"][0] // 100)
         y_off_end = int(c_height * roi["y"][1] // 100)
         x_off_start = int(roi["x"][0] * c_width // 100)
         x_off_end = int(roi["x"][1] * c_width // 100)
-        frame = frame[y_off_start:y_off_end,x_off_start:x_off_end,:]
+    frame = frame[y_off_start:y_off_end, x_off_start:x_off_end]
     cv.imwrite(path, frame)
     logger.info(f"Screenshot saved in " + path)
 
@@ -131,8 +131,9 @@ def pause(camera: Camera):
 
 
 def reload_config(camera: Camera, tank: Tank):
-    logger.info("Reloading configuration")
+    logger.info("Reloading configuration...")
     tank.load_config()
+    camera.load_config()
 
 def open_sticker_debug(tank: Tank):
     if tank.debug_sticker:

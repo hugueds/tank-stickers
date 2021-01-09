@@ -20,7 +20,7 @@ class Controller:
     camera: Camera
     plc: PLC
     read_plc: PLCInterface = PLCInterface()
-    write_plc: PLCWriteInterface
+    write_plc: PLCWriteInterface = PLCWriteInterface(0)
     start_time = datetime.now()
     tank: Tank = Tank()
     camera_enabled = True
@@ -47,9 +47,8 @@ class Controller:
         success, self.frame = self.camera.read()
 
     def open_file(self, file):
-        self.frame = cv.imread(file)
-        if self.frame is None:
-            self.file_frame = self.frame
+        self.frame = cv.imread(file)        
+        self.file_frame = self.frame
 
     def show(self):
         frame = self.frame.copy()
@@ -157,6 +156,9 @@ class Controller:
         key_pressed(key, self.camera, self.tank)
         if key == ord('n'):
             self.get_fake_parameters()
+
+    def send_command(self, key):
+        key_pressed(key, self.camera, self.tank)
 
     def start_plc(self):
         logger.info('Starting PLC Thread')
