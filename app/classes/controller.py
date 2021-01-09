@@ -35,7 +35,7 @@ class Controller:
         self.start_time = datetime.now()
         self.tank = Tank()
         self.camera = Camera()
-        self.plc = PLC()
+        self.plc = PLC(self.camera.number)
         if not is_picture:
             self.camera.start()
         self.model = TFModel(model_name='sticker')

@@ -4,7 +4,7 @@ from time import sleep
 import yaml
 from threading import Thread
 from datetime import datetime
-from classes import Sticker, Tank
+from classes import Sticker, Tank, camera
 from models import PLCInterface, PLCWriteInterface
 from logger import logger
 
@@ -17,9 +17,11 @@ class PLC:
     read_bytes: bytearray
     interface: PLCInterface
     thread: Thread
+    camera: int
 
-    def __init__(self, config_file='config.yml'):
+    def __init__(self, camera_number, config_file='config.yml'):
         self.load_config(config_file)
+        self.camera_number = camera_number
         self.client = Client()
 
     def load_config(self, config_file='config.yml'):
@@ -50,7 +52,8 @@ class PLC:
     def read(self):
         try:
             db = self.db_read
-            return self.client.db_read(db['number'], db['start'], db['size'])
+            start = db['size'] * self.camera_number
+            return self.client.db_read(db['number'], start, db['size'])
         except Exception as e:
             logger.exception(e)
 
@@ -58,6 +61,7 @@ class PLC:
         try:
             _bytearray = data.get_bytearray()
             db = self.db_write
+            start = db['size'] * self.camera_number
             self.client.db_write(db['number'], db['start'], _bytearray)
         except Exception as e:
             logger.exception(e)
