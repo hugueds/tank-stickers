@@ -7,7 +7,7 @@ device:
 camera:
     number: 1
     debug: False
-    rpi_camera: 0
+    rpi_camera: 1
     threaded: True
     resolution: [640,480]
     display: [640,480]
