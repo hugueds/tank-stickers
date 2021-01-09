@@ -83,12 +83,14 @@ class Tank:
                                         param1=self.params[0],
                                         param2=self.params[1],
                                         minDist=self.min_dist,
-                                        minRadius=self.min_radius)  # parametrizar o segundo valor
+                                        minRadius=self.min_radius,
+                                        maxRadius=300
+                                        )  # parametrizar o segundo valor
         if self.circles is not None:
             circles = np.uint16(np.around(self.circles))
             for x, y, r in circles[0, :]:
-                self.x = int(x - r) if (x - r) > 0 else 0
-                self.y = int(y - r) if (y - r) > 0 else 0
+                self.x = int(x - r) if (x - r) > 0 and x < 640 else 0
+                self.y = int(y - r) if (y - r) > 0 and y < 480 else 0
                 self.w, self.h = 2*r, 2*r
                 self.found = True
                 self.image = frame[self.y: self.y +
@@ -234,4 +236,32 @@ class Tank:
         self.found = self.h >= self.min_height
         self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
+    def find_circle_2(self, frame: np.ndarray):
 
+        cam_config = self.config["camera"]
+        c_width, c_height = cam_config["resolution"]
+        roi = cam_config["roi"]
+        y_off_start = int(c_height * roi["y"][0] // 100)
+        y_off_end = int(c_height * roi["y"][1] // 100)
+        x_off_start = int(roi["x"][0] * c_width // 100)
+        x_off_end = int(roi["x"][1] * c_width // 100)
+
+        roi_mask = np.ones(frame.shape[:2], dtype=np.uint8)
+        roi_mask[0:y_off_start,:] = 255
+        roi_mask[y_off_end:c_height,:] = 255
+        roi_mask[:, 0:x_off_start] = 255
+        roi_mask[:, x_off_end:c_width] = 255
+
+        y, x = frame.shape[:2]
+        mid_x, mid_y = int(x // 2), int(y // 2)
+
+        g_frame = cv.cvtColor(roi_mask, cv.COLOR_BGR2GRAY)
+        blur = cv.GaussianBlur(g_frame, (5,5), 1)
+        _, thresh = cv.threshold(blur, 120, 255, cv.THRESH_BINARY_INV)
+
+        vector_x = frame[:, mid_x]
+
+        # encontrar o comprimento maximo, sendo ele maior que o minimo especficado, sua altura sera a mesma e seu inicio metade
+        # fazer contornos com o gradient
+
+    def find_circle_3(self, drame.)
