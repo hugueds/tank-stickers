@@ -124,16 +124,17 @@ model.compile(loss='categorical_crossentropy',
         metrics=['accuracy']
 )
 
-batch_size = 16
-epochs = 50
+batch_size = 8
+epochs = 100
 callbacks = [EarlyStopping(patience=2), board]
 callbacks = []
 
+model.fit(datagen.flow(X_train, y_cat_train, batch_size=16),
+    steps_per_epoch=(len(X_train) // batch_size),
+    validation_data=(X_test, y_cat_test),
+    epochs=epochs)
 
-
-# model.fit(datagen.flow(X_train, y_cat_train, batch_size=16), validation_data=(X_test, y_cat_test),  epochs=epochs)
-
-model.fit(X_train, y_cat_train, batch_size=batch_size, epochs=epochs, callbacks=callbacks, validation_split=0.1, )
+# model.fit(X_train, y_cat_train, batch_size=batch_size, epochs=epochs, callbacks=callbacks, validation_split=0.1, )
 
 # Model evaluation
 loss, acc = model.evaluate(X_test, y_cat_test)

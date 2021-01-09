@@ -62,7 +62,7 @@ class PLC:
             _bytearray = data.get_bytearray()
             db = self.db_write
             start = db['size'] * self.camera_number
-            self.client.db_write(db['number'], db['start'], _bytearray)
+            self.client.db_write(db['number'], start, _bytearray)
         except Exception as e:
             logger.exception(e)
 
