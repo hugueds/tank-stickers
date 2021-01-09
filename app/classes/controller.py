@@ -36,12 +36,13 @@ class Controller:
         self.tank = Tank()
         self.camera = Camera()
         self.plc = PLC(self.camera.number)
+        self.is_picture = is_picture
         if not is_picture:
             self.camera.start()
         self.model = TFModel(model_name='sticker')
 
-    def get_frame(self, picture=False):
-        if picture:
+    def get_frame(self):
+        if self.is_picture:
             self.frame = self.file_frame
             return
         success, self.frame = self.camera.read()

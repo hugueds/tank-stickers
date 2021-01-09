@@ -286,7 +286,7 @@ class Tank:
     def get_roi(self, frame: np.ndarray):
         camera_config = self.config['camera']
         c_height, c_width = frame.shape[:2]
-        roi = camera_config.roi
+        roi = camera_config['roi']
         y_off_start = int(c_height * roi["y"][0] // 100)
         y_off_end = int(c_height * roi["y"][1] // 100)
         x_off_start = int(roi["x"][0] * c_width // 100)

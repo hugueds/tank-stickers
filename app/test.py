@@ -23,7 +23,7 @@ for folder in folders:
 controller.open_file(file_list[index])
 
 while True:
-    controller.get_frame(picture=True)
+    controller.get_frame()
     controller.process()
     controller.show()
     if cv.waitKey(10) & 0xFF == ord("*"):
@@ -31,9 +31,9 @@ while True:
         if index >= len(file_list):
             print("last_file reached")
             break
-        frame = controller.frame
-
-        # cv.imwrite(file_list[index], )        
+        frame = controller.file_frame.copy()
+        frame = controller.tank.get_roi(frame)
         controller.open_file(file_list[index])
+        cv.imwrite(file_list[index], frame)        
 
     controller.get_command()
