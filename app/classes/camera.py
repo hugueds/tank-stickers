@@ -99,7 +99,7 @@ class Camera:
 
     def set_hardware_rpi(self):
         # search for minimum and maximus
-        self.cap.stream.camera.iso = 400 # 100, 200, 320, 400, 500, 640, 800.
+        self.cap.stream.camera.iso = 100 # 100, 200, 320, 400, 500, 640, 800.
         self.cap.stream.camera.awb_mode = 'tungsten'
         #awb_modes: 'off', 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
         self.cap.stream.camera.exposure_mode = 'off' # snow, beach, spotlight

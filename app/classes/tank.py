@@ -76,8 +76,24 @@ class Tank:
 
     def find_in_circle(self, frame: np.ndarray):
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        blur = cv.GaussianBlur(g_frame, (5,5), 0)
-                
+
+        cam_config = self.config["camera"]
+        c_width, c_height = cam_config["resolution"]
+        roi = cam_config["roi"]
+        y_off_start = int(c_height * roi["y"][0] // 100)
+        y_off_end = int(c_height * roi["y"][1] // 100)
+        x_off_start = int(roi["x"][0] * c_width // 100)
+        x_off_end = int(roi["x"][1] * c_width // 100)
+        
+        g_frame[0:y_off_start] = 0
+        g_frame[y_off_end:c_height] = 0
+        g_frame[:, 0:x_off_start] = 0
+        g_frame[:, x_off_end:c_width] = 0
+
+        # blur = cv.GaussianBlur(g_frame, np.ones((11,11)), 1.0)        
+        blur = cv.blur(g_frame, (9,9))        
+
+        cv.imshow('a', blur)
         self.circles = cv.HoughCircles(blur, cv.HOUGH_GRADIENT, 
                                         param1=self.params[0],
                                         param2=self.params[1],
@@ -88,8 +104,8 @@ class Tank:
         if self.circles is not None:
             circles = np.uint16(np.around(self.circles))
             for x, y, r in circles[0, :]:
-                self.x = int(x - r) if (x - r) > 0 and x < 640 else 0
-                self.y = int(y - r) if (y - r) > 0 and y < 480 else 0
+                self.x = int(x - r) if (x - r) > 0 and x < frame.shape[1] else 0
+                self.y = int(y - r) if (y - r) > 0 and y < frame.shape[0] else 0
                 self.w, self.h = 2*r, 2*r
                 self.found = True
                 self.image = frame[self.y: self.y +
@@ -184,7 +200,8 @@ class Tank:
         roi_mask[:, x_off_end:c_width] = 255
 
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-        blur = cv.GaussianBlur(hsv,(7,7), 0)
+        # blur = cv.GaussianBlur(hsv,(7,7), 0)
+        blur = cv.blur(hsv,(9,9))
         lower =  np.array( (self.table_hsv[0][0], self.table_hsv[0][1], self.table_hsv[0][2]), np.uint8)
         higher = np.array( (self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2]), np.uint8)
         mask = cv.inRange(blur, lower, higher)
@@ -266,4 +283,17 @@ class Tank:
     def find_circle_3(self, frame):
         pass
 
-    def get_
+    def get_roi(self, frame: np.ndarray):
+        camera_config = self.config['camera']
+        c_height, c_width = frame.shape[:2]
+        roi = camera_config.roi
+        y_off_start = int(c_height * roi["y"][0] // 100)
+        y_off_end = int(c_height * roi["y"][1] // 100)
+        x_off_start = int(roi["x"][0] * c_width // 100)
+        x_off_end = int(roi["x"][1] * c_width // 100)
+        roi_frame = frame.copy()
+        roi_frame = roi_frame[y_off_start:y_off_end, x_off_start:x_off_end]
+        return roi_frame
+
+    def eliminate_non_roi(self, frame, color=255):
+        return frame
