@@ -50,8 +50,8 @@ class Tank:
         self.max_width = width[1]
         self.min_height = height[0]
         self.max_height = height[1]
-        self.min_radius = config['min_radius']
-        self.min_dist = config['min_radius']
+        self.radius = config['radius']
+        self.min_dist = config['min_dist']
         self.params = config['params']
         self.table_hsv = config['table_filter']
 
@@ -77,15 +77,14 @@ class Tank:
     def find_in_circle(self, frame: np.ndarray):
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         blur = cv.GaussianBlur(g_frame, (5,5), 0)
-
-        # find only inside the roi lines to reduce error
-        self.circles = cv.HoughCircles(blur, cv.HOUGH_GRADIENT, 1.2,
+                
+        self.circles = cv.HoughCircles(blur, cv.HOUGH_GRADIENT, 
                                         param1=self.params[0],
                                         param2=self.params[1],
                                         minDist=self.min_dist,
-                                        minRadius=self.min_radius,
-                                        maxRadius=300
-                                        )  # parametrizar o segundo valor
+                                        dp= self.radius[0],
+                                        minRadius=self.radius[1],
+                                        maxRadius=self.radius[2])  
         if self.circles is not None:
             circles = np.uint16(np.around(self.circles))
             for x, y, r in circles[0, :]:
@@ -264,4 +263,7 @@ class Tank:
         # encontrar o comprimento maximo, sendo ele maior que o minimo especficado, sua altura sera a mesma e seu inicio metade
         # fazer contornos com o gradient
 
-    def find_circle_3(self, drame.)
+    def find_circle_3(self, frame):
+        pass
+
+    def get_

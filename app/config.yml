@@ -25,28 +25,13 @@ camera:
     sharpness: 230
     exposure: -4
     white_balance: 4200
-plc:
-    debug: True
-    enabled: False
-    ip: "192.27.6.172"
-    rack: 0
-    slot: 2
-    db_read:
-        number: 13
-        start: 0
-        size: 40
-    db_write:
-        number: 14
-        start: 0
-        size: 10
-    update_time: 0.2
 tank:
     min: [0, 1]
     max: [0, 1]
     size: [[300, 800], [150, 500]]
     area: [0,99999]
     blur: [9,9]
-    min_radius: 120
+    radius: [1.2, 120, 400]    
     min_dist: 120
     params: [80,80]
     table_filter: [[42,10,10],[144,255,255]]
@@ -69,6 +54,21 @@ drain:
         max: 100
     hsv_filter: [[7, 20, 10], [25, 255, 255]]
     lab_filter: [[100, 120, 140], [255, 140, 180]]
+plc:
+    debug: True
+    enabled: False
+    ip: "192.27.6.172"
+    rack: 0
+    slot: 2
+    db_read:
+        number: 13
+        start: 0
+        size: 40
+    db_write:
+        number: 14
+        start: 0
+        size: 10
+    update_time: 0.2
 model:
     sticker:
         size: 70
