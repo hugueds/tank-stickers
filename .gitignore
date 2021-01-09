@@ -52,5 +52,9 @@ app/logs/results/*
 results/*
 drain/
 drain/*
+drain_/
+drain/*
 drain_2/
+drain_1/
+drain_1/*
 drain_2/*
