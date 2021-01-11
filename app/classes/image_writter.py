@@ -95,15 +95,17 @@ def draw_drain(frame: np.ndarray, tank: Tank):
     color = dark_yellow
     dx, dy, dw, dh = tank.drain_x, tank.drain_y, tank.drain_w, tank.drain_h
     cv.rectangle(frame, (dx, dy), (dx+dw, dy+dh), dark_yellow, 2)
-    point = (10, 100)
+    point = (10, 60)
     font_size = (0.0007 * x)
     text = f"DRAIN X: {tank.drain_rel_x} Y: {tank.drain_rel_y}, A: {tank.drain_area_found}, Q: {tank.drain_position}"
     cv.putText(frame, text, point, font, font_size, color, 2)
     return frame
 
 def draw_drain_ml(frame: np.ndarray, tank: Tank):
+    if tank.drain_position == 0:
+        return frame
     color = dark_yellow
-    point = (10, 100)
+    point = (10, 65)
     font_size = (0.00075 * frame.shape[1])
     text = f"DRAIN POSITION: {tank.drain_position}"
     cv.putText(frame, text, point, font, font_size, color, 2)
