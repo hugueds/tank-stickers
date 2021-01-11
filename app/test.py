@@ -26,14 +26,16 @@ while True:
     controller.get_frame()
     controller.process()
     controller.show()
+
     if cv.waitKey(10) & 0xFF == ord("*"):
         index += 1
         if index >= len(file_list):
             print("last_file reached")
             break
+        controller.get_frame()
         frame = controller.file_frame.copy()
         frame = controller.tank.get_roi(frame)
         controller.open_file(file_list[index])
-        cv.imwrite(file_list[index], frame)        
+        cv.imwrite(file_list[index], frame)
 
     controller.get_command()
