@@ -105,10 +105,6 @@ def record(camera: Camera):
         camera.output.release()
 
 
-def close():
-    pass
-
-
 def skip_frames(camera: Camera):
     logger.info("Adding frames")
     current_frame = camera.cap.get(cv.CAP_PROP_POS_FRAMES)

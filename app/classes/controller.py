@@ -95,15 +95,15 @@ class Controller:
         if not self.tank.found:
             self.write_plc.cam_status = 0
             return
-        if self.read_plc.drain_camera and self.read_plc.drain_position != self.tank.drain_position:
-            print('Drain on Wrong Position')
-            self.write_plc.cam_status = 7
-            error = True
+        if self.tank.check_drain:
+            if self.read_plc.drain_camera and self.read_plc.drain_position != self.tank.drain_position:
+                print('Drain on Wrong Position')
+                self.write_plc.cam_status = 7
+                error = True
         if len(self.tank.stickers) > 1:
-            print('There are more stickers than needed')
+            print('Found more stickers than needed')
             self.write_plc.cam_status = 2
-            error = True
-        # Condition if found and not requested
+            error = True        
         if len(self.tank.stickers) == 0 and self.read_plc.sticker_camera:
             print('Sticker not found')
             self.write_plc.cam_status = 3

@@ -54,6 +54,7 @@ class Tank:
         self.min_dist = config['min_dist']
         self.params = config['params']
         self.table_hsv = config['table_filter']
+        self.check_drain = config['check_drain']
 
     def load_sticker_config(self, config):
         self.sticker_thresh = config["threshold"]
