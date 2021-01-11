@@ -46,6 +46,7 @@ class Tank:
     def load_tank_config(self, config):
         self.weight = {"min": config["min"], "max": config["max"]}
         width, height = config["size"]
+        self.threshold = config['threshold']
         self.min_width = width[0]
         self.max_width = width[1]
         self.min_height = height[0]
@@ -85,23 +86,26 @@ class Tank:
         y_off_end = int(c_height * roi["y"][1] // 100)
         x_off_start = int(roi["x"][0] * c_width // 100)
         x_off_end = int(roi["x"][1] * c_width // 100)
-        
+
         g_frame[0:y_off_start] = 0
         g_frame[y_off_end:c_height] = 0
         g_frame[:, 0:x_off_start] = 0
         g_frame[:, x_off_end:c_width] = 0
 
-        # blur = cv.GaussianBlur(g_frame, np.ones((11,11)), 1.0)        
-        blur = cv.blur(g_frame, (9,9))        
+        _, th = cv.threshold(g_frame, self.threshold, 255, cv.THRESH_BINARY)
 
-        cv.imshow('a', blur)
-        self.circles = cv.HoughCircles(blur, cv.HOUGH_GRADIENT, 
+        blur = cv.blur(th, (3,3))
+
+        if self.debug_tank:
+            cv.imshow('debug_tank', th)
+
+        self.circles = cv.HoughCircles(blur, cv.HOUGH_GRADIENT,
                                         param1=self.params[0],
                                         param2=self.params[1],
                                         minDist=self.min_dist,
                                         dp= self.radius[0],
                                         minRadius=self.radius[1],
-                                        maxRadius=self.radius[2])  
+                                        maxRadius=self.radius[2])
         if self.circles is not None:
             circles = np.uint16(np.around(self.circles))
             for x, y, r in circles[0, :]:
@@ -115,6 +119,22 @@ class Tank:
             self.found = False
             self.x, self.y, self.w, self.h = 0, 0, 0, 0
 
+    def get_sticker_position(self, frame: np.ndarray):
+        if self.x <= 0:
+            tank = frame.copy()
+            return
+        else:
+            tank = frame[self.y: self.y + self.h, self.x: self.x + self.w]
+        if tank.size == 0:
+            return
+
+        g_frame = cv.cvtColor(tank, cv.COLOR_BGR2GRAY)
+        _, th = cv.threshold(g_frame, self.sticker_thresh, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
+        self.append_stickers(th, tank)
+        if self.debug_sticker:
+            cv.imshow("debug_tank_sticker", th)
+
+
     def get_sticker_position_lab(self, frame: np.ndarray):
 
         if self.x <= 0:
@@ -126,29 +146,27 @@ class Tank:
         if tank.size == 0:
             return
 
-        kernel = np.ones((5, 5), np.uint8)  # GET the kernel from config
-        lab = cv.cvtColor(tank, cv.COLOR_BGR2LAB)
+        kernel = np.ones((5,5), np.uint8)  # GET the kernel from config
+        lab = cv.cvtColor(tank, cv.COLOR_RGB2LAB)
         lower = np.array(self.sticker_lab[0], np.uint8)
         higher = np.array(self.sticker_lab[1], np.uint8)
         mask = cv.inRange(lab, lower, higher)
-        mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel, iterations=2)
-        contour, _ = cv.findContours(
-            mask, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
-        self.append_stickers(contour, tank)
-
+        mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel, iterations=5)
+        self.append_stickers(mask, tank)
         if self.debug_sticker:
             cv.imshow("debug_tank_sticker", mask)
 
-    def append_stickers(self, contour, tank):
+    def append_stickers(self, mask, tank):
         camera = self.config['camera']['number']
         self.stickers = []
+        contour, _ = cv.findContours(mask, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE)
         for c in contour:
             area = cv.contourArea(c)
             cond = area >= self.sticker_area["min"]
             cond = cond and area <= self.sticker_area["max"]
             if cond:
                 arc = cv.arcLength(c, True)
-                poly = cv.approxPolyDP(c, arc * 0.02, True)
+                poly = cv.approxPolyDP(c, arc * 0.03, True)
                 if len(poly) == 4:
                     (x, y, w, h) = cv.boundingRect(c)
                     ar = w / float(h)
@@ -201,13 +219,14 @@ class Tank:
         roi_mask[:, x_off_end:c_width] = 255
 
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-        # blur = cv.GaussianBlur(hsv,(7,7), 0)
-        blur = cv.blur(hsv,(9,9))
+        blur = cv.GaussianBlur(hsv, (9,9), 0)
         lower =  np.array( (self.table_hsv[0][0], self.table_hsv[0][1], self.table_hsv[0][2]), np.uint8)
         higher = np.array( (self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2]), np.uint8)
         mask = cv.inRange(blur, lower, higher)
 
         mask = cv.bitwise_and(mask, mask, mask=roi_mask)
+
+        # morph close
 
         if self.debug_tank:
             cv.imshow('debug_tank', mask)

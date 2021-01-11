@@ -48,22 +48,8 @@ class Controller:
         success, self.frame = self.camera.read()
 
     def open_file(self, file):
-        self.frame = cv.imread(file)        
+        self.frame = cv.imread(file)
         self.file_frame = self.frame
-
-    def show(self):
-        frame = self.frame.copy()
-        if self.tank.found:
-            frame = draw_tank_center_axis(frame, self.tank)
-            frame = draw_tank_rectangle(frame, self.tank)
-            frame = draw_sticker(frame, self.camera, self.tank)
-            # frame = draw_drain(frame, self.tank) # remove after ML implementation
-            frame = draw_drain_ml(frame, self.tank) # remove after ML implementation
-        frame = draw_roi_lines(frame, self.camera)
-        frame = draw_center_axis(frame, self.camera)
-        frame = draw_camera_info(frame, self.camera)
-        frame = draw_plc_status(frame, self.plc, self.read_plc, self.write_plc)
-        self.camera.show(frame)
 
     def process(self, frame: np.ndarray = 0):
         if not frame:
@@ -79,11 +65,29 @@ class Controller:
                 if self.drain_model == None:
                     self.drain_model = TFModel(model_name='drain') # to be implemented
                 self.tank.get_drain_ml(frame, self.drain_model)
-
-            self.tank.get_sticker_position_lab(frame)
+            if self.camera.number == 1:
+                self.tank.get_sticker_position_lab(frame)
+            else:
+                self.tank.get_sticker_position(frame)
             for sticker in self.tank.stickers:
                     sticker.label_index, sticker.label = self.model.predict(sticker.image)
                     sticker.update_label_info()
+
+    def show(self):
+        frame = self.frame.copy()
+        if self.tank.found:
+            frame = draw_tank_center_axis(frame, self.tank)
+            frame = draw_tank_rectangle(frame, self.tank)
+            frame = draw_sticker(frame, self.camera, self.tank)
+            # frame = draw_drain(frame, self.tank) # remove after ML implementation
+            frame = draw_drain_ml(frame, self.tank) # remove after ML implementation
+        frame = draw_roi_lines(frame, self.camera)
+        frame = draw_center_axis(frame, self.camera)
+        frame = draw_camera_info(frame, self.camera)
+        frame = draw_plc_status(frame, self.plc, self.read_plc, self.write_plc)
+        self.camera.show(frame)
+
+
 
     def analyse(self):
         # compare if requested PLC info matches processed image
@@ -103,7 +107,7 @@ class Controller:
         if len(self.tank.stickers) > 1:
             print('Found more stickers than needed')
             self.write_plc.cam_status = 2
-            error = True        
+            error = True
         if len(self.tank.stickers) == 0 and self.read_plc.sticker_camera:
             print('Sticker not found')
             self.write_plc.cam_status = 3
