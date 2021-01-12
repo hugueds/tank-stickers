@@ -119,6 +119,7 @@ class Controller:
             self.final_result = True
             self.write_plc.cam_status = 1
             self.write_plc.job_status = 2
+            self.write_plc.request_ack = False
 
     def show(self):
         frame = self.frame.copy()

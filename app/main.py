@@ -1,10 +1,6 @@
-from logging import FATAL
 from time import sleep
 from models import AppState
-from classes import Controller, Camera
-
-
-# TODO: Take a picture when requested instead of process the image all the time or take e.g 10 pictures
+from classes import Controller
 
 controller = Controller()
 controller.set_state(AppState.INITIAL)
@@ -15,12 +11,11 @@ while True:
     controller.process()
 
     if controller.state == AppState.INITIAL:
-        if True:
-            controller.start_plc()
-            controller.set_state(AppState.WAITING_REQUEST)
+        sleep(1)
+        controller.start_plc()
+        controller.set_state(AppState.WAITING_REQUEST)
 
     elif controller.state == AppState.WAITING_REQUEST:
-        controller.write_plc.request_ack = False
         if controller.read_plc.read_request:
             controller.confirm_request()
             controller.set_state(AppState.PROCESSING_IMAGE)
