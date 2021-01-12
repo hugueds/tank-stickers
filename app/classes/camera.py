@@ -22,7 +22,7 @@ class Camera:
     window_name = 'Main'
     multiple_monitors = False
     monitor_counter = 0
-    full_screen = True
+    full_screen = False
 
     def __init__(self, config_file='config.yml'):
         self.config_file = config_file

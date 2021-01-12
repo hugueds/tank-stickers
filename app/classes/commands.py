@@ -34,7 +34,7 @@ def key_pressed(key, camera: Camera, tank: Tank):
     elif key == ord("-"):
         rewind_frames(camera)
     elif key == ord("s"):
-        save_image(camera)
+        save_image(camera, tank)
     elif key == ord("S"):
         save_image(camera, tank, roi=True)
     elif key == ord("v"):
@@ -52,8 +52,7 @@ def key_pressed(key, camera: Camera, tank: Tank):
     elif key == ord("c"):
         open_camera_tracker(camera)
     elif key == ord('f'):
-        set_full_screen(camera)
-
+        toggle_full_screen(camera)
 
 def disable():
     pass
@@ -217,10 +216,10 @@ def open_camera_tracker(camera: Camera):
     camera_tracker_window = not camera_tracker_window
 
 
-def set_full_screen(camera: Camera):
+def toggle_full_screen(camera: Camera):
     camera.full_screen = not camera.full_screen
     if camera.full_screen:
         cv.setWindowProperty(camera.window_name, cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
     else:
-        cv.resizeWindow(camera.window_name, camera.monitor_display)
+        cv.setWindowProperty(camera.window_name, cv.WND_PROP_FULLSCREEN,cv.WINDOW_NORMAL)
 
