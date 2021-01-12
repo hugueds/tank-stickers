@@ -80,7 +80,7 @@ class Tank:
     def find_in_circle(self, frame: np.ndarray):
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         ys, ye, xs, xe = self.__get_roi(frame)
-        g_frame = self.eliminate_non_roi(g_frame, ys, ye, xs, xe, 0)
+        g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)
         _, th = cv.threshold(g_frame, self.threshold, 255, cv.THRESH_BINARY)
 
         blur = cv.blur(th, tuple(self.blur))
@@ -193,7 +193,7 @@ class Tank:
         mask = cv.inRange(blur, lower, higher)
 
         ys, ye, x_off_start, x_off_end = self.__get_roi(frame)
-        mask = self.eliminate_non_roi(mask, ys, ye, x_off_start, x_off_end)
+        mask = self.__eliminate_non_roi(mask, ys, ye, x_off_start, x_off_end)
 
         # morph close
 
@@ -251,7 +251,7 @@ class Tank:
         x_off_end = int(roi["x"][1] * c_width // 100)
         return y_off_start, y_off_end, x_off_start, x_off_end
 
-    def eliminate_non_roi(self, frame: np.ndarray, ys, ye, xs, xe, color=255):
+    def __eliminate_non_roi(self, frame: np.ndarray, ys, ye, xs, xe, color=255):
         frame[0:ys] = color
         frame[ye:frame.shape[0]] = color
         frame[:, 0:xs] = color
