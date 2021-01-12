@@ -64,7 +64,6 @@ class Camera:
             self.set_hardware_threaded()
         else:
             self.cap = cv.VideoCapture(self.src)
-            self.set_hardware()
 
         if self.multiple_monitors:
             self.move_window(self.MONITOR_LIMIT + 1, 0)
@@ -79,17 +78,6 @@ class Camera:
             self.cap.stream.release()
         else:
             self.cap.release()
-
-    def set_hardware(self, **kwargs):
-        self.cap.set(CameraConstants.WIDTH.value, self.width)
-        self.cap.set(CameraConstants.HEIGHT.value, self.height)
-        self.cap.set(CameraConstants.BRIGHTNESS.value, self.brighteness)
-        self.cap.set(CameraConstants.CONTRAST.value, self.contrast)
-        self.cap.set(CameraConstants.SATURATION.value, self.saturation)
-        self.cap.set(CameraConstants.HUE.value, 255)
-        self.cap.set(CameraConstants.EXPOSURE.value, self.exposure)
-        self.cap.set(CameraConstants.WHITE_BALANCE.value, self.white_balance)
-        self.cap.set(CameraConstants.FOCUS.value, 0)
 
     def set_hardware_threaded(self, **kwargs):
         self.cap.stream.set(cv.CAP_PROP_BRIGHTNESS, self.brightness) # # min: 0 max: 255 increment:1
