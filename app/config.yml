@@ -5,7 +5,7 @@ device:
     ip: '192.27.X.X'
     mac: '00-00-00-00-00-00'
 camera:
-    number: 0
+    number: 1
     debug: False
     rpi_camera: 0
     threaded: True
@@ -31,7 +31,7 @@ tank:
     max: [0, 1]
     size: [[300, 800], [150, 500]]
     area: [0,99999]
-    blur: [3,3]
+    blur: [5,5]
     threshold: 50
     radius: [2.3, 70, 400]
     min_dist: 100

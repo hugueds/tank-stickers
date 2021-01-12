@@ -46,6 +46,7 @@ class Tank:
     def load_tank_config(self, config):
         self.weight = {"min": config["min"], "max": config["max"]}
         width, height = config["size"]
+        self.blur = config['blur']
         self.threshold = config['threshold']
         self.min_width = width[0]
         self.max_width = width[1]
@@ -78,23 +79,11 @@ class Tank:
 
     def find_in_circle(self, frame: np.ndarray):
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-
-        cam_config = self.config["camera"]
-        c_width, c_height = cam_config["resolution"]
-        roi = cam_config["roi"]
-        y_off_start = int(c_height * roi["y"][0] // 100)
-        y_off_end = int(c_height * roi["y"][1] // 100)
-        x_off_start = int(roi["x"][0] * c_width // 100)
-        x_off_end = int(roi["x"][1] * c_width // 100)
-
-        g_frame[0:y_off_start] = 0
-        g_frame[y_off_end:c_height] = 0
-        g_frame[:, 0:x_off_start] = 0
-        g_frame[:, x_off_end:c_width] = 0
-
+        ys, ye, xs, xe = self.__get_roi(frame)
+        g_frame = self.eliminate_non_roi(g_frame, ys, ye, xs, xe, 0)
         _, th = cv.threshold(g_frame, self.threshold, 255, cv.THRESH_BINARY)
 
-        blur = cv.blur(th, (3,3))
+        blur = cv.blur(th, tuple(self.blur))
 
         if self.debug_tank:
             cv.imshow('debug_tank', th)
@@ -133,7 +122,6 @@ class Tank:
         self.append_stickers(th, tank)
         if self.debug_sticker:
             cv.imshow("debug_tank_sticker", th)
-
 
     def get_sticker_position_lab(self, frame: np.ndarray):
 
@@ -189,13 +177,7 @@ class Tank:
 
     def get_drain_ml(self, frame: np.ndarray, model: TFModel):
         if self.found:
-            cam_config = self.config["camera"]
-            c_width, c_height = cam_config["resolution"]
-            roi = cam_config["roi"]
-            y_off_start = int(c_height * roi["y"][0] // 100)
-            y_off_end = int(c_height * roi["y"][1] // 100)
-            x_off_start = int(roi["x"][0] * c_width // 100)
-            x_off_end = int(roi["x"][1] * c_width // 100)
+            y_off_start, y_off_end, x_off_start, x_off_end = self.__get_roi(frame)
             croped_img = frame[y_off_start:y_off_end,x_off_start:x_off_end,:]
             index, label = model.predict(croped_img)
             self.drain_position = int(label)
@@ -204,35 +186,23 @@ class Tank:
 
     def find(self, frame: np.ndarray):
 
-        cam_config = self.config["camera"]
-        c_width, c_height = cam_config["resolution"]
-        roi = cam_config["roi"]
-        y_off_start = int(c_height * roi["y"][0] // 100)
-        y_off_end = int(c_height * roi["y"][1] // 100)
-        x_off_start = int(roi["x"][0] * c_width // 100)
-        x_off_end = int(roi["x"][1] * c_width // 100)
-
-        roi_mask = np.ones(frame.shape[:2], dtype=np.uint8)
-        roi_mask[0:y_off_start,:] = 255
-        roi_mask[y_off_end:c_height,:] = 255
-        roi_mask[:, 0:x_off_start] = 255
-        roi_mask[:, x_off_end:c_width] = 255
-
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-        blur = cv.GaussianBlur(hsv, (9,9), 0)
+        blur = cv.GaussianBlur(hsv, tuple(self.blur), 0)
         lower =  np.array( (self.table_hsv[0][0], self.table_hsv[0][1], self.table_hsv[0][2]), np.uint8)
         higher = np.array( (self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2]), np.uint8)
         mask = cv.inRange(blur, lower, higher)
 
-        mask = cv.bitwise_and(mask, mask, mask=roi_mask)
+        ys, ye, x_off_start, x_off_end = self.__get_roi(frame)
+        mask = self.eliminate_non_roi(mask, ys, ye, x_off_start, x_off_end)
 
         # morph close
 
         if self.debug_tank:
             cv.imshow('debug_tank', mask)
 
+        cam_config = self.config['camera']
         mid_x = frame.shape[1] // 2
-        x_center_offset = int(cam_config["center_x_offset"] * c_width // 100)
+        x_center_offset = int(cam_config["center_x_offset"] * frame.shape[1] // 100)
         vector_y = mask[:, mid_x + x_center_offset]
         roi_vector_y = vector_y[:]
         roi_vector_y = roi_vector_y[roi_vector_y == 0]
@@ -242,12 +212,11 @@ class Tank:
         else:
             self.h = 0
             self.found = False
-            return False
+            return
 
         self.y = np.where(vector_y == 0)[0][0]  # Get the first black pixel
 
         center_y = (self.y + self.h) // 2
-
 
         adj_y1 = int(self.y + (self.h * 0.22))  # SET IN CONFIG
         adj_y2 = int(center_y + (self.h * 0.3))
@@ -269,41 +238,10 @@ class Tank:
                 self.w = (mask.shape[1] - self.x) - x2
                 break
 
-        self.found = self.h >= self.min_height
+        self.found = self.h >= self.min_height and self.w >= self.min_width
         self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
-    def find_circle_2(self, frame: np.ndarray):
-
-        cam_config = self.config["camera"]
-        c_width, c_height = cam_config["resolution"]
-        roi = cam_config["roi"]
-        y_off_start = int(c_height * roi["y"][0] // 100)
-        y_off_end = int(c_height * roi["y"][1] // 100)
-        x_off_start = int(roi["x"][0] * c_width // 100)
-        x_off_end = int(roi["x"][1] * c_width // 100)
-
-        roi_mask = np.ones(frame.shape[:2], dtype=np.uint8)
-        roi_mask[0:y_off_start,:] = 255
-        roi_mask[y_off_end:c_height,:] = 255
-        roi_mask[:, 0:x_off_start] = 255
-        roi_mask[:, x_off_end:c_width] = 255
-
-        y, x = frame.shape[:2]
-        mid_x, mid_y = int(x // 2), int(y // 2)
-
-        g_frame = cv.cvtColor(roi_mask, cv.COLOR_BGR2GRAY)
-        blur = cv.GaussianBlur(g_frame, (5,5), 1)
-        _, thresh = cv.threshold(blur, 120, 255, cv.THRESH_BINARY_INV)
-
-        vector_x = frame[:, mid_x]
-
-        # encontrar o comprimento maximo, sendo ele maior que o minimo especficado, sua altura sera a mesma e seu inicio metade
-        # fazer contornos com o gradient
-
-    def find_circle_3(self, frame):
-        pass
-
-    def get_roi(self, frame: np.ndarray):
+    def __get_roi(self, frame: np.ndarray):
         camera_config = self.config['camera']
         c_height, c_width = frame.shape[:2]
         roi = camera_config['roi']
@@ -311,9 +249,11 @@ class Tank:
         y_off_end = int(c_height * roi["y"][1] // 100)
         x_off_start = int(roi["x"][0] * c_width // 100)
         x_off_end = int(roi["x"][1] * c_width // 100)
-        roi_frame = frame.copy()
-        roi_frame = roi_frame[y_off_start:y_off_end, x_off_start:x_off_end]
-        return roi_frame
+        return y_off_start, y_off_end, x_off_start, x_off_end
 
-    def eliminate_non_roi(self, frame, color=255):
+    def eliminate_non_roi(self, frame: np.ndarray, ys, ye, xs, xe, color=255):
+        frame[0:ys] = color
+        frame[ye:frame.shape[0]] = color
+        frame[:, 0:xs] = color
+        frame[:, xe:frame.shape[1]] = color
         return frame

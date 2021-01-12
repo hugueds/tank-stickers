@@ -1,3 +1,4 @@
+from models.plc_read_interface import PLCInterface
 import cv2 as cv
 import yaml
 from datetime import datetime
@@ -10,7 +11,7 @@ from logger import logger
 help_window = False
 tracker_window = False
 camera_tracker_window = False
-full_screen = False
+full_screen = True
 
 # TODO:
 # REDUCE WINDOW
@@ -84,7 +85,7 @@ def save_image(camera: Camera, roi = False, gray=False):
         y_off_end = int(c_height * roi["y"][1] // 100)
         x_off_start = int(roi["x"][0] * c_width // 100)
         x_off_end = int(roi["x"][1] * c_width // 100)
-    frame = frame[y_off_start:y_off_end, x_off_start:x_off_end]
+        frame = frame[y_off_start:y_off_end, x_off_start:x_off_end]
     cv.imwrite(path, frame)
     logger.info(f"Screenshot saved in " + path)
 
@@ -98,7 +99,7 @@ def record(camera: Camera):
         file_name = f"RECORDING_{str_date}.avi"
         path = "../captures/" + file_name
         writter = cv.VideoWriter_fourcc("M", "J", "P", "G")
-        camera.output = cv.VideoWriter(path, writter, 10, (1080, 720))
+        camera.output = cv.VideoWriter(path, writter, 10, (640, 480))
     else:
         logger.info("STOP RECORDING")
         camera.recording = False
@@ -119,12 +120,10 @@ def rewind_frames(camera: Camera):
         frame = current_frame - camera.SKIP_FRAMES
         camera.cap.set(cv.CAP_PROP_POS_FRAMES, frame)
 
-
 def pause(camera: Camera):
     camera.pause = not camera.pause
     status = "Pause" if camera.pause else "Play"
     logger.info(status + " Video Stream")
-
 
 def reload_config(camera: Camera, tank: Tank):
     logger.info("Reloading configuration...")

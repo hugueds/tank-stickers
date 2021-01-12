@@ -8,7 +8,7 @@ from classes.camera import Camera
 from classes.plc import PLC
 from classes.tank import Tank
 from classes.sticker import Sticker
-from classes.commands import *
+from classes.commands import key_pressed
 from classes.image_writter import *
 from classes.tf_model import TFModel
 from models import AppState, PLCInterface, PLCWriteInterface
@@ -25,7 +25,7 @@ class Controller:
     tank: Tank = Tank()
     camera_enabled = True
     start_time: datetime
-    frame: np.ndarray = None
+    frame: np.ndarray = np.zeros((640,480))
     file_frame = None
     result_list = []
     final_result = False
@@ -51,59 +51,44 @@ class Controller:
         self.frame = cv.imread(file)
         self.file_frame = self.frame
 
-    def process(self, frame: np.ndarray = 0):
-        if not frame:
-            frame = self.frame
-
+    def process(self):
         if self.camera.number == 1:
-            self.tank.find(frame)
+            self.__process_up_camera()
         else:
-            self.tank.find_in_circle(frame)
+            self.__process_side_camera()
 
+    def __process_up_camera(self):
+        self.tank.find(self.frame)
         if self.tank.found:
-            if self.camera.number == 1:
-                if self.drain_model == None:
-                    self.drain_model = TFModel(model_name='drain') # to be implemented
-                self.tank.get_drain_ml(frame, self.drain_model)
-            if self.camera.number == 1:
-                self.tank.get_sticker_position_lab(frame)
-            else:
-                self.tank.get_sticker_position(frame)
-            for sticker in self.tank.stickers:
-                    sticker.label_index, sticker.label = self.model.predict(sticker.image)
-                    sticker.update_label_info()
+            if self.drain_model == None:
+                self.drain_model = TFModel(model_name='drain') # to be implemented
+            self.tank.get_drain_ml(self.frame, self.drain_model)
+            self.tank.get_sticker_position_lab(self.frame)
+            self.__predict_sticker()
 
-    def show(self):
-        frame = self.frame.copy()
+    def __process_side_camera(self):
+        self.tank.find_in_circle(self.frame)
         if self.tank.found:
-            frame = draw_tank_center_axis(frame, self.tank)
-            frame = draw_tank_rectangle(frame, self.tank)
-            frame = draw_sticker(frame, self.camera, self.tank)
-            # frame = draw_drain(frame, self.tank) # remove after ML implementation
-            frame = draw_drain_ml(frame, self.tank) # remove after ML implementation
-        frame = draw_roi_lines(frame, self.camera)
-        frame = draw_center_axis(frame, self.camera)
-        frame = draw_camera_info(frame, self.camera)
-        frame = draw_plc_status(frame, self.plc, self.read_plc, self.write_plc)
-        self.camera.show(frame)
+            self.tank.get_sticker_position(self.frame)
+            self.__predict_sticker()
 
-
+    def __predict_sticker(self):
+        for sticker in self.tank.stickers:
+                sticker.label_index, sticker.label = self.model.predict(sticker.image)
+                sticker.update_label_info()
 
     def analyse(self):
-        # compare if requested PLC info matches processed image
-        # define error priority
-        # make 5 times loop and only if the tank is found
+        # TODO: make 5 times loop and only if the tank is found
         self.__clear_plc()
         error = False
         sticker = Sticker()
         if not self.tank.found:
             self.write_plc.cam_status = 0
             return
-        if self.tank.check_drain:
-            if self.read_plc.drain_camera and self.read_plc.drain_position != self.tank.drain_position:
-                print('Drain on Wrong Position')
-                self.write_plc.cam_status = 7
-                error = True
+        if self.tank.check_drain and self.read_plc.drain_camera and (self.read_plc.drain_position != self.tank.drain_position):
+            print('Drain on Wrong Position')
+            self.write_plc.cam_status = 7
+            error = True
         if len(self.tank.stickers) > 1:
             print('Found more stickers than needed')
             self.write_plc.cam_status = 2
@@ -135,6 +120,20 @@ class Controller:
             self.write_plc.cam_status = 1
             self.write_plc.job_status = 2
 
+    def show(self):
+        frame = self.frame.copy()
+        if self.tank.found:
+            frame = draw_tank_center_axis(frame, self.tank)
+            frame = draw_tank_rectangle(frame, self.tank)
+            frame = draw_sticker(frame, self.camera, self.tank)
+            # frame = draw_drain(frame, self.tank)  # remove after ML implementation
+            frame = draw_drain_ml(frame, self.tank)
+        frame = draw_roi_lines(frame, self.camera)
+        frame = draw_center_axis(frame, self.camera)
+        frame = draw_camera_info(frame, self.camera)
+        frame = draw_plc_status(frame, self.plc, self.read_plc, self.write_plc)
+        self.camera.show(frame)
+
     def get_fake_parameters(self):
         self.read_plc.read_request = True
         self.read_plc.sticker = 1
@@ -161,6 +160,11 @@ class Controller:
         key_pressed(key, self.camera, self.tank)
         if key == ord('n'):
             self.get_fake_parameters()
+        elif key == ord('i'):
+            print('PLC READ:')
+            print(self.read_plc.__dict__)
+            print('PLC WRITE:')
+            print(self.write_plc.__dict__)
 
     def send_command(self, key):
         key_pressed(key, self.camera, self.tank)
@@ -170,10 +174,6 @@ class Controller:
         self.plc.connect()
         self.write_plc = PLCWriteInterface(self.plc.db_write['size'])
         Thread(name='thread_plc', target=self.update_plc, daemon=True).start()
-
-    def set_state(self, state: AppState):
-        logger.info(f'Updating state to: {state}')
-        self.state = state
 
     def update_plc(self):
         last_life_beat = -1
@@ -192,6 +192,10 @@ class Controller:
                 sleep(self.plc.update_time)
         else:
             logger.warning('PLC is not Enabled')
+
+    def set_state(self, state: AppState):
+            logger.info(f'Updating state to: {state}')
+            self.state = state
 
     def save_result(self):
         try:

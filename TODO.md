@@ -2,13 +2,13 @@
 
 ## 2020-09-02
 
-- [ ] Software adaptation for RPI camera
-- [ ] New config window to adjust camera properties
+- [x] Software adaptation for RPI camera
+- [x] New config window to adjust camera properties
 
 ## 2020-08-07
 
-- [ ] Update text size and position depending on window size
-- [ ] Load camera properties from config
+- [x] Update text size and position depending on window size
+- [x] Load camera properties from config
 - [x] Add camera properties into config
 - [x] Order and sort drain contorns
 - [x] Module to write info on Screen
@@ -27,7 +27,7 @@
 
 ## 2020-07-21
 
-- [ ] Create Filter for the exclusion of the envoirment
+- [x] Create Filter for the exclusion of the envoirment
 - [x] Define camera hardware parameters
 - [x] Create adicional filters for drain detection
 
