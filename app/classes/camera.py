@@ -22,6 +22,7 @@ class Camera:
     window_name = 'Main'
     multiple_monitors = False
     monitor_counter = 0
+    full_screen = True
 
     def __init__(self, config_file='config.yml'):
         self.config_file = config_file
@@ -70,7 +71,8 @@ class Camera:
 
         cv.namedWindow(self.window_name, cv.WINDOW_NORMAL)
         cv.resizeWindow(self.window_name, self.monitor_display)
-        cv.setWindowProperty(self.window_name, cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
+        if self.full_screen:
+            cv.setWindowProperty(self.window_name, cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
 
     def stop(self):
         if self.threaded or self.rpi_camera:

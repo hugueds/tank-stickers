@@ -1,10 +1,8 @@
 from models.plc_read_interface import PLCInterface
 import cv2 as cv
-import yaml
 from datetime import datetime
 from classes.tank import Tank
 from classes.camera import Camera
-from models.camera_constants import CameraConstants
 from configparser import ConfigParser
 from logger import logger
 
@@ -38,7 +36,7 @@ def key_pressed(key, camera: Camera, tank: Tank):
     elif key == ord("s"):
         save_image(camera)
     elif key == ord("S"):
-        save_image(camera, roi=True)
+        save_image(camera, tank, roi=True)
     elif key == ord("v"):
         record(camera)
     elif key == ord("r"):
@@ -60,7 +58,6 @@ def key_pressed(key, camera: Camera, tank: Tank):
 def disable():
     pass
 
-
 def open_help():
     global help_window
     if not help_window:
@@ -71,20 +68,14 @@ def open_help():
         help_window = False
         cv.destroyWindow("Instructions")
 
-
-def save_image(camera: Camera, roi = False, gray=False):
+def save_image(camera: Camera, tank: Tank, roi = False, gray=False):
     _, frame = camera.read()
     now = datetime.now()
     str_date = now.strftime("%Y-%m-%d_%H%M%S")
     file_name = f"SCREENSHOT_{str_date}.jpg"
     path = "../captures/" + file_name
     if roi:
-        c_width, c_height = camera.width, camera.height
-        roi = camera.roi
-        y_off_start = int(c_height * roi["y"][0] // 100)
-        y_off_end = int(c_height * roi["y"][1] // 100)
-        x_off_start = int(roi["x"][0] * c_width // 100)
-        x_off_end = int(roi["x"][1] * c_width // 100)
+        y_off_start, y_off_end, x_off_start, x_off_end = tank.__get_roi()
         frame = frame[y_off_start:y_off_end, x_off_start:x_off_end]
     cv.imwrite(path, frame)
     logger.info(f"Screenshot saved in " + path)
@@ -146,7 +137,6 @@ def open_drain_debug(tank: Tank):
         cv.destroyWindow('debug_drain_lab')
         cv.destroyWindow('debug_drain_hsv')
     tank.debug_drain = not tank.debug_drain
-
 
 def __updateTracker(obj, key, value, index):
     _filter = getattr(obj, key)
@@ -228,9 +218,8 @@ def open_camera_tracker(camera: Camera):
 
 
 def set_full_screen(camera: Camera):
-    global full_screen
-    full_screen = not full_screen
-    if full_screen:
+    camera.full_screen = not camera.full_screen
+    if camera.full_screen:
         cv.setWindowProperty(camera.window_name, cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
     else:
         cv.resizeWindow(camera.window_name, camera.monitor_display)
