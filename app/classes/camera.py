@@ -5,7 +5,6 @@ import logging
 import platform
 from imutils.video.webcamvideostream import WebcamVideoStream
 from imutils.video import VideoStream
-from models.camera_constants import CameraConstants
 from logger import logger
 
 if platform.system() == 'Windows':
