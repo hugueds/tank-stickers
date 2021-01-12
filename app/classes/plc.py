@@ -11,13 +11,8 @@ from logger import logger
 class PLC:
 
     online = False
-    reading = False
-    lock = False
     debug = False
-    read_bytes: bytearray
-    interface: PLCInterface
-    thread: Thread
-    camera: int
+    camera_number: int
 
     def __init__(self, camera_number, config_file='config.yml'):
         self.load_config(config_file)
