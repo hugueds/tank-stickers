@@ -1,3 +1,4 @@
+import os
 from models.plc_read_interface import PLCInterface
 import cv2 as cv
 from datetime import datetime
@@ -9,11 +10,6 @@ from logger import logger
 help_window = False
 tracker_window = False
 camera_tracker_window = False
-full_screen = True
-
-# TODO:
-# REDUCE WINDOW
-# COMANDS TO PLC
 
 def key_pressed(key, camera: Camera, tank: Tank):
 
@@ -53,6 +49,19 @@ def key_pressed(key, camera: Camera, tank: Tank):
         open_camera_tracker(camera)
     elif key == ord('f'):
         toggle_full_screen(camera)
+
+
+def plc_command_received(command: int, value: int):
+    print('Executing command ' + str(command))
+    if command == 1:
+
+        pass
+    elif command == 2:
+        pass
+    elif command == 3:
+        pass
+    else:
+        print(f'Command {command} not Found')
 
 def disable():
     pass

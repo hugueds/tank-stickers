@@ -3,7 +3,6 @@ from models import AppState
 from classes import Controller
 
 controller = Controller()
-controller.set_state(AppState.INITIAL)
 
 while True:
 

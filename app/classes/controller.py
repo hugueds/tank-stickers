@@ -77,7 +77,7 @@ class Controller:
                 sticker.label_index, sticker.label = self.model.predict(sticker.image)
                 sticker.update_label_info()
 
-    def analyse(self):
+    def analyse(self) -> None:
         # TODO: make 5 times loop and only if the tank is found
         self.__clear_plc()
         error = False
@@ -121,7 +121,7 @@ class Controller:
             self.write_plc.job_status = 2
             self.write_plc.request_ack = False
 
-    def show(self):
+    def show(self) -> None:
         frame = self.frame.copy()
         if self.tank.found:
             frame = draw_tank_center_axis(frame, self.tank)
@@ -135,14 +135,14 @@ class Controller:
         frame = draw_plc_status(frame, self.plc, self.read_plc, self.write_plc)
         self.camera.show(frame)
 
-    def get_fake_parameters(self):
+    def get_fake_parameters(self) -> None:
         self.read_plc.read_request = True
         self.read_plc.sticker = 1
         self.read_plc.sticker_angle = 2
         self.read_plc.sticker_position = 4
         self.read_plc.drain_position = 0
 
-    def confirm_request(self):
+    def confirm_request(self) -> None:
         self.final_result = False
         self.read_plc.read_request = False
         self.write_plc.request_ack = True
@@ -150,33 +150,39 @@ class Controller:
         self.write_plc.job_status = 1
         self.__clear_plc()
 
-    def __clear_plc(self):
+    def __clear_plc(self) -> None:
         self.write_plc.position_inc_drain = 0
         self.write_plc.position_inc_sticker = 0
         self.write_plc.inc_sticker = 0
         self.write_plc.inc_angle = 0
 
-    def get_command(self):
+    def get_command(self) -> None:
         key = cv.waitKey(1) & 0xFF
         key_pressed(key, self.camera, self.tank)
         if key == ord('n'):
             self.get_fake_parameters()
         elif key == ord('i'):
-            print('PLC READ:')
-            print(self.read_plc.__dict__)
-            print('PLC WRITE:')
-            print(self.write_plc.__dict__)
+            self.__print_plc_values()
+        if self.read_plc.read_command:
+            pass
+            # send_command()
 
-    def send_command(self, key):
+    def __print_plc_values(self) -> None:
+        print('PLC READ:')
+        print(self.read_plc.__dict__)
+        print('PLC WRITE:')
+        print(self.write_plc.__dict__)
+
+    def send_command(self, key) -> None:
         key_pressed(key, self.camera, self.tank)
 
-    def start_plc(self):
+    def start_plc(self) -> None:
         logger.info('Starting PLC Thread')
         self.plc.connect()
         self.write_plc = PLCWriteInterface(self.plc.db_write['size'])
         Thread(name='thread_plc', target=self.update_plc, daemon=True).start()
 
-    def update_plc(self):
+    def update_plc(self) -> None:
         last_life_beat = -1
         while self.plc.enabled:
             read_data = self.plc.read()
@@ -194,11 +200,11 @@ class Controller:
         else:
             logger.warning('PLC is not Enabled')
 
-    def set_state(self, state: AppState):
+    def set_state(self, state: AppState) -> None:
             logger.info(f'Updating state to: {state}')
             self.state = state
 
-    def save_result(self):
+    def save_result(self) -> None:
         try:
             now = datetime.now()
             path = f'../results/{now.year}/{now.month}/{now.day}/{self.read_plc.popid}'
