@@ -75,12 +75,12 @@ model:
     sticker:
         size: 70
         channels: 1
-        file: "graph.h5"
+        file: "./graphs/graph.h5"
         labels_file: "labels.txt"
         default_labels: ["1","2","P","T","1_180","2_180","P_180","T_180","1_90","2_90","P_90","T_90"]
     drain:
         size: 100
         channels: 1
-        file: "drain_graph.h5"
+        file: "./graphs/drain_graph.h5"
         labels_file: "labels.txt"
         default_labels: ["6","8", "9", "11", "12","14"]
