@@ -118,7 +118,7 @@ class Tank:
             return
 
         g_frame = cv.cvtColor(tank, cv.COLOR_BGR2GRAY)
-        _, th = cv.threshold(g_frame, self.sticker_thresh, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
+        _, th = cv.threshold(g_frame, self.sticker_thresh, 255, cv.THRESH_BINARY)
         self.append_stickers(th, tank)
         if self.debug_sticker:
             cv.imshow("debug_tank_sticker", th)
