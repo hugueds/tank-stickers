@@ -67,14 +67,14 @@ def open_help():
         help_window = False
         cv.destroyWindow("Instructions")
 
-def save_image(camera: Camera, tank: Tank, roi = False, gray=False):
+def save_image(camera: Camera, tank: Tank, roi = False):
     _, frame = camera.read()
     now = datetime.now()
     str_date = now.strftime("%Y-%m-%d_%H%M%S")
     file_name = f"SCREENSHOT_{str_date}.jpg"
     path = "../captures/" + file_name
     if roi:
-        y_off_start, y_off_end, x_off_start, x_off_end = tank.__get_roi()
+        y_off_start, y_off_end, x_off_start, x_off_end = tank.get_roi(frame)
         frame = frame[y_off_start:y_off_end, x_off_start:x_off_end]
     cv.imwrite(path, frame)
     logger.info(f"Screenshot saved in " + path)

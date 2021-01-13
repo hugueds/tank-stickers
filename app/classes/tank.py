@@ -1,4 +1,3 @@
-from numpy.core.defchararray import lower
 import yaml
 from typing import List
 import numpy as np
@@ -17,7 +16,6 @@ class Tank:
     image: np.ndarray = 0
     x, y, w, h = 0, 0, 0, 0
     circle: List[int] = []
-    radius = 0
     sticker_count = 0
     stickers: List[Sticker] = []
     quantity = 0
@@ -45,9 +43,9 @@ class Tank:
 
     def load_tank_config(self, config):
         self.weight = {"min": config["min"], "max": config["max"]}
-        width, height = config["size"]
         self.blur = config['blur']
         self.threshold = config['threshold']
+        width, height = config["size"]
         self.min_width = width[0]
         self.max_width = width[1]
         self.min_height = height[0]
@@ -79,7 +77,7 @@ class Tank:
 
     def find_in_circle(self, frame: np.ndarray):
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        ys, ye, xs, xe = self.__get_roi(frame)
+        ys, ye, xs, xe = self.get_roi(frame)
         g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)
         _, th = cv.threshold(g_frame, self.threshold, 255, cv.THRESH_BINARY)
 
@@ -120,6 +118,7 @@ class Tank:
         g_frame = cv.cvtColor(tank, cv.COLOR_BGR2GRAY)
         _, th = cv.threshold(g_frame, self.sticker_thresh, 255, cv.THRESH_BINARY)
         self.append_stickers(th, tank)
+
         if self.debug_sticker:
             cv.imshow("debug_tank_sticker", th)
 
@@ -177,7 +176,7 @@ class Tank:
 
     def get_drain_ml(self, frame: np.ndarray, model: TFModel):
         if self.found:
-            y_off_start, y_off_end, x_off_start, x_off_end = self.__get_roi(frame)
+            y_off_start, y_off_end, x_off_start, x_off_end = self.get_roi(frame)
             croped_img = frame[y_off_start:y_off_end,x_off_start:x_off_end,:]
             index, label = model.predict(croped_img)
             self.drain_position = int(label)
@@ -192,7 +191,7 @@ class Tank:
         higher = np.array( (self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2]), np.uint8)
         mask = cv.inRange(blur, lower, higher)
 
-        ys, ye, x_off_start, x_off_end = self.__get_roi(frame)
+        ys, ye, x_off_start, x_off_end = self.get_roi(frame)
         mask = self.__eliminate_non_roi(mask, ys, ye, x_off_start, x_off_end)
 
         # morph close
@@ -241,7 +240,7 @@ class Tank:
         self.found = self.h >= self.min_height and self.w >= self.min_width
         self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
-    def __get_roi(self, frame: np.ndarray):
+    def get_roi(self, frame: np.ndarray):
         camera_config = self.config['camera']
         c_height, c_width = frame.shape[:2]
         roi = camera_config['roi']
