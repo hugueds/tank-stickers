@@ -51,6 +51,7 @@ app.log.*
 app/logs/results/*
 results/*
 drain/
+drain*
 drain/*
 drain_/
 drain/*

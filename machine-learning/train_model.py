@@ -65,7 +65,6 @@ for image, label in dataset:
 
 print(f'Total images: {len(dataset)}')
 
-
 X = np.array(X).reshape(-1, IMG_SIZE, IMG_SIZE, CHANNELS)
 X = X / 255
 
@@ -82,8 +81,8 @@ y_cat_test = to_categorical(y_test, num_classes)
 
 datagen = ImageDataGenerator(
     rotation_range=10,
-    height_shift_range=0.3,
-    width_shift_range=0.3
+    height_shift_range=0.1,
+    width_shift_range=0.1
 )
 
 datagen.fit(X_train)
@@ -125,9 +124,9 @@ model.compile(loss='categorical_crossentropy',
 )
 
 batch_size = 8
-epochs = 100
+epochs = 30
 callbacks = [EarlyStopping(patience=2), board]
-callbacks = []
+# callbacks = []
 
 # model.fit(datagen.flow(X_train, y_cat_train, batch_size=16),
 #     steps_per_epoch=(len(X_train) // batch_size),
@@ -148,7 +147,8 @@ print(classification_report(y_test, pred))
 # Model write to file
 now = datetime.now()
 str_date = now.strftime("%Y-%m-%d_%H%M%S")
-file_name = f"keras_models/{MODEL}_{IMG_SIZE}x{IMG_SIZE}.h5"
+# file_name = f"keras_models/{MODEL}_{IMG_SIZE}x{IMG_SIZE}.h5"
+file_name = f"drain_graph.h5"
 
 model.save(file_name)
 

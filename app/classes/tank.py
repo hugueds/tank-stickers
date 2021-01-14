@@ -57,6 +57,7 @@ class Tank:
         self.check_drain = config['check_drain']
 
     def load_sticker_config(self, config):
+        self.sticker_kernel = config["kernel"]
         self.sticker_thresh = config["threshold"]
         self.sticker_size = config["size"]
         self.sticker_area = config["area"]
@@ -115,12 +116,14 @@ class Tank:
         if tank.size == 0:
             return
 
+        kernel = np.ones(self.sticker_kernel, np.uint8)
         g_frame = cv.cvtColor(tank, cv.COLOR_BGR2GRAY)
         _, th = cv.threshold(g_frame, self.sticker_thresh, 255, cv.THRESH_BINARY)
-        self.append_stickers(th, tank)
+        mask = cv.morphologyEx(th, cv.MORPH_CLOSE, kernel, iterations=3)
+        self.append_stickers(mask, tank)
 
         if self.debug_sticker:
-            cv.imshow("debug_tank_sticker", th)
+            cv.imshow("debug_tank_sticker", mask)
 
     def get_sticker_position_lab(self, frame: np.ndarray):
 
@@ -133,7 +136,7 @@ class Tank:
         if tank.size == 0:
             return
 
-        kernel = np.ones((5,5), np.uint8)  # GET the kernel from config
+        kernel = np.ones(self.sticker_kernel, np.uint8)
         lab = cv.cvtColor(tank, cv.COLOR_RGB2LAB)
         lower = np.array(self.sticker_lab[0], np.uint8)
         higher = np.array(self.sticker_lab[1], np.uint8)

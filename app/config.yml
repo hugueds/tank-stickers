@@ -7,7 +7,7 @@ device:
 camera:
     number: 0
     debug: False
-    rpi_camera: 0
+    rpi_camera: 1
     threaded: True
     resolution: [640,480]
     display: [640,480]
@@ -17,7 +17,7 @@ camera:
     roi:
         x: [15.0, 90.0]
         y: [15.0, 91.0]
-    fps: 15
+    fps: 20
     src: 0
     brightness: 200
     contrast: 200
@@ -32,19 +32,20 @@ tank:
     size: [[300, 800], [150, 500]]
     area: [0,99999]
     blur: [5,5]
-    threshold: 50
+    threshold: 75
     radius: [2.3, 70, 400]
     min_dist: 100
     params: [240,210]
     table_filter: [[42,10,10],[144,255,255]]
 sticker:
-    threshold: 172
+    threshold: 80
     area:
         min: 300
         max: 5000
     size:
         min: 20
         max: 100
+    kernel: [3,3]
     hsv_filter: [[0, 0, 0], [179, 255, 255]]
     lab_filter: [[70, 115, 100], [255, 145, 140]]
 drain:
@@ -58,7 +59,7 @@ drain:
     lab_filter: [[100, 120, 140], [255, 140, 180]]
 plc:
     debug: True
-    enabled: False
+    enabled: 1
     ip: "192.27.6.172"
     rack: 0
     slot: 2
@@ -83,4 +84,4 @@ model:
         channels: 1
         file: "./graphs/drain_graph.h5"
         labels_file: "labels.txt"
-        default_labels: ["6","8", "9", "11", "12","14"]
+        default_labels: ["6", "7", 8", "9", "10", "11", "12", "13", "14"]
