@@ -2,7 +2,7 @@ import yaml
 from typing import List
 import numpy as np
 import cv2 as cv
-from .sticker import Sticker
+from classes.sticker import Sticker
 from .drain import Drain
 from .tf_model import TFModel
 from .colors import *
@@ -122,8 +122,8 @@ class Tank:
         g_frame = cv.cvtColor(tank, cv.COLOR_BGR2GRAY)
         _, th = cv.threshold(g_frame, self.sticker_thresh, 255, cv.THRESH_BINARY)
         # mask = cv.morphologyEx(th, cv.MORPH_CLOSE, kernel, iterations=3)
-        mask = cv.erode(mask, None, iterations=2)
-        mask = cv.dilate(mask, None, iterations=4)
+        mask = cv.erode(th, None, iterations=3)
+        mask = cv.dilate(mask, None, iterations=5)
         self.append_stickers(mask, tank)
 
         if self.debug_sticker:

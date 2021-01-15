@@ -1,5 +1,4 @@
 import numpy as np
-from classes.tank import Tank
 from models.quadrants import get_quadrant
 
 class Sticker:
@@ -23,7 +22,7 @@ class Sticker:
         self.h = h
         self.area = area
 
-    def set_relative(self, tank: Tank) -> None:
+    def set_relative(self, tank) -> None:
         zero_x, zero_y = int(tank.w // 2), int(tank.h // 2)
         self.relative_x = (self.x - zero_x) - tank.x + (self.w // 2)
         self.relative_y = tank.y - (self.y - zero_y) - (self.h // 2)

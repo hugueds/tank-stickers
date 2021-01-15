@@ -60,7 +60,7 @@ class Camera:
             self.cap.start()
             self.set_hardware_rpi()
         elif self.threaded:
-            self.cap = WebcamVideoStream(self.src, name='cam', resolution=(self.width, self.height))
+            self.cap = WebcamVideoStream(self.src, name='cam')
             self.cap.start()
             self.set_hardware_threaded()
         else:

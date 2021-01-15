@@ -7,7 +7,7 @@ device:
 camera:
     number: 0
     debug: False
-    rpi_camera: 1
+    rpi_camera: 0
     threaded: True
     resolution: [640,480]
     display: [640,480]
@@ -59,7 +59,7 @@ drain:
     lab_filter: [[100, 120, 140], [255, 140, 180]]
 plc:
     debug: True
-    enabled: 1
+    enabled: 0
     ip: "192.27.6.172"
     rack: 0
     slot: 2
