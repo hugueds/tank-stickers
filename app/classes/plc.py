@@ -14,12 +14,12 @@ class PLC:
     debug = False
     camera_number: int
 
-    def __init__(self, camera_number, config_file='config.yml'):
+    def __init__(self, camera_number, config_file='config.yml') -> None:
         self.load_config(config_file)
         self.camera_number = camera_number
         self.client = Client()
 
-    def load_config(self, config_file='config.yml'):
+    def load_config(self, config_file='config.yml') -> None:
         with open(config_file) as file:
             config = yaml.safe_load(file)['plc']
         self.enabled = config['enabled']
@@ -31,7 +31,7 @@ class PLC:
         self.update_time = config['update_time']
         self.debug = config['debug']
 
-    def connect(self):
+    def connect(self) -> None:
 
         if not self.enabled:
             return logger.info('PLC is Disabled, change config file to start communication')
@@ -44,7 +44,7 @@ class PLC:
             except Exception as e:
                 logging.exception(f"connect::Failed to connect to PLC {self.ip} " + str(e))
 
-    def read(self):
+    def read(self) -> bytearray:
         try:
             db = self.db_read
             start = db['size'] * self.camera_number
@@ -52,7 +52,7 @@ class PLC:
         except Exception as e:
             logger.exception(e)
 
-    def write(self, data: PLCWriteInterface):
+    def write(self, data: PLCWriteInterface) -> None:
         try:
             _bytearray = data.get_bytearray()
             db = self.db_write

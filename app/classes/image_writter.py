@@ -8,7 +8,7 @@ from classes.colors import *
 font = cv.FONT_HERSHEY_SIMPLEX
 offset = 25
 
-def draw_roi_lines(frame: np.ndarray, camera: Camera):
+def draw_roi_lines(frame: np.ndarray, camera: Camera) -> np.ndarray:
     color = cyan
     (y, x) = frame.shape[:2]
     x_start = int(camera.width * camera.roi['x'][0] // 100)
@@ -23,7 +23,7 @@ def draw_roi_lines(frame: np.ndarray, camera: Camera):
     return frame
 
 
-def draw_center_axis(frame: np.ndarray, camera: Camera):
+def draw_center_axis(frame: np.ndarray, camera: Camera) -> np.ndarray:
     color = fucshia
     (y, x) = frame.shape[:2]
     x_offset = int(x // 2 + (camera.width * camera.center_x_offset) // 100)
@@ -31,7 +31,7 @@ def draw_center_axis(frame: np.ndarray, camera: Camera):
     cv.line(frame, (0, y // 2), (x, y // 2), color)
     return frame
 
-def draw_camera_info(frame: np.ndarray, camera: Camera):
+def draw_camera_info(frame: np.ndarray, camera: Camera) -> np.ndarray:
     text = f"Resolution {camera.width}x{camera.height} "
     color = navy_blue
     font_size = (frame.shape[1] * 0.0006)
@@ -46,14 +46,14 @@ def draw_camera_info(frame: np.ndarray, camera: Camera):
     return frame
 
 
-def draw_tank_center_axis(frame: np.ndarray, tank: Tank):
+def draw_tank_center_axis(frame: np.ndarray, tank: Tank) -> np.ndarray:
     x, y, w, h = tank.x, tank.y, tank.w, tank.h
     cv.line(frame, (x, y + (h // 2)), (x + w, y + (h // 2)), red, 1)
     cv.line(frame, (x + (w // 2), y), (x + (w // 2), y + h), red, 1)
     return frame
 
 
-def draw_tank_rectangle(frame: np.ndarray, tank: Tank):
+def draw_tank_rectangle(frame: np.ndarray, tank: Tank) -> np.ndarray:
     color = tank_color
     x, y, w, h = tank.x, tank.y, tank.w, tank.h
     text = f"TANK X: {x}, Y: {y} - W: {w}, H: {h}"
@@ -63,7 +63,7 @@ def draw_tank_rectangle(frame: np.ndarray, tank: Tank):
     return frame
 
 
-def draw_tank_circle(frame: np.ndarray, tank: Tank):
+def draw_tank_circle(frame: np.ndarray, tank: Tank) -> np.ndarray:
     if tank.circles is not None:
         circles = np.uint16(np.around(tank.circles))
         for x, y, r in circles[0, :]:
@@ -72,7 +72,7 @@ def draw_tank_circle(frame: np.ndarray, tank: Tank):
             cv.line(frame, (x-r, y), (x+r, y), (0, 0, 255), 1)
     return frame
 
-def draw_sticker(frame: np.ndarray, camera: Camera, tank: Tank):
+def draw_sticker(frame: np.ndarray, camera: Camera, tank: Tank) -> np.ndarray:
     i = 1
     for s in tank.stickers:
         color = color_list[s.label_index]
@@ -88,7 +88,7 @@ def draw_sticker(frame: np.ndarray, camera: Camera, tank: Tank):
         i += 1
     return frame
 
-def draw_drain(frame: np.ndarray, tank: Tank):
+def draw_drain(frame: np.ndarray, tank: Tank) -> np.ndarray:
     if not tank.drain_found:
         return frame
     x, y = frame.shape[1], frame.shape[0]
@@ -101,7 +101,7 @@ def draw_drain(frame: np.ndarray, tank: Tank):
     cv.putText(frame, text, point, font, font_size, color, 2)
     return frame
 
-def draw_drain_ml(frame: np.ndarray, tank: Tank):
+def draw_drain_ml(frame: np.ndarray, tank: Tank) -> np.ndarray:
     if tank.drain_position == 0:
         return frame
     color = dark_yellow
@@ -111,7 +111,7 @@ def draw_drain_ml(frame: np.ndarray, tank: Tank):
     cv.putText(frame, text, point, font, font_size, color, 2)
     return frame
 
-def draw_plc_status(frame: np.ndarray, plc: PLC, read_plc: PLCInterface, write_plc: PLCWriteInterface):
+def draw_plc_status(frame: np.ndarray, plc: PLC, read_plc: PLCInterface, write_plc: PLCWriteInterface) -> np.ndarray:
     x, y = frame.shape[1], frame.shape[0]
     start = int(0.65 * x)
     color = mid_blue
@@ -133,7 +133,7 @@ def draw_plc_status(frame: np.ndarray, plc: PLC, read_plc: PLCInterface, write_p
     return frame
 
 
-def draw_gradient(frame: np.ndarray):
+def draw_gradient(frame: np.ndarray) -> np.ndarray:
     _, frame = cv.threshold(frame, 127, 255, cv.THRESH_BINARY)
     blur = cv.GaussianBlur(frame, (5, 5), 0)
     blur = cv.bilateralFilter(frame, 9, 75, 75)
@@ -142,7 +142,7 @@ def draw_gradient(frame: np.ndarray):
     return frame
 
 
-def draw_sobel(frame: np.ndarray):
+def draw_sobel(frame: np.ndarray) -> np.ndarray:
     _, frame = cv.threshold(frame, 100, 255, cv.THRESH_BINARY)
     blur = cv.GaussianBlur(frame, (3, 3), 0)
     sobelx = cv.Sobel(blur, cv.CV_64F, 0, 1, ksize=3)
@@ -151,7 +151,7 @@ def draw_sobel(frame: np.ndarray):
     return frame
 
 
-def draw_canny(frame: np.ndarray):
+def draw_canny(frame: np.ndarray) -> np.ndarray:
     _, frame = cv.threshold(frame, 50, 255, cv.THRESH_BINARY)
     sigma = 0.5
     v = np.median(frame)

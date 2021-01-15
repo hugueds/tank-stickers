@@ -11,7 +11,7 @@ help_window = False
 tracker_window = False
 camera_tracker_window = False
 
-def key_pressed(key, camera: Camera, tank: Tank):
+def key_pressed(key, camera: Camera, tank: Tank) -> None:
 
     if key > 0 and chr(key) != "ÿ":
         logger.info('Key Pressed ' + chr(key))
@@ -51,7 +51,7 @@ def key_pressed(key, camera: Camera, tank: Tank):
         toggle_full_screen(camera)
 
 
-def plc_command_received(command: int, value: int):
+def plc_command_received(command: int, value: int) -> None:
     print('Executing command ' + str(command))
     if command == 1:
 
@@ -63,8 +63,6 @@ def plc_command_received(command: int, value: int):
     else:
         print(f'Command {command} not Found')
 
-def disable():
-    pass
 
 def open_help():
     global help_window
@@ -76,11 +74,11 @@ def open_help():
         help_window = False
         cv.destroyWindow("Instructions")
 
-def save_image(camera: Camera, tank: Tank, roi = False):
+def save_image(camera: Camera, tank: Tank, roi = False) -> None:
     _, frame = camera.read()
     now = datetime.now()
     str_date = now.strftime("%Y-%m-%d_%H%M%S")
-    file_name = f"SCREENSHOT_{str_date}.jpg"
+    file_name = f"{str_date}.jpg"
     path = "../captures/" + file_name
     if roi:
         y_off_start, y_off_end, x_off_start, x_off_end = tank.get_roi(frame)
@@ -89,7 +87,7 @@ def save_image(camera: Camera, tank: Tank, roi = False):
     logger.info(f"Screenshot saved in " + path)
 
 
-def record(camera: Camera):
+def record(camera: Camera) -> None:
     if not camera.recording:
         logger.info("START RECORDING...")
         camera.recording = True
@@ -200,7 +198,7 @@ def open_tracker(camera: Camera, tank: Tank):
     tracker_window = not tracker_window
 
 
-def update_camera_config(camera: Camera, key, value):
+def update_camera_config(camera: Camera, key, value) -> None:
     setattr(camera, key, value)
     if camera.rpi_camera:
         camera.set_hardware_rpi()

@@ -24,11 +24,11 @@ class Camera:
     monitor_counter = 0
     full_screen = True
 
-    def __init__(self, config_file='config.yml'):
+    def __init__(self, config_file='config.yml') -> None:
         self.config_file = config_file
         self.load_config()
 
-    def load_config(self):
+    def load_config(self) -> None:
         with open(self.config_file) as file:
             config = yaml.safe_load(file)['camera']
         self.debug = config['debug']
@@ -52,7 +52,7 @@ class Camera:
         self.monitor_display = tuple(config['display'])
         self.hue = 0
 
-    def start(self):
+    def start(self) -> None:
         logger.info('Starting Camera')
         if self.rpi_camera:
             self.cap = VideoStream(
@@ -74,19 +74,19 @@ class Camera:
         if self.full_screen:
             cv.setWindowProperty(self.window_name, cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
 
-    def stop(self):
+    def stop(self) -> None:
         if self.threaded or self.rpi_camera:
             self.cap.stop()
             self.cap.stream.release()
         else:
             self.cap.release()
 
-    def set_hardware_threaded(self, **kwargs):
+    def set_hardware_threaded(self, **kwargs) -> None:
         self.cap.stream.set(cv.CAP_PROP_BRIGHTNESS, self.brightness) # # min: 0 max: 255 increment:1
         self.cap.stream.set(cv.CAP_PROP_CONTRAST, self.contrast)  # min: 0 max: 255 increment:1
         self.cap.stream.set(cv.CAP_PROP_SATURATION, self.saturation) #  min: 0 max: 255 increment:1
 
-    def set_hardware_rpi(self):
+    def set_hardware_rpi(self) -> None:
         # search for minimum and maximus
         self.cap.stream.camera.iso = 100 # 100, 200, 320, 400, 500, 640, 800.
         self.cap.stream.camera.awb_mode = 'tungsten'
@@ -99,7 +99,7 @@ class Camera:
         self.cap.stream.camera.saturation = self._scale(self.saturation, -100, 100)
         self.cap.stream.camera.sharpness = self._scale(self.sharpness, -100, 100)
 
-    def _scale(self, x, y0, y1):
+    def _scale(self, x, y0, y1) -> int:
         x0, x1 = 0, 255
         return int(y0 + ( (y1 -y0) / (x1 - x0) * (x - x0)) )
 
@@ -109,12 +109,12 @@ class Camera:
         cv.imshow(self.window_name, frame)
         self.__update_frame_counter()
 
-    def move_window(self, x, y):
+    def move_window(self, x, y) -> None:
         if self.MAX_MONITORS == 2:
             logging.info(f'Moving window to {x}, {y}')
             cv.moveWindow(self.window_name, x, y)
 
-    def __update_frame_counter(self):
+    def __update_frame_counter(self) -> None:
         if self.frame_counter % 200 == 0:
             logging.info("Keep Alive Camera Message")
         self.frame_counter = self.frame_counter + \
