@@ -15,19 +15,19 @@ class Sticker:
     debug = False
     image: np.ndarray = 0
 
-    def __init__(self, x=0, y=0, w=0, h=0, area=0):
+    def __init__(self, x=0, y=0, w=0, h=0, area=0) -> None:
         self.x = x
         self.y = y
         self.w = w
         self.h = h
         self.area = area
 
-    def set_relative(self, tank):
+    def set_relative(self, tank: Tank) -> None:
         zero_x, zero_y = int(tank.w // 2), int(tank.h // 2)
         self.relative_x = (self.x - zero_x) - tank.x + (self.w // 2)
         self.relative_y = tank.y - (self.y - zero_y) - (self.h // 2)
 
-    def update_label_info(self):
+    def update_label_info(self) -> None:
         self.label_char = (self.label.split('_')[0]).lower()
         sticker_chars = ['1', '2', 'p', 't']
         self.label_char_index = sticker_chars.index(self.label_char) + 1
@@ -39,7 +39,7 @@ class Sticker:
         else:
             self.position = 2
 
-    def update_label_angle(self):
+    def update_label_angle(self) -> None:
         split = self.label.split('_')
         if len(split) == 1:
             self.angle = 0
@@ -49,7 +49,7 @@ class Sticker:
             else:
                 self.angle = 3
 
-    def calc_quadrant(self, tank_x:int, tank_y:int, tank_w:int, tank_h:int, camera: int):
+    def calc_quadrant(self, tank_x:int, tank_y:int, tank_w:int, tank_h:int, camera: int) -> None:
         row, col = -1, -1
 
         q_list = [

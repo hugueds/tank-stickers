@@ -82,7 +82,9 @@ class Tank:
         g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)
         _, th = cv.threshold(g_frame, self.threshold, 255, cv.THRESH_BINARY)
 
-        blur = cv.blur(th, tuple(self.blur))
+        blur = cv.GaussianBlur(th, tuple(self.blur), 0)
+        # blur = cv.erode(blur, None, iterations=2)
+        # blur = cv.dilate(blur, None, iterations=4)
 
         if self.debug_tank:
             cv.imshow('debug_tank', th)
@@ -119,7 +121,9 @@ class Tank:
         kernel = np.ones(self.sticker_kernel, np.uint8)
         g_frame = cv.cvtColor(tank, cv.COLOR_BGR2GRAY)
         _, th = cv.threshold(g_frame, self.sticker_thresh, 255, cv.THRESH_BINARY)
-        mask = cv.morphologyEx(th, cv.MORPH_CLOSE, kernel, iterations=3)
+        # mask = cv.morphologyEx(th, cv.MORPH_CLOSE, kernel, iterations=3)
+        mask = cv.erode(mask, None, iterations=2)
+        mask = cv.dilate(mask, None, iterations=4)
         self.append_stickers(mask, tank)
 
         if self.debug_sticker:
@@ -141,7 +145,9 @@ class Tank:
         lower = np.array(self.sticker_lab[0], np.uint8)
         higher = np.array(self.sticker_lab[1], np.uint8)
         mask = cv.inRange(lab, lower, higher)
-        mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel, iterations=5)
+        # mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel, iterations=5) # OLD
+        mask = cv.erode(mask, None, iterations=2)
+        mask = cv.dilate(mask, None, iterations=4)
         self.append_stickers(mask, tank)
         if self.debug_sticker:
             cv.imshow("debug_tank_sticker", mask)
@@ -160,7 +166,7 @@ class Tank:
                 if len(poly) == 4:
                     (x, y, w, h) = cv.boundingRect(c)
                     ar = w / float(h)
-                    cond = ar >= 0.75 and ar <= 1.2
+                    cond = ar >= 0.75 and ar <= 1.25
                     cond = cond and (h) >= self.sticker_size["min"]
                     cond = cond and (h) <= self.sticker_size["max"]
                     cond = cond and (w) >= self.sticker_size["min"]

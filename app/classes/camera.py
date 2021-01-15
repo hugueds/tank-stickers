@@ -126,6 +126,19 @@ class Camera:
             return True, self.cap.read()
         return self.cap.read()
 
+    def get_tune_point(self, frame, x, y):
+        gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        return gray[y,x]
+
+    def auto_tune(self, pixel):
+        # set contrast, bright and threshold
+        if pixel <= 120:
+            pass
+        elif pixel>=180:
+            pass
+        elif pixel >=220:
+            pass
+
     def set_alpha(self, image):
         # loop over the alpha transparency values
         alpha = 0.5
