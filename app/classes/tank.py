@@ -141,7 +141,7 @@ class Tank:
             return
 
         kernel = np.ones(self.sticker_kernel, np.uint8)
-        lab = cv.cvtColor(tank, cv.COLOR_RGB2LAB)
+        lab = cv.cvtColor(tank, cv.COLOR_BGR2LAB)
         lower = np.array(self.sticker_lab[0], np.uint8)
         higher = np.array(self.sticker_lab[1], np.uint8)
         mask = cv.inRange(lab, lower, higher)

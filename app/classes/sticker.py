@@ -1,4 +1,5 @@
 import numpy as np
+from classes.tank import Tank
 from models.quadrants import get_quadrant
 
 class Sticker:

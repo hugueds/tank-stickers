@@ -6,16 +6,16 @@ import tensorflow as tf
 import cv2 as cv
 import numpy as np
 from tensorflow.keras.models import load_model
-np.set_printoptions(suppress=True)
 from PIL import Image, ImageOps
 from datetime import datetime
 
+np.set_printoptions(suppress=True)
 tf.compat.v1.disable_eager_execution()
 
 
 class TFModel:
 
-    def __init__(self, config_file='config.yml', model_name='sticker'):
+    def __init__(self, config_file='config.yml', model_name='sticker') -> None:
         with open(config_file) as file:
             config = yaml.safe_load(file)['model'][model_name]
         self.size = config['size']
@@ -33,7 +33,7 @@ class TFModel:
             label = self.labels[index]
             return (index, label)
 
-    def __preprocess(self, image: np.ndarray):
+    def __preprocess(self, image: np.ndarray) -> np.ndarray:
         if self.channels == 1:
             image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 
