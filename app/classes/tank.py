@@ -192,7 +192,7 @@ class Tank:
         else:
             self.drain_position = 0
 
-    def find(self, frame: np.ndarray):
+    def find(self, frame: np.ndarray) -> None:
 
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         blur = cv.GaussianBlur(hsv, tuple(self.blur), 0)
