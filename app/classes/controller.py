@@ -117,10 +117,13 @@ class Controller:
             error = True
 
         if not error:
-            self.final_result = True
-            self.write_plc.cam_status = 1
-            self.write_plc.job_status = 2
-            self.write_plc.request_ack = False
+            self.__job_done()
+
+    def __job_done(self):
+        self.final_result = True
+        self.write_plc.cam_status = 1
+        self.write_plc.job_status = 2
+        self.write_plc.request_ack = False
 
     def show(self) -> None:
         frame = self.frame.copy()
@@ -161,6 +164,8 @@ class Controller:
         key_pressed(key, self.camera, self.tank)
         if key == ord('n'):
             self.get_fake_parameters()
+        elif key == ord('o'):
+            self.__job_done()
         elif key == ord('i'):
             self.__print_plc_values()
         if self.read_plc.read_command:

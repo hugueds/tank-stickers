@@ -16,6 +16,7 @@ while True:
 
     elif controller.state == AppState.WAITING_REQUEST:
         if controller.read_plc.read_request:
+            print('New Job Request')
             controller.confirm_request()
             controller.set_state(AppState.PROCESSING_IMAGE)
 
@@ -23,9 +24,12 @@ while True:
         controller.analyse()
         if controller.final_result:
             controller.set_state(AppState.SAVING_RESULTS)
+        elif controller.read_plc.read_request:
+            sleep(1)
+            controller.set_state(AppState.WAITING_REQUEST)
         else:
             print('Invalid Configuration, redoing operation')
-            sleep(0.1)
+            sleep(0.2)
 
     elif controller.state == AppState.SAVING_RESULTS:
         controller.save_result()
