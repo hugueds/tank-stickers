@@ -28,7 +28,9 @@ def draw_center_axis(frame: np.ndarray, camera: Camera) -> np.ndarray:
     (y, x) = frame.shape[:2]
     x_offset = int(x // 2 + (camera.width * camera.center_x_offset) // 100)
     cv.line(frame, (x_offset, 0), (x_offset, y), color)
-    cv.line(frame, (0, y // 2), (x, y // 2), color)
+
+    y_offset = int(y // 2 + (camera.height * camera.center_y_offset) // 100)
+    cv.line(frame, (0, y_offset), (x, y_offset), color)
     return frame
 
 def draw_camera_info(frame: np.ndarray, camera: Camera) -> np.ndarray:

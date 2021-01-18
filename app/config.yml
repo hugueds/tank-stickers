@@ -1,9 +1,6 @@
 app:
     name: "Sticker Tanks"
     version: 0.1.0
-device:
-    ip: '192.27.X.X'
-    mac: '00-00-00-00-00-00'
 camera:
     number: 0
     debug: False
@@ -12,6 +9,7 @@ camera:
     resolution: [640,480]
     display: [640,480]
     center_x_offset: 7.0
+    center_y_offset: -2.0
     monitor_limit: 1920
     max_monitors: 1
     roi:
@@ -85,3 +83,6 @@ model:
         file: "./graphs/drain_graph.h5"
         labels_file: "labels.txt"
         default_labels: ["6", "7", 8", "9", "10", "11", "12", "13", "14"]
+device:
+    ip: '192.27.X.X'
+    mac: '00-00-00-00-00-00'

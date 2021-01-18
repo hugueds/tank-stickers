@@ -37,6 +37,7 @@ class Camera:
         self.height = config['resolution'][1]
         self.display = tuple(config['display'])
         self.center_x_offset = config['center_x_offset']
+        self.center_y_offset = config['center_y_offset']
         self.roi = config['roi']
         self.rpi_camera = config['rpi_camera']
         self.fps = config['fps']
@@ -87,12 +88,10 @@ class Camera:
         self.cap.stream.set(cv.CAP_PROP_SATURATION, self.saturation) #  min: 0 max: 255 increment:1
 
     def set_hardware_rpi(self) -> None:
-        # search for minimum and maximus
         self.cap.stream.camera.iso = 640 # 100, 200, 320, 400, 500, 640, 800.
-        self.cap.stream.camera.awb_mode = 'tungsten' # change and watch
+        self.cap.stream.camera.awb_mode = 'sunlight' # change and watch
         #awb_modes: 'off', 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
         self.cap.stream.camera.exposure_mode = 'off' # snow, beach, spotlight
-        # self.cap.stream.camera.image_effect = 'colorbalance'
         self.cap.stream.camera.exposure_compensation = self._scale(self.exposure_comp, -25, 25)
         self.cap.stream.camera.brightness = self._scale(self.brightness, 0, 100)
         self.cap.stream.camera.contrast = self._scale(self.contrast, -100 , 100)
@@ -102,7 +101,6 @@ class Camera:
     def _scale(self, x, y0, y1) -> int:
         x0, x1 = 0, 255
         return int(y0 + ( (y1 -y0) / (x1 - x0) * (x - x0)) )
-
 
     def show(self, frame: np.ndarray = np.ones((400, 400, 1))):
         frame = cv.resize(frame, self.display)

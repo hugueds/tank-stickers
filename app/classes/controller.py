@@ -58,7 +58,8 @@ class Controller:
             self.__process_side_camera()
 
     def __process_up_camera(self):
-        self.tank.find(self.frame)
+        # self.tank.find(self.frame)
+        self.tank.find_2(self.frame) # TODO: unify strategies
         if self.tank.found:
             if self.drain_model == None:
                 self.drain_model = TFModel(model_name='drain') # to be implemented
@@ -127,7 +128,6 @@ class Controller:
             frame = draw_tank_center_axis(frame, self.tank)
             frame = draw_tank_rectangle(frame, self.tank)
             frame = draw_sticker(frame, self.camera, self.tank)
-            # frame = draw_drain(frame, self.tank)  # remove after ML implementation
             frame = draw_drain_ml(frame, self.tank)
         frame = draw_roi_lines(frame, self.camera)
         frame = draw_center_axis(frame, self.camera)
@@ -164,8 +164,8 @@ class Controller:
         elif key == ord('i'):
             self.__print_plc_values()
         if self.read_plc.read_command:
+            # send_command() # TODO Define and receive commands from PLC
             pass
-            # send_command()
 
     def __print_plc_values(self) -> None:
         print('PLC READ:')
