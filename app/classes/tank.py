@@ -105,7 +105,6 @@ class Tank:
                     self.found = True
                     self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
-
     def find(self, frame: np.ndarray) -> None:
 
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
