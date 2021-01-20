@@ -146,11 +146,11 @@ class Controller:
         self.read_plc.drain_position = 0
 
     def confirm_request(self) -> None:
-        self.final_result = False
         self.read_plc.read_request = False
         self.write_plc.request_ack = True
         self.write_plc.cam_status = 0
         self.write_plc.job_status = 1
+        self.final_result = False
         self.__clear_plc()
 
     def __clear_plc(self) -> None:

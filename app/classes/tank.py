@@ -72,20 +72,36 @@ class Tank:
         self.arc = config["arc"]
         self.drain_area_found = 0
 
-    def find_in_circle(self, frame: np.ndarray):
+    def find_in_circle(self, frame: np.ndarray, _filter='threshold'):
+
+        # TODO: Use HSV / LAB Filter
+
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         ys, ye, xs, xe = self.get_roi(frame)
         g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)
-        _, th = cv.threshold(g_frame, self.threshold, 255, cv.THRESH_BINARY)
 
-        blur = cv.blur(th, tuple(self.blur), 0)
-        # blur = cv.erode(blur, None, iterations=2)
-        # blur = cv.dilate(blur, None, iterations=4)
+
+        if _filter == 'threshold':
+            blur = cv.blur(g_frame, tuple(self.blur), 0)
+            _, mask = cv.threshold(blur, self.threshold, 255, cv.THRESH_BINARY)
+        else:
+            if _filter == 'hsv':
+                cvt_frame = cv.cvtColor(frame, cv.COLOR_RGB2HSV)
+                lower =  np.array( (self.table_hsv[0][0], self.table_hsv[0][1], self.table_hsv[0][2]), np.uint8)
+                higher = np.array( (self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2]), np.uint8)
+            else:
+                cvt_frame = cv.cvtColor(frame, cv.COLOR_RGB2LAB)
+                lower =  np.array( (self.table_hsv[0][0], self.table_hsv[0][1], self.table_hsv[0][2]), np.uint8)
+                higher = np.array( (self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2]), np.uint8)
+            mask = cv.inRange(cvt_frame, lower, higher)
+
+        # mask = cv.erode(mask, None, iterations=2)
+        # mask = cv.dilate(mask, None, iterations=4)
 
         if self.debug_tank:
-            cv.imshow('debug_tank', th)
+            cv.imshow('debug_tank', mask)
 
-        self.circles = cv.HoughCircles(blur, cv.HOUGH_GRADIENT,
+        self.circles = cv.HoughCircles(mask, cv.HOUGH_GRADIENT,
                                         param1=self.params[0],
                                         param2=self.params[1],
                                         minDist=self.min_dist,
@@ -99,8 +115,8 @@ class Tank:
             for x, y, r in circles[0, :]:
                 self.x = int(x - r) if (x - r) > 0 and x < frame.shape[1] else 0
                 self.y = int(y - r) if (y - r) > 0 and y < frame.shape[0] else 0
-                if self.x != 0 and self.y != 0:
 
+                if self.x > 0 and self.y > 0:
                     self.w, self.h = 2*r, 2*r
                     self.found = True
                     self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
