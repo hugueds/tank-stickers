@@ -4,6 +4,7 @@ from datetime import datetime
 from time import sleep
 from threading import Thread
 from pathlib import Path
+from collections import Counter
 from classes.camera import Camera
 from classes.plc import PLC
 from classes.tank import Tank
@@ -79,10 +80,10 @@ class Controller:
                 sticker.update_label_info()
 
     def analyse(self) -> None:
-        # TODO: make 5 times loop and only if the tank is found
         self.__clear_plc()
         error = False
         sticker = Sticker()
+        status = 0
         if not self.tank.found:
             self.write_plc.cam_status = 0
             return
@@ -94,23 +95,23 @@ class Controller:
             print('Found more stickers than needed')
             self.write_plc.cam_status = 2
             error = True
-        if len(self.tank.stickers) == 0 and self.read_plc.sticker_camera:
+        if self.read_plc.sticker_camera and len(self.tank.stickers) == 0:
             print('Sticker not found')
             self.write_plc.cam_status = 3
             error = True
         if len(self.tank.stickers):
             sticker = self.tank.stickers[0]
-        if self.read_plc.sticker != sticker.label_char_index: # sticker.label_char_index
+        if self.read_plc.sticker_camera and self.read_plc.sticker != sticker.label_char_index:
             print('Wrong Label, expected:' + str(self.read_plc.sticker) + ', received: ' + str(sticker.label))
             self.write_plc.inc_sticker = sticker.label_char_index
             self.write_plc.cam_status = 9
             error = True
-        if self.read_plc.sticker_angle != sticker.angle:
+        if self.read_plc.sticker_camera and self.read_plc.sticker_angle != sticker.angle:
             print('Wrong Label Angle, expected:' + str(self.read_plc.sticker_angle) + ', received: ' + str(sticker.angle))
             self.write_plc.inc_angle = sticker.angle
             self.write_plc.cam_status = 8
             error = True
-        if self.read_plc.sticker_position != sticker.quadrant:
+        if self.read_plc.sticker_camera and self.read_plc.sticker_position != sticker.quadrant:
             print('Wrong Label Position, expected:' + str(self.read_plc.sticker_position) + ', received: ' + str(sticker.quadrant))
             self.write_plc.position_inc_sticker = sticker.quadrant
             self.write_plc.cam_status = 2
@@ -118,6 +119,24 @@ class Controller:
 
         if not error:
             self.__job_done()
+
+        # TO IMPLEMENT
+        # Check the highest arg in last 5 frames
+        if not error:
+            self.write_plc.cam_status = 1
+
+        self.result_list.append(self.write_plc.cam_status)
+
+        if len(self.result_list > 5):
+            self.result_list.pop(0)
+        if Counter(self.result_list).most_common()[0][0] == 1:
+            self.__job_done()
+
+        # ----------------------------------------------------
+
+
+
+
 
     def __job_done(self):
         self.final_result = True
@@ -151,6 +170,7 @@ class Controller:
         self.write_plc.cam_status = 0
         self.write_plc.job_status = 1
         self.final_result = False
+        self.result_list.clear()
         self.__clear_plc()
 
     def __clear_plc(self) -> None:

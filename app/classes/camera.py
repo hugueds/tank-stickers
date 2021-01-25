@@ -42,6 +42,7 @@ class Camera:
         self.rpi_camera = config['rpi_camera']
         self.fps = config['fps']
         self.src = config['src']
+        self.full_screen = config['full_screen']
         self.brightness = config['brightness']
         self.contrast = config['contrast']
         self.saturation = config['saturation']

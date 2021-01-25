@@ -72,9 +72,10 @@ class Tank:
         self.arc = config["arc"]
         self.drain_area_found = 0
 
-    def find_in_circle(self, frame: np.ndarray, _filter='threshold'):
+    def find_in_circle(self, frame: np.ndarray, _filter='hsv'):
 
-        # TODO: Use HSV / LAB Filter
+        # TODO: implement algotithm to find check if X or Y Offset has more than N pixels
+        # TODO: implement tracker algorithm to identify if a tank is present
 
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         ys, ye, xs, xe = self.get_roi(frame)
@@ -84,6 +85,7 @@ class Tank:
         if _filter == 'threshold':
             blur = cv.blur(g_frame, tuple(self.blur), 0)
             _, mask = cv.threshold(blur, self.threshold, 255, cv.THRESH_BINARY)
+            mask = cv.adaptiveThreshold(g_frame,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY,11,2)
         else:
             if _filter == 'hsv':
                 cvt_frame = cv.cvtColor(frame, cv.COLOR_RGB2HSV)
@@ -97,6 +99,10 @@ class Tank:
 
         # mask = cv.erode(mask, None, iterations=2)
         # mask = cv.dilate(mask, None, iterations=4)
+
+
+        mask = cv.Canny(g_frame,100,100)
+
 
         if self.debug_tank:
             cv.imshow('debug_tank', mask)
@@ -116,7 +122,7 @@ class Tank:
                 self.x = int(x - r) if (x - r) > 0 and x < frame.shape[1] else 0
                 self.y = int(y - r) if (y - r) > 0 and y < frame.shape[0] else 0
 
-                if self.x > 0 and self.y > 0:
+                if self.x > 0 and self.x < 60_000 and self.y > 0 and self.y < 60_000:
                     self.w, self.h = 2*r, 2*r
                     self.found = True
                     self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]

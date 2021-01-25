@@ -6,7 +6,7 @@ from logger import logger
 
 controller = Controller(is_picture=True)
 
-controller.open_file('./tests/images/test_1.jpg')
+controller.open_file('./tests/images/test_3.jpg')
 
 while True:
     controller.get_frame()
