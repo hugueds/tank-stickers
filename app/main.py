@@ -25,6 +25,7 @@ while True:
         if controller.final_result:
             controller.set_state(AppState.SAVING_RESULTS)
         elif controller.read_plc.read_request:
+            print('New Job Request During Job')
             sleep(1)
             controller.set_state(AppState.WAITING_REQUEST)
         else:
