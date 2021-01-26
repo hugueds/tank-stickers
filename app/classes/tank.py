@@ -55,6 +55,7 @@ class Tank:
         self.table_hsv = config['table_filter']
         self.check_drain = config['check_drain']
 
+
     def load_sticker_config(self, config):
         self.sticker_kernel = config["kernel"]
         self.sticker_thresh = config["threshold"]
@@ -72,7 +73,7 @@ class Tank:
         self.arc = config["arc"]
         self.drain_area_found = 0
 
-    def find_in_circle(self, frame: np.ndarray, _filter='hsv'):
+    def find_in_circle(self, frame: np.ndarray, _filter='threshold'):
 
         # TODO: implement algotithm to find check if X or Y Offset has more than N pixels
         # TODO: implement tracker algorithm to identify if a tank is present
@@ -84,8 +85,8 @@ class Tank:
 
         if _filter == 'threshold':
             blur = cv.blur(g_frame, tuple(self.blur), 0)
-            _, mask = cv.threshold(blur, self.threshold, 255, cv.THRESH_BINARY)
-            mask = cv.adaptiveThreshold(g_frame,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY,11,2)
+            _, mask = cv.threshold(blur, self.threshold, 255, cv.THRESH_BINARY_INV)
+            # mask = cv.adaptiveThreshold(blur,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,7, 3)
         else:
             if _filter == 'hsv':
                 cvt_frame = cv.cvtColor(frame, cv.COLOR_RGB2HSV)
@@ -99,10 +100,6 @@ class Tank:
 
         # mask = cv.erode(mask, None, iterations=2)
         # mask = cv.dilate(mask, None, iterations=4)
-
-
-        mask = cv.Canny(g_frame,100,100)
-
 
         if self.debug_tank:
             cv.imshow('debug_tank', mask)

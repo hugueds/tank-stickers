@@ -46,7 +46,7 @@ class Controller:
         if self.is_picture:
             self.frame = self.file_frame
             return
-        success, self.frame = self.camera.read()
+        _, self.frame = self.camera.read()
 
     def open_file(self, file):
         self.frame = cv.imread(file)
@@ -120,7 +120,7 @@ class Controller:
         if not error:
             self.__job_done()
 
-        # TO IMPLEMENT
+        # ---------------- TO IMPLEMENT ----------------------
         # Check the highest arg in last 5 frames
         if not error:
             self.write_plc.cam_status = 1
@@ -129,13 +129,11 @@ class Controller:
 
         if len(self.result_list > 5):
             self.result_list.pop(0)
+
         if Counter(self.result_list).most_common()[0][0] == 1:
             self.__job_done()
 
         # ----------------------------------------------------
-
-
-
 
 
     def __job_done(self):
