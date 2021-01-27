@@ -59,8 +59,7 @@ class Controller:
             self.__process_side_camera()
 
     def __process_up_camera(self):
-        # self.tank.find(self.frame)
-        self.tank.find_2(self.frame) # TODO: unify strategies
+        self.tank.find(self.frame)
         if self.tank.found:
             if self.drain_model == None:
                 self.drain_model = TFModel(model_name='drain') # to be implemented

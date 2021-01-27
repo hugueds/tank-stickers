@@ -122,7 +122,7 @@ class Tank:
                     self.found = True
                     self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
-    def find(self, frame: np.ndarray) -> None:
+    def find_old(self, frame: np.ndarray) -> None:
 
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         blur = cv.GaussianBlur(hsv, tuple(self.blur), 0)
@@ -132,8 +132,6 @@ class Tank:
 
         ys, ye, x_off_start, x_off_end = self.get_roi(frame)
         mask = self.__eliminate_non_roi(mask, ys, ye, x_off_start, x_off_end)
-
-        # morph close
 
         if self.debug_tank:
             cv.imshow('debug_tank', mask)
@@ -179,7 +177,7 @@ class Tank:
         self.found = self.h >= self.min_height and self.w >= self.min_width
         self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
-    def find_2(self, frame: np.ndarray):
+    def find(self, frame: np.ndarray):
 
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         blur = cv.blur(hsv, tuple(self.blur), 0)
