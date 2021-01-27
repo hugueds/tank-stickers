@@ -83,42 +83,46 @@ class Controller:
         self.__clear_plc()
         error = False
         sticker = Sticker()
-        status = 0
+        status = 1
         if not self.tank.found:
-            self.write_plc.cam_status = 0
+            status = 0
             return
         if self.tank.check_drain and self.read_plc.drain_camera and (self.read_plc.drain_position != self.tank.drain_position):
             print('Drain on Wrong Position')
-            self.write_plc.cam_status = 7
+            status = 7
             error = True
         if len(self.tank.stickers) > 1:
             print('Found more stickers than needed')
-            self.write_plc.cam_status = 2
+            status = 4
             error = True
         if self.read_plc.sticker_camera and len(self.tank.stickers) == 0:
             print('Sticker not found')
-            self.write_plc.cam_status = 3
+            status = 3
             error = True
         if len(self.tank.stickers):
             sticker = self.tank.stickers[0]
         if self.read_plc.sticker_camera and self.read_plc.sticker != sticker.label_char_index:
             print('Wrong Label, expected:' + str(self.read_plc.sticker) + ', received: ' + str(sticker.label))
             self.write_plc.inc_sticker = sticker.label_char_index
-            self.write_plc.cam_status = 9
+            status = 9
             error = True
         if self.read_plc.sticker_camera and self.read_plc.sticker_angle != sticker.angle:
             print('Wrong Label Angle, expected:' + str(self.read_plc.sticker_angle) + ', received: ' + str(sticker.angle))
             self.write_plc.inc_angle = sticker.angle
-            self.write_plc.cam_status = 8
+            status = 8
             error = True
         if self.read_plc.sticker_camera and self.read_plc.sticker_position != sticker.quadrant:
             print('Wrong Label Position, expected:' + str(self.read_plc.sticker_position) + ', received: ' + str(sticker.quadrant))
             self.write_plc.position_inc_sticker = sticker.quadrant
-            self.write_plc.cam_status = 2
+            status = 2
             error = True
+
+        self.write_plc.cam_status = status
 
         if not error:
             self.__job_done()
+
+        return
 
         # ---------------- TO IMPLEMENT ----------------------
         # Check the highest arg in last 5 frames
@@ -155,13 +159,6 @@ class Controller:
         frame = draw_plc_status(frame, self.plc, self.read_plc, self.write_plc)
         self.camera.show(frame)
 
-    def get_fake_parameters(self) -> None:
-        self.read_plc.read_request = True
-        self.read_plc.sticker = 1
-        self.read_plc.sticker_angle = 2
-        self.read_plc.sticker_position = 4
-        self.read_plc.drain_position = 0
-
     def confirm_request(self) -> None:
         self.read_plc.read_request = False
         self.write_plc.request_ack = True
@@ -169,7 +166,6 @@ class Controller:
         self.write_plc.job_status = 1
         self.final_result = False
         self.result_list.clear()
-        self.__clear_plc()
 
     def __clear_plc(self) -> None:
         self.write_plc.position_inc_drain = 0
@@ -181,7 +177,7 @@ class Controller:
         key = cv.waitKey(1) & 0xFF
         key_pressed(key, self.camera, self.tank)
         if key == ord('n'):
-            self.get_fake_parameters()
+            self.__get_fake_parameters()
         elif key == ord('o'):
             self.__job_done()
         elif key == ord('i'):
@@ -189,12 +185,6 @@ class Controller:
         if self.read_plc.read_command:
             # send_command() # TODO Define and receive commands from PLC
             pass
-
-    def __print_plc_values(self) -> None:
-        print('PLC READ:')
-        print(self.read_plc.__dict__)
-        print('PLC WRITE:')
-        print(self.write_plc.__dict__)
 
     def send_command(self, key) -> None:
         key_pressed(key, self.camera, self.tank)
@@ -238,6 +228,19 @@ class Controller:
             results_logger.info(f'{self.read_plc.popid} - {self.read_plc.partnumber} - {self.read_plc.parameter}')
         except Exception as e:
             logger.exception(e)
+
+    def __print_plc_values(self) -> None:
+        print('PLC READ:')
+        print(self.read_plc.__dict__)
+        print('PLC WRITE:')
+        print(self.write_plc.__dict__)
+
+    def __get_fake_parameters(self) -> None:
+        self.read_plc.read_request = True
+        self.read_plc.sticker = 1
+        self.read_plc.sticker_angle = 2
+        self.read_plc.sticker_position = 4
+        self.read_plc.drain_position = 0
 
 
 

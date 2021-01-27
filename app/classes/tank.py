@@ -73,33 +73,31 @@ class Tank:
         self.arc = config["arc"]
         self.drain_area_found = 0
 
-    def find_in_circle(self, frame: np.ndarray, _filter='threshold'):
-
-        # TODO: implement algotithm to find check if X or Y Offset has more than N pixels
-        # TODO: implement tracker algorithm to identify if a tank is present
+    def find_in_circle(self, frame: np.ndarray, _filter='lab'):
 
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         ys, ye, xs, xe = self.get_roi(frame)
         g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)
 
-
         if _filter == 'threshold':
             blur = cv.blur(g_frame, tuple(self.blur), 0)
             _, mask = cv.threshold(blur, self.threshold, 255, cv.THRESH_BINARY_INV)
-            # mask = cv.adaptiveThreshold(blur,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,7, 3)
+            # mask = cv.adaptiveThreshold(g_frame,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,5,2) # test / reduce the frame size
         else:
+            cut_frame = frame.copy()
+            cut_frame = self.__eliminate_non_roi(cut_frame, ys, ye, xs, xe)
             if _filter == 'hsv':
-                cvt_frame = cv.cvtColor(frame, cv.COLOR_RGB2HSV)
+                cvt_frame = cv.cvtColor(cut_frame, cv.COLOR_BGR2HSV)
                 lower =  np.array( (self.table_hsv[0][0], self.table_hsv[0][1], self.table_hsv[0][2]), np.uint8)
                 higher = np.array( (self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2]), np.uint8)
             else:
-                cvt_frame = cv.cvtColor(frame, cv.COLOR_RGB2LAB)
+                cvt_frame = cv.cvtColor(cut_frame, cv.COLOR_RGB2LAB)
                 lower =  np.array( (self.table_hsv[0][0], self.table_hsv[0][1], self.table_hsv[0][2]), np.uint8)
                 higher = np.array( (self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2]), np.uint8)
             mask = cv.inRange(cvt_frame, lower, higher)
 
-        # mask = cv.erode(mask, None, iterations=2)
-        # mask = cv.dilate(mask, None, iterations=4)
+        mask = cv.erode( mask, None, iterations=2)
+        mask = cv.dilate(mask, None, iterations=2)
 
         if self.debug_tank:
             cv.imshow('debug_tank', mask)
@@ -237,9 +235,9 @@ class Tank:
         kernel = np.ones(self.sticker_kernel, np.uint8)
         g_frame = cv.cvtColor(tank, cv.COLOR_BGR2GRAY)
         _, th = cv.threshold(g_frame, self.sticker_thresh, 255, cv.THRESH_BINARY)
-        # mask = cv.morphologyEx(th, cv.MORPH_CLOSE, kernel, iterations=3)
-        mask = cv.erode(th, None, iterations=3)
-        mask = cv.dilate(mask, None, iterations=5)
+        mask = cv.morphologyEx(th, cv.MORPH_CLOSE, kernel, iterations=3)
+        # mask = cv.erode(th, None, iterations=2)
+        # mask = cv.dilate(mask, None, iterations=2)
         self.append_stickers(mask, tank)
 
         if self.debug_sticker:

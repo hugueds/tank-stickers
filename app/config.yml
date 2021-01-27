@@ -15,7 +15,7 @@ camera:
     full_screen: False
     roi:
         x: [15.0, 90.0]
-        y: [15.0, 91.0]
+        y: [5.0, 91.0]
     fps: 20
     src: 0
     brightness: 200
@@ -31,14 +31,14 @@ tank:
     size: [[300, 800], [150, 500]]
     area: [0,99999]
     blur: [3,3]
-    threshold: 75
+    threshold: 80
     radius: [5, 70, 400]
-    min_dist: 150
-    params: [240,210]
+    min_dist: 200
+    params: [350,300]
     canny: [60,0]
     table_filter: [[42,10,10],[144,255,255]]
 sticker:
-    threshold: 80
+    threshold: 170
     area:
         min: 300
         max: 5000
