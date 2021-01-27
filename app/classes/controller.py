@@ -12,7 +12,7 @@ from classes.sticker import Sticker
 from classes.commands import key_pressed
 from classes.image_writter import *
 from classes.tf_model import TFModel
-from models import AppState, PLCInterface, PLCWriteInterface
+from models import AppState, PLCInterface, PLCWriteInterface, Deviation
 from logger import logger, results_logger
 
 class Controller:
@@ -62,7 +62,7 @@ class Controller:
         self.tank.find(self.frame)
         if self.tank.found:
             if self.drain_model == None:
-                self.drain_model = TFModel(model_name='drain') # to be implemented
+                self.drain_model = TFModel(model_name='drain')
             self.tank.get_drain_ml(self.frame, self.drain_model)
             self.tank.get_sticker_position_lab(self.frame)
             self.__predict_sticker()
@@ -82,43 +82,43 @@ class Controller:
         self.__clear_plc()
         error = False
         sticker = Sticker()
-        status = 1
+        status: Deviation = Deviation.NONE
         if not self.tank.found:
-            status = 0
+            status = Deviation.TANK_NOT_FOUND
             return
         if self.tank.check_drain and self.read_plc.drain_camera and (self.read_plc.drain_position != self.tank.drain_position):
             print('Drain on Wrong Position')
-            status = 7
+            status = Deviation.DRAIN_POSITION
             error = True
         if len(self.tank.stickers) > 1:
             print('Found more stickers than needed')
-            status = 4
+            status = Deviation.STICKER_QUANTITY
             error = True
         if self.read_plc.sticker_camera and len(self.tank.stickers) == 0:
             print('Sticker not found')
-            status = 3
+            status = Deviation.STICKER_NOT_FOUND
             error = True
         if len(self.tank.stickers):
             sticker = self.tank.stickers[0]
         if self.read_plc.sticker_camera and self.read_plc.sticker != sticker.label_char_index:
             print('Wrong Label, expected:' + str(self.read_plc.sticker) + ', received: ' + str(sticker.label))
             self.write_plc.inc_sticker = sticker.label_char_index
-            status = 9
+            status = Deviation.STICKER_VALUE
             error = True
         if self.read_plc.sticker_camera and self.read_plc.sticker_angle != sticker.angle:
             print('Wrong Label Angle, expected:' + str(self.read_plc.sticker_angle) + ', received: ' + str(sticker.angle))
             self.write_plc.inc_angle = sticker.angle
-            status = 8
+            status = Deviation.STICKER_ANGLE
             error = True
         if self.read_plc.sticker_camera and self.read_plc.sticker_position != sticker.quadrant:
             print('Wrong Label Position, expected:' + str(self.read_plc.sticker_position) + ', received: ' + str(sticker.quadrant))
             self.write_plc.position_inc_sticker = sticker.quadrant
-            status = 2
+            status = Deviation.STICKER_POSITION
             error = True
 
         self.write_plc.cam_status = status
 
-        if not error:
+        if status != Deviation.NONE:
             self.__job_done()
 
         return

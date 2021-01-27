@@ -1,6 +1,7 @@
 from enum import Enum
 
 class Deviation:
+    NONE = 1
     TANK_NOT_FOUND = 0
     STICKER_POSITION = 2
     STICKER_NOT_FOUND = 3
