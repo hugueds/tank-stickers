@@ -22,15 +22,13 @@ class Controller:
     plc: PLC
     read_plc: PLCInterface = PLCInterface()
     write_plc: PLCWriteInterface = PLCWriteInterface(0)
-    start_time = datetime.now()
     tank: Tank = Tank()
     camera_enabled = True
-    start_time: datetime
     frame: np.ndarray = np.zeros((640,480))
     file_frame = None
+    drain_model: TFModel = None
     result_list = []
     final_result = False
-    drain_model: TFModel = None
 
     def __init__(self, is_picture=False):
         self.start_time = datetime.now()
