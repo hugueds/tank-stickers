@@ -15,6 +15,7 @@ class PLCInterface:
     popid = ''
     parameter = ''
     partnumber = ''
+    skid = 0
 
     def update(self, data = None):
         if data is None:

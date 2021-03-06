@@ -15,6 +15,8 @@ from classes.tf_model import TFModel
 from models import AppState, PLCInterface, PLCWriteInterface, Deviation
 from logger import logger, results_logger
 
+# TO ADD LATER: TANK STATUS VIA DB
+
 class Controller:
 
     state: AppState = AppState.INITIAL
