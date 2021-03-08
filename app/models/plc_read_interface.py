@@ -29,7 +29,7 @@ class PLCInterface:
         self.drain_position = int(data[3])
         self.sticker_position = int(data[4])
         self.sticker_angle = int(data[5])
-        self.command = int(data[6])
+        self.skid = int(data[6])
         self.popid = get_string(data, 8, 8)
         self.partnumber = get_string(data, 18, 8)
         self.parameter = get_string(data, 28, 10)
