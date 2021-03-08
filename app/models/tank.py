@@ -1,4 +1,7 @@
+import numpy as np
 from typing import List
+from .sticker import Sticker
+from .drain import Drain
 
 
 class Tank:

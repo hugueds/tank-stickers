@@ -25,10 +25,9 @@ class Controller:
     read_plc: PLCInterface = PLCInterface()
     write_plc: PLCWriteInterface = PLCWriteInterface(0)
     tank: Tank = Tank()
-    camera_enabled = True
     frame: np.ndarray = np.zeros((640,480))
-    file_frame = None
     drain_model: TFModel = None
+    file_frame = None
     result_list = []
     final_result = False
 
@@ -45,8 +44,8 @@ class Controller:
     def get_frame(self):
         if self.is_picture:
             self.frame = self.file_frame
-            return
-        _, self.frame = self.camera.read()
+        else:
+            _, self.frame = self.camera.read()
 
     def open_file(self, file):
         self.frame = cv.imread(file)
@@ -80,64 +79,52 @@ class Controller:
 
     def analyse(self) -> None:
         self.__clear_plc()
-        error = False
         sticker = Sticker()
         status: Deviation = Deviation.NONE
+
         if not self.tank.found:
             status = Deviation.TANK_NOT_FOUND
+            self.write_plc.cam_status = status
             return
         if self.tank.check_drain and self.read_plc.drain_camera and (self.read_plc.drain_position != self.tank.drain_position):
             print('Drain on Wrong Position')
             status = Deviation.DRAIN_POSITION
-            error = True
         if len(self.tank.stickers) > 1:
             print('Found more stickers than needed')
             status = Deviation.STICKER_QUANTITY
-            error = True
         if self.read_plc.sticker_camera and len(self.tank.stickers) == 0:
             print('Sticker not found')
             status = Deviation.STICKER_NOT_FOUND
-            error = True
         if len(self.tank.stickers):
             sticker = self.tank.stickers[0]
         if self.read_plc.sticker_camera and self.read_plc.sticker != sticker.label_char_index:
             print('Wrong Label, expected:' + str(self.read_plc.sticker) + ', received: ' + str(sticker.label))
             self.write_plc.inc_sticker = sticker.label_char_index
             status = Deviation.STICKER_VALUE
-            error = True
         if self.read_plc.sticker_camera and self.read_plc.sticker_angle != sticker.angle:
             print('Wrong Label Angle, expected:' + str(self.read_plc.sticker_angle) + ', received: ' + str(sticker.angle))
             self.write_plc.inc_angle = sticker.angle
             status = Deviation.STICKER_ANGLE
-            error = True
         if self.read_plc.sticker_camera and self.read_plc.sticker_position != sticker.quadrant:
             print('Wrong Label Position, expected:' + str(self.read_plc.sticker_position) + ', received: ' + str(sticker.quadrant))
             self.write_plc.position_inc_sticker = sticker.quadrant
             status = Deviation.STICKER_POSITION
-            error = True
 
         self.write_plc.cam_status = status
 
-        if status != Deviation.NONE:
+        if status == Deviation.NONE:
             self.__job_done()
-
-        return
 
         # ---------------- TO IMPLEMENT ----------------------
-        # Check the highest arg in last 5 frames
-        if not error:
-            self.write_plc.cam_status = 1
-
-        self.result_list.append(self.write_plc.cam_status)
-
-        if len(self.result_list > 5):
-            self.result_list.pop(0)
-
-        if Counter(self.result_list).most_common()[0][0] == 1:
-            self.__job_done()
-
+        # self.__get_final_result(status)
         # ----------------------------------------------------
 
+    def __get_final_result(self, status: Deviation):
+        self.result_list.append(status)
+        if len(self.result_list > 5):
+            self.result_list.pop(0)
+        if Counter(self.result_list).most_common()[0][0] == 1:
+            self.__job_done()
 
     def __job_done(self):
         self.final_result = True
@@ -181,9 +168,6 @@ class Controller:
             self.__job_done()
         elif key == ord('i'):
             self.__print_plc_values()
-        if self.read_plc.read_command:
-            # send_command() # TODO Define and receive commands from PLC
-            pass
 
     def send_command(self, key) -> None:
         key_pressed(key, self.camera, self.tank)
@@ -196,6 +180,7 @@ class Controller:
 
     def update_plc(self) -> None:
         last_life_beat = -1
+
         while self.plc.enabled:
             read_data = self.plc.read()
             self.read_plc.update(read_data)
@@ -207,7 +192,8 @@ class Controller:
             else:
                 last_life_beat = self.read_plc.life_beat
                 self.write_plc.update_life_beat()
-                self.plc.write(self.write_plc)
+                _bytearray = self.write_plc.get_bytearray()
+                self.plc.write(_bytearray)
                 sleep(self.plc.update_time)
         else:
             logger.warning('PLC is not Enabled')

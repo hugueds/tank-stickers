@@ -2,8 +2,6 @@ from snap7.util import set_bool
 
 class PLCWriteInterface:
 
-    _bytearray: bytearray
-
     def __init__(self, size):
         self.request_ack = False
         self.drain_found = False
@@ -17,7 +15,7 @@ class PLCWriteInterface:
         self.inc_angle = 0
         self.size = size
 
-    def get_bytearray(self) -> bytearray:
+    def update_bytearray(self) -> bytearray:
 
         _bytearray = bytearray(self.size)
 
@@ -33,7 +31,6 @@ class PLCWriteInterface:
         _bytearray[7] = self.inc_angle
         _bytearray[8] = self.inc_sticker
 
-        self._bytearray = _bytearray
         return _bytearray
 
     def update_life_beat(self) -> None:
@@ -41,3 +38,14 @@ class PLCWriteInterface:
             self.life_beat += 1
         else:
             self.life_beat = 0
+
+    def job_done(self):
+        self.write_plc.cam_status = 1
+        self.write_plc.job_status = 2
+        self.write_plc.request_ack = False
+
+    def clear(self) -> None:
+        self.position_inc_drain = 0
+        self.position_inc_sticker = 0
+        self.inc_sticker = 0
+        self.inc_angle = 0

@@ -118,7 +118,7 @@ class Tank:
                 self.y = int(y - r) if (y - r) > 0 and y < frame.shape[0] else 0
 
                 if self.x > 0 and self.x < 60_000 and self.y > 0 and self.y < 60_000:
-                    self.w, self.h = 2*r, 2*r
+                    self.w, self.h = 2 * r, 2 * r
                     self.found = True
                     self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 

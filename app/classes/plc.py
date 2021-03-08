@@ -1,11 +1,6 @@
 from snap7.client import Client
 from snap7.util import *
-from time import sleep
 import yaml
-from threading import Thread
-from datetime import datetime
-from classes import Sticker, Tank, camera
-from models import PLCInterface, PLCWriteInterface
 from logger import logger
 
 class PLC:
@@ -52,9 +47,8 @@ class PLC:
         except Exception as e:
             logger.exception(e)
 
-    def write(self, data: PLCWriteInterface) -> None:
+    def write(self, _bytearray: bytearray) -> None:
         try:
-            _bytearray = data.get_bytearray()
             db = self.db_write
             start = db['size'] * self.camera_number
             self.client.db_write(db['number'], start, _bytearray)
