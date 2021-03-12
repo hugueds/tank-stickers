@@ -30,6 +30,7 @@ class Controller:
     file_frame = None
     result_list = []
     final_result = False
+    analyse_counter = 0
 
     def __init__(self, is_picture=False):
         self.start_time = datetime.now()
@@ -74,63 +75,67 @@ class Controller:
 
     def __predict_sticker(self):
         for sticker in self.tank.stickers:
-                sticker.label_index, sticker.label = self.model.predict(sticker.image)
-                sticker.update_label_info()
+            sticker.label_index, sticker.label = self.model.predict(sticker.image)
+            sticker.update_label_info()
 
     def analyse(self) -> None:
         self.__clear_plc()
         sticker = Sticker()
         status: Deviation = Deviation.NONE
+        qnt_stickers = len(self.tank.stickers)
 
         if not self.tank.found:
             status = Deviation.TANK_NOT_FOUND
-            self.write_plc.cam_status = status
             return
         if self.tank.check_drain and self.read_plc.drain_camera and (self.read_plc.drain_position != self.tank.drain_position):
             print('Drain on Wrong Position')
             status = Deviation.DRAIN_POSITION
-        if len(self.tank.stickers) > 1:
+        if qnt_stickers > 1:
             print('Found more stickers than needed')
             status = Deviation.STICKER_QUANTITY
         if self.read_plc.sticker_camera and len(self.tank.stickers) == 0:
             print('Sticker not found')
             status = Deviation.STICKER_NOT_FOUND
-        if len(self.tank.stickers):
+        if qnt_stickers:
             sticker = self.tank.stickers[0]
-        if self.read_plc.sticker_camera and self.read_plc.sticker != sticker.label_char_index:
+        if self.read_plc.sticker_camera and self.read_plc.sticker != sticker.label_char_index and qnt_stickers:
             print('Wrong Label, expected:' + str(self.read_plc.sticker) + ', received: ' + str(sticker.label))
             self.write_plc.inc_sticker = sticker.label_char_index
             status = Deviation.STICKER_VALUE
-        if self.read_plc.sticker_camera and self.read_plc.sticker_angle != sticker.angle:
+        if self.read_plc.sticker_camera and self.read_plc.sticker_angle != sticker.angle and qnt_stickers:
             print('Wrong Label Angle, expected:' + str(self.read_plc.sticker_angle) + ', received: ' + str(sticker.angle))
             self.write_plc.inc_angle = sticker.angle
             status = Deviation.STICKER_ANGLE
-        if self.read_plc.sticker_camera and self.read_plc.sticker_position != sticker.quadrant:
+        if self.read_plc.sticker_camera and self.read_plc.sticker_position != sticker.quadrant and qnt_stickers:
             print('Wrong Label Position, expected:' + str(self.read_plc.sticker_position) + ', received: ' + str(sticker.quadrant))
             self.write_plc.position_inc_sticker = sticker.quadrant
             status = Deviation.STICKER_POSITION
 
         self.write_plc.cam_status = status
 
-        if status == Deviation.NONE:
-            self.__job_done()
 
-        # ---------------- TO IMPLEMENT ----------------------
-        # self.__get_final_result(status)
-        # ----------------------------------------------------
+        self.__get_final_result(status)
+        self.analyse_counter = self.analyse_counter + 1
+
 
     def __get_final_result(self, status: Deviation):
         self.result_list.append(status)
-        if len(self.result_list > 5):
+        if len(self.result_list) > 5:
             self.result_list.pop(0)
-        if Counter(self.result_list).most_common()[0][0] == 1:
-            self.__job_done()
+            if Counter(self.result_list).most_common()[0][0] == 1:
+                self.__job_done()
 
     def __job_done(self):
         self.final_result = True
         self.write_plc.cam_status = 1
         self.write_plc.job_status = 2
         self.write_plc.request_ack = False
+
+    def __clear_plc(self) -> None:
+        self.write_plc.position_inc_drain = 0
+        self.write_plc.position_inc_sticker = 0
+        self.write_plc.inc_sticker = 0
+        self.write_plc.inc_angle = 0
 
     def show(self) -> None:
         frame = self.frame.copy()
@@ -151,13 +156,8 @@ class Controller:
         self.write_plc.cam_status = 0
         self.write_plc.job_status = 1
         self.final_result = False
+        self.analyse_counter = 0
         self.result_list.clear()
-
-    def __clear_plc(self) -> None:
-        self.write_plc.position_inc_drain = 0
-        self.write_plc.position_inc_sticker = 0
-        self.write_plc.inc_sticker = 0
-        self.write_plc.inc_angle = 0
 
     def get_command(self) -> None:
         key = cv.waitKey(1) & 0xFF
@@ -199,8 +199,8 @@ class Controller:
             logger.warning('PLC is not Enabled')
 
     def set_state(self, state: AppState) -> None:
-            logger.info(f'Updating state to: {state}')
-            self.state = state
+        logger.info(f'Updating state to: {state}')
+        self.state = state
 
     def save_result(self) -> None:
         try:
@@ -217,7 +217,7 @@ class Controller:
     def __print_plc_values(self) -> None:
         print('PLC READ:')
         print(self.read_plc.__dict__)
-        print('PLC WRITE:')
+        print('\nPLC WRITE:')
         print(self.write_plc.__dict__)
 
     def __get_fake_parameters(self) -> None:

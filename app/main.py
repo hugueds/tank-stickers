@@ -18,6 +18,7 @@ while True:
         if controller.read_plc.read_request:
             print('New Job Request')
             controller.confirm_request()
+            sleep(1)
             controller.set_state(AppState.PROCESSING_IMAGE)
 
     elif controller.state == AppState.PROCESSING_IMAGE:
@@ -26,11 +27,11 @@ while True:
             controller.set_state(AppState.SAVING_RESULTS)
         elif controller.read_plc.read_request:
             print('Aborting current Job...')
-            sleep(1)
+            controller.write_plc.job_status = 0
             controller.set_state(AppState.WAITING_REQUEST)
         else:
             print('Invalid Configuration, redoing operation')
-            sleep(0.2)
+            sleep(0.1)
 
     elif controller.state == AppState.SAVING_RESULTS:
         controller.save_result()
