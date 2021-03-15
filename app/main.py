@@ -15,6 +15,11 @@ while True:
         controller.set_state(AppState.WAITING_REQUEST)
 
     elif controller.state == AppState.WAITING_REQUEST:
+
+        if not controller.tank.found or controller.read_plc.skid == 0:
+            controller.write_plc.cam_status = 0
+            controller.write_plc.job_status = 0
+
         if controller.read_plc.read_request:
             print('New Job Request')
             controller.confirm_request()
