@@ -123,10 +123,11 @@ class Controller:
 
     def __get_final_result(self, status: Deviation):
         self.result_list.append(status)
-        if len(self.result_list) > 5:
-            self.result_list.pop(0)
+        total_reads = 3
+        if len(self.result_list) > total_reads:
             if Counter(self.result_list).most_common()[0][0] == 1:
                 self.__job_done()
+            self.result_list.pop(0)
 
     def __job_done(self):
         self.final_result = True
@@ -143,7 +144,7 @@ class Controller:
     def abort_job(self):
         self.__clear_plc()
         self.write_plc.cam_status = 0
-        self.write_plc.cam_status = JobStatus.CANCELLED
+        self.write_plc.job_status = JobStatus.CANCELLED
 
     def show(self) -> None:
         frame = self.frame.copy()
