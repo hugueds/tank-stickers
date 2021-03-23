@@ -69,7 +69,8 @@ class Controller:
             self.__predict_sticker()
 
     def __process_side_camera(self):
-        self.tank.find_in_circle(self.frame)
+        # self.tank.find_in_circle(self.frame)
+        self.tank.find_convex(self.frame)
         if self.tank.found:
             self.tank.get_sticker_position(self.frame)
             self.__predict_sticker()

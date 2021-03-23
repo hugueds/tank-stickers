@@ -15,7 +15,7 @@ camera:
     full_screen: False
     roi:
         x: [15.0, 90.0]
-        y: [15.0, 91.0]
+        y: [5.0, 91.0]
     fps: 20
     src: 0
     brightness: 200
@@ -32,10 +32,10 @@ tank:
     area: [0,99999]
     blur: [5,5]
     threshold: 75
-    radius: [2.3, 70, 400]
-    min_dist: 100
-    params: [240,210]
-    table_filter: [[42,10,10],[144,255,255]]
+    radius: [3, 70, 400]
+    min_dist: 200
+    params: [240,180]
+    table_filter: [[0,0,0],[200,255,130]]
 sticker:
     threshold: 80
     area:
@@ -44,7 +44,7 @@ sticker:
     size:
         min: 20
         max: 100
-    kernel: [3,3]
+    kernel: [1,1]
     hsv_filter: [[0, 0, 0], [179, 255, 255]]
     lab_filter: [[70, 115, 100], [255, 145, 140]]
 drain:
