@@ -72,7 +72,7 @@ class Controller:
     def __process_side_camera(self):        
         self.tank.find_convex(self.frame)
         if self.tank.found:
-            self.tank.get_sticker_position(self.frame)
+            self.tank.get_sticker_position(self.frame, 'canny')
             self.__predict_sticker()
 
     def __predict_sticker(self):

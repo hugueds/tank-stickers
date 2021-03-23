@@ -110,6 +110,62 @@ class Tank:
             self.found = False
             self.x, self.y, self.w, self.h = 0, 0, 0, 0
 
+        def find_old(self, frame: np.ndarray) -> None:
+
+        hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+        blur = cv.GaussianBlur(hsv, tuple(self.blur), 0)
+        lower =  np.array( (self.table_hsv[0][0], self.table_hsv[0][1], self.table_hsv[0][2]), np.uint8)
+        higher = np.array( (self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2]), np.uint8)
+        mask = cv.inRange(blur, lower, higher)
+
+        ys, ye, x_off_start, x_off_end = self.get_roi(frame)
+        mask = self.__eliminate_non_roi(mask, ys, ye, x_off_start, x_off_end)
+
+        if self.debug_tank:
+            cv.imshow('debug_tank', mask)
+
+        cam_config = self.config['camera']
+        mid_x = frame.shape[1] // 2
+        x_center_offset = int(cam_config["center_x_offset"] * frame.shape[1] // 100)
+        vector_y = mask[:, mid_x + x_center_offset]
+        roi_vector_y = vector_y[:]
+        roi_vector_y = roi_vector_y[roi_vector_y == 0]
+
+        if roi_vector_y.size > int(self.min_height):
+            self.h = roi_vector_y.size
+        else:
+            self.h = 0
+            self.found = False
+            return
+
+        self.y = np.where(vector_y == 0)[0][0]  # Get the first black pixel
+
+        center_y = (self.y + self.h) // 2
+
+        adj_y1 = int(self.y + (self.h * 0.22))  # SET IN CONFIG
+        adj_y2 = int(center_y + (self.h * 0.3))
+
+        # Create lines for adj_y
+        vector_x1 = mask[adj_y1, x_off_start:mid_x]
+        vector_x2 = mask[adj_y2, mid_x:x_off_end]
+
+        for i in range(len(vector_x1)):
+            if vector_x1[i] == 0:
+                self.x = i + x_off_start
+                break
+
+        vector_x2 = mask[adj_y2, mid_x:x_off_end]
+
+        for i in range(len(vector_x2) - 1, -1, -1):
+            if vector_x2[i] == 0:
+                x2 = mid_x - i
+                self.w = (mask.shape[1] - self.x) - x2
+                break
+
+        self.found = self.h >= self.min_height and self.w >= self.min_width
+        self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
+
+
     def find(self, frame: np.ndarray):
 
         cam_config = self.config["camera"]

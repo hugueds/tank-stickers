@@ -30,14 +30,6 @@ tank:
     max: [0, 1]
     size: [[300, 800], [150, 500]]
     area: [0,99999]
-<<<<<<< HEAD
-    blur: [5,5]
-    threshold: 75
-    radius: [3, 70, 400]
-    min_dist: 200
-    params: [240,180]
-    table_filter: [[0,0,0],[200,255,130]]
-=======
     blur: [3,3]
     threshold: 80
     radius: [5, 70, 400]
@@ -45,7 +37,6 @@ tank:
     params: [350,300]
     canny: [60,0]
     table_filter: [[42,10,10],[144,255,255]]
->>>>>>> dfbe2d2b247353a4d718eec0e61629678b1755f4
 sticker:
     threshold: 170
     area:

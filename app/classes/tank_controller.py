@@ -6,6 +6,9 @@ def get_drain(tank: Tank):
 def find(tank: Tank):
     pass
 
+def find_convex(tank: Tank):
+    pass
+
 def find_in_circle(tank: Tank):
     pass
 
