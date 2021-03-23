@@ -57,6 +57,7 @@ class Tank:
         self.table_hsv = config['table_filter']
         self.check_drain = config['check_drain']
 
+
     def load_sticker_config(self, config):
         self.sticker_kernel = config["kernel"]
         self.sticker_thresh = config["threshold"]
@@ -74,69 +75,20 @@ class Tank:
         self.arc = config["arc"]
         self.drain_area_found = 0
 
-
-    def find_convex(self, frame):
-        g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        ys, ye, xs, xe = self.get_roi(frame)
-        g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)
-        threshold = 65
-        canny_output = cv.Canny(g_frame, threshold, threshold * 2)
-        contours, _ = cv.findContours(canny_output, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-        hull_list = []
-        for i in range(len(contours)):
-            hull = cv.convexHull(contours[i])
-            hull_list.append(hull)
-        # Draw contours + hull results
-        drawing = np.zeros((canny_output.shape[0], canny_output.shape[1], 3), dtype=np.uint8)
-        for i in range(len(contours)):
-            # color = (rng.randint(0,256), rng.randint(0,256), rng.randint(0,256))
-            color = (255,255,255)
-            cv.drawContours(drawing, contours, i, color)
-            cv.drawContours(drawing, hull_list, i, color)
-        # Show in a window
-        g_frame = cv.cvtColor(drawing, cv.COLOR_BGR2GRAY)
-        cv.imshow('Contours', g_frame)
-
-        self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT,
-                                        param1=self.params[0],
-                                        param2=self.params[1],
-                                        minDist=self.min_dist,
-                                        dp= self.radius[0],
-                                        minRadius=self.radius[1],
-                                        maxRadius=self.radius[2])
-        self.found = False
-        self.x, self.y, self.w, self.h = 0, 0, 0, 0
-        if self.circles is not None:
-            circles = np.uint16(np.around(self.circles))
-            for x, y, r in circles[0, :]:
-                self.x = int(x - r) if (x - r) > 0 and x < frame.shape[1] else 0
-                self.y = int(y - r) if (y - r) > 0 and y < frame.shape[0] else 0
-
-                if self.x > 0 and self.x < 60_000 and self.y > 0 and self.y < 60_000:
-                    self.w, self.h = 2*r, 2*r
-                    self.found = True
-                    self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
-        
-
-
-    def find_in_circle(self, frame: np.ndarray, _filter='lab'):        
+    def find_in_circle(self, frame: np.ndarray, _filter='lab'):
 
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         ys, ye, xs, xe = self.get_roi(frame)
         g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)
 
-
-        if _filter == 'thresh':
+        if _filter == 'threshold':
             blur = cv.blur(g_frame, tuple(self.blur), 0)
-            _, mask = cv.threshold(blur, self.threshold, 255, cv.THRESH_BINARY)
-            mask = cv.pyrMeanShiftFiltering(frame, 5, 21)
-            # mask = cv.adaptiveThreshold(g_frame,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY,11,2)
-        elif _filter == 'knn':
-            mask = extract(frame)
+            _, mask = cv.threshold(blur, self.threshold, 255, cv.THRESH_BINARY_INV)
+            # mask = cv.adaptiveThreshold(g_frame,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,5,2) # test / reduce the frame size
         else:
             cut_frame = frame.copy()
             cut_frame = self.__eliminate_non_roi(cut_frame, ys, ye, xs, xe)
-            if _filter == 'hsv':                
+            if _filter == 'hsv':
                 cvt_frame = cv.cvtColor(cut_frame, cv.COLOR_BGR2HSV)
                 lower =  np.array( (self.table_hsv[0][0], self.table_hsv[0][1], self.table_hsv[0][2]), np.uint8)
                 higher = np.array( (self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2]), np.uint8)
@@ -146,6 +98,7 @@ class Tank:
                 higher = np.array( (self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2]), np.uint8)
             mask = cv.inRange(cvt_frame, lower, higher)
 
+<<<<<<< HEAD
         # mask = cv.erode(mask, None, iterations=2)
         # mask = cv.dilate(mask, None, iterations=4)        
 
@@ -160,6 +113,10 @@ class Tank:
 
         # cv.imshow('test', test_frame)
         # return
+=======
+        mask = cv.erode( mask, None, iterations=2)
+        mask = cv.dilate(mask, None, iterations=2)
+>>>>>>> dfbe2d2b247353a4d718eec0e61629678b1755f4
 
         if self.debug_tank:
             cv.imshow('debug_tank', mask)     
@@ -181,11 +138,11 @@ class Tank:
                 self.y = int(y - r) if (y - r) > 0 and y < frame.shape[0] else 0
 
                 if self.x > 0 and self.x < 60_000 and self.y > 0 and self.y < 60_000:
-                    self.w, self.h = 2*r, 2*r
+                    self.w, self.h = 2 * r, 2 * r
                     self.found = True
                     self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
-    def find(self, frame: np.ndarray) -> None:
+    def find_old(self, frame: np.ndarray) -> None:
 
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         blur = cv.GaussianBlur(hsv, tuple(self.blur), 0)
@@ -195,8 +152,6 @@ class Tank:
 
         ys, ye, x_off_start, x_off_end = self.get_roi(frame)
         mask = self.__eliminate_non_roi(mask, ys, ye, x_off_start, x_off_end)
-
-        # morph close
 
         if self.debug_tank:
             cv.imshow('debug_tank', mask)
@@ -242,7 +197,7 @@ class Tank:
         self.found = self.h >= self.min_height and self.w >= self.min_width
         self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
-    def find_2(self, frame: np.ndarray):
+    def find(self, frame: np.ndarray):
 
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         blur = cv.blur(hsv, tuple(self.blur), 0)
@@ -299,8 +254,13 @@ class Tank:
         g_frame = cv.cvtColor(tank, cv.COLOR_BGR2GRAY)
         _, th = cv.threshold(g_frame, self.sticker_thresh, 255, cv.THRESH_BINARY)
         mask = cv.morphologyEx(th, cv.MORPH_CLOSE, kernel, iterations=3)
+<<<<<<< HEAD
         # mask = cv.erode(th, None, iterations=3)
         # mask = cv.dilate(mask, None, iterations=5)
+=======
+        # mask = cv.erode(th, None, iterations=2)
+        # mask = cv.dilate(mask, None, iterations=2)
+>>>>>>> dfbe2d2b247353a4d718eec0e61629678b1755f4
         self.append_stickers(mask, tank)
 
         if self.debug_sticker:
