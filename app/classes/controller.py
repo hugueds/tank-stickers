@@ -31,6 +31,8 @@ class Controller:
     result_list = []
     final_result = False
     analyse_counter = 0
+    last_request = 0
+    total_reads = 3
 
     def __init__(self, is_picture=False):
         self.start_time = datetime.now()
@@ -67,8 +69,7 @@ class Controller:
             self.tank.get_sticker_position_lab(self.frame)
             self.__predict_sticker()
 
-    def __process_side_camera(self):
-        # self.tank.find_in_circle(self.frame)
+    def __process_side_camera(self):        
         self.tank.find_convex(self.frame)
         if self.tank.found:
             self.tank.get_sticker_position(self.frame)
@@ -83,11 +84,7 @@ class Controller:
         self.__clear_plc()
         sticker = Sticker()
         status: Deviation = Deviation.NONE
-        qnt_stickers = len(self.tank.stickers)
-
-        if self.read_plc.skid == 0:
-            print('Skid not Found, Cancelling the JOB')
-            self.abort_job()
+        qnt_stickers = len(self.tank.stickers)        
 
         if not self.tank.found:
             print('Tank not Found')
@@ -123,9 +120,8 @@ class Controller:
 
 
     def __get_final_result(self, status: Deviation):
-        self.result_list.append(status)
-        total_reads = 3
-        if len(self.result_list) > total_reads:
+        self.result_list.append(status)        
+        if len(self.result_list) >= self.total_reads:
             if Counter(self.result_list).most_common()[0][0] == 1:
                 self.__job_done()
             self.result_list.pop(0)
@@ -141,6 +137,10 @@ class Controller:
         self.write_plc.position_inc_sticker = 0
         self.write_plc.inc_sticker = 0
         self.write_plc.inc_angle = 0
+    
+    def check_skid(self):
+        if not self.tank.found and self.read_plc.skid == 0:
+            self.abort_job()
 
     def abort_job(self):
         self.__clear_plc()
@@ -160,7 +160,12 @@ class Controller:
         frame = draw_plc_status(frame, self.plc, self.read_plc, self.write_plc)
         self.camera.show(frame)
 
+    def new_request(self):
+        return self.read_plc.request_number != self.last_request
+
     def confirm_request(self) -> None:
+        print('New Job Request...') # Print JOB Info     
+        self.last_request = self.read_plc.request_number
         self.read_plc.read_request = False
         self.write_plc.request_ack = True
         self.write_plc.cam_status = 0
@@ -168,6 +173,7 @@ class Controller:
         self.final_result = False
         self.analyse_counter = 0
         self.result_list.clear()
+        sleep(1)
 
     def get_command(self) -> None:
         key = cv.waitKey(1) & 0xFF

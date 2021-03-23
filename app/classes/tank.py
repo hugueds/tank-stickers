@@ -10,7 +10,7 @@ import random as rng
 from classes.knn import extract
 
 font = cv.FONT_HERSHEY_SIMPLEX
-rng.seed(12345)
+
 class Tank:
 
     found = False
@@ -98,25 +98,8 @@ class Tank:
                 higher = np.array( (self.table_hsv[1][0], self.table_hsv[1][1], self.table_hsv[1][2]), np.uint8)
             mask = cv.inRange(cvt_frame, lower, higher)
 
-<<<<<<< HEAD
-        # mask = cv.erode(mask, None, iterations=2)
-        # mask = cv.dilate(mask, None, iterations=4)        
-
-        # mask = cv.Canny(g_frame,100,100)
-
-        # cnt, hier = cv.findContours(mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-
-        # test_frame = frame.copy()
-
-        # for c in cnt:
-        #     cv.drawContours(test_frame, [c], -1, (255,0,0), 2)
-
-        # cv.imshow('test', test_frame)
-        # return
-=======
         mask = cv.erode( mask, None, iterations=2)
         mask = cv.dilate(mask, None, iterations=2)
->>>>>>> dfbe2d2b247353a4d718eec0e61629678b1755f4
 
         if self.debug_tank:
             cv.imshow('debug_tank', mask)     
@@ -254,13 +237,8 @@ class Tank:
         g_frame = cv.cvtColor(tank, cv.COLOR_BGR2GRAY)
         _, th = cv.threshold(g_frame, self.sticker_thresh, 255, cv.THRESH_BINARY)
         mask = cv.morphologyEx(th, cv.MORPH_CLOSE, kernel, iterations=3)
-<<<<<<< HEAD
-        # mask = cv.erode(th, None, iterations=3)
-        # mask = cv.dilate(mask, None, iterations=5)
-=======
         # mask = cv.erode(th, None, iterations=2)
         # mask = cv.dilate(mask, None, iterations=2)
->>>>>>> dfbe2d2b247353a4d718eec0e61629678b1755f4
         self.append_stickers(mask, tank)
 
         if self.debug_sticker:
