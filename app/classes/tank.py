@@ -77,7 +77,7 @@ class Tank:
     def find_convex(self, frame, hull=False):
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         ys, ye, xs, xe = self.get_roi(frame)
-        g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)        
+        g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)
         canny_output = cv.Canny(g_frame, self.threshold, self.threshold * 1.5)
         contours, _ = cv.findContours(canny_output, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
         hull_list = []
@@ -90,11 +90,11 @@ class Tank:
         for i in range(len(contours)):
             color = (255, 255, 255)
             cv.drawContours(drawing, contours, i, color, 3)
-            cv.drawContours(drawing, hull_list, i, color)        
-        
+            cv.drawContours(drawing, hull_list, i, color)
+
         if self.debug_tank:
             cv.imshow('debug_tank', drawing)
-            
+
         self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT,
                                         param1=self.params[0],
                                         param2=self.params[1],
@@ -222,7 +222,7 @@ class Tank:
         else:
             tank = frame[self.y: self.y + self.h, self.x: self.x + self.w]
         if tank.size == 0:
-            return        
+            return
 
         g_frame = cv.cvtColor(tank, cv.COLOR_BGR2GRAY)
 
@@ -233,18 +233,17 @@ class Tank:
                 mask = cv.dilate(mask, None, iterations=2)
 
         elif _filter == 'canny':
-            mask = cv.Canny(g_frame, self.threshold, self.threshold * 1.5)
-            # mask = cv.cvtColor(mask, cv.COLOR_BGR2GRAY)
+            mask = cv.Canny(g_frame, self.sticker_thresh, self.thresh * 1.5)
         else:
             kernel = np.ones(self.sticker_kernel, np.uint8)
             lower = np.array(self.sticker_lab[0], np.uint8)
             higher = np.array(self.sticker_lab[1], np.uint8)
-            if _filter == 'hsv':            
-                mode = cv.cvtColor(tank, cv.COLOR_BGR2HSV)                
-            elif _filter == 'lab':            
-                mode = cv.cvtColor(tank, cv.COLOR_BGR2LAB)            
+            if _filter == 'hsv':
+                mode = cv.cvtColor(tank, cv.COLOR_BGR2HSV)
+            elif _filter == 'lab':
+                mode = cv.cvtColor(tank, cv.COLOR_BGR2LAB)
             mask = cv.inRange(mode, lower, higher)
-            mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel, iterations=5)            
+            mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel, iterations=5)
 
         self.append_stickers(mask, tank)
 
