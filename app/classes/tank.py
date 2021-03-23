@@ -77,23 +77,26 @@ class Tank:
     def find_convex(self, frame, hull=False):
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         ys, ye, xs, xe = self.get_roi(frame)
-        g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)
+        g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)        
         canny_output = cv.Canny(g_frame, self.threshold, self.threshold * 1.5)
+        _, th = cv.threshold(g_frame, self.threshold, 255, cv.THRESH_BINARY)
         contours, _ = cv.findContours(canny_output, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
         hull_list = []
         if hull:
             for i in range(len(contours)):
                 hull = cv.convexHull(contours[i])
-                hull_list.append(hull)
-                # Draw contours + hull results
+                hull_list.append(hull)                
         drawing = np.zeros((canny_output.shape[0], canny_output.shape[1], 3), dtype=np.uint8)
         for i in range(len(contours)):
             color = (255, 255, 255)
-            cv.drawContours(drawing, contours, i, color, 3)
-            cv.drawContours(drawing, hull_list, i, color)
+            cv.drawContours(drawing, contours, i, color, 1)
+            # cv.drawContours(drawing, hull_list, i, color)
 
-        if self.debug_tank:
-            cv.imshow('debug_tank', drawing)
+        g_frame = cv.cvtColor(drawing, cv.COLOR_BGR2GRAY)
+
+        if self.debug_tank or True:
+            cv.imshow('debug_tank', g_frame)
+            cv.imshow('debug_tank2', th)
 
         self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT,
                                         param1=self.params[0],
@@ -106,12 +109,11 @@ class Tank:
         self.x, self.y, self.w, self.h = 0, 0, 0, 0
         if self.circles is not None:
             circles = np.uint16(np.around(self.circles))
-            for x, y, r in circles[0, :]:
+            for x, y, r in circles[0, :]:                
                 self.x = int(x - r) if (x - r) > 0 and x < frame.shape[1] else 0
                 self.y = int(y - r) if (y - r) > 0 and y < frame.shape[0] else 0
-
-                if self.x > 0 and self.x < 60_000 and self.y > 0 and self.y < 60_000:
-                    self.w, self.h = 2*r, 2*r
+                if self.x > 0 and self.x < 60_000 and self.y > 0 and self.y < 60_000 and r < 1_000:
+                    self.w, self.h = abs(2*r), abs(2*r)
                     self.found = True
                     self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
@@ -233,7 +235,7 @@ class Tank:
                 mask = cv.dilate(mask, None, iterations=2)
 
         elif _filter == 'canny':
-            mask = cv.Canny(g_frame, self.sticker_thresh, self.thresh * 1.5)
+            mask = cv.Canny(g_frame, self.sticker_thresh, self.sticker_thresh * 1.5)
         else:
             kernel = np.ones(self.sticker_kernel, np.uint8)
             lower = np.array(self.sticker_lab[0], np.uint8)
