@@ -5,8 +5,6 @@ import numpy as np
 from classes import Camera, PLC, Tank
 from classes.colors import *
 
-# TODO: Create a black square in Upper to Put the information in contrast with the app
-
 font = cv.FONT_HERSHEY_SIMPLEX
 offset = 25
 
@@ -116,19 +114,12 @@ def draw_drain_ml(frame: np.ndarray, tank: Tank) -> np.ndarray:
     return frame
 
 def draw_plc_status(frame: np.ndarray, plc: PLC, read_plc: PLCInterface, write_plc: PLCWriteInterface) -> np.ndarray:
-    # TODO: Put info into a black square
-    # TODO: Write Skid Number
-    # TODO: Write Job STATUS + Camera Status
-    # TODO: Write Only if PLC is Online
-
     x, y = frame.shape[1], frame.shape[0]
     start = int(0.73 * x)
-    # color = mid_blue
     color = yellow
     font_size = (0.00055 * x)
     o = 14
     cv.rectangle(frame, (start, 0),(x, int(y * 0.25)), (30,30,30), -1)
-
     text = f"PLC ONLINE {plc.online}, LIFEBIT: {read_plc.life_beat}"
     cv.putText(frame, text, (start, 1 * o), font, font_size, color, 1)
     text = f"SKID #: {read_plc.skid}"
