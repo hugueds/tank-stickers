@@ -52,8 +52,8 @@ class Controller:
         self.frame = cv.imread(file)
         self.file_frame = self.frame
 
-    def process_2(self):
-        self.tank.find(self.camera.number)
+    def process(self):
+        self.tank.find(self.camera.number, self.frame)
         if self.tank.found:
             self.tank.get_sticker_position(self.frame, 'lab')
             self.__predict_sticker()
@@ -61,27 +61,6 @@ class Controller:
                 if self.drain_model == None:
                     self.drain_model = TFModel(model_name='drain')
                 self.tank.get_drain_ml(self.frame, self.drain_model)
-
-    def process(self):
-        if self.camera.number == 1:
-            self.__process_up_camera()
-        else:
-            self.__process_side_camera()
-
-    def __process_up_camera(self):
-        self.tank.find(self.frame)
-        if self.tank.found:
-            if self.drain_model == None:
-                self.drain_model = TFModel(model_name='drain')
-            self.tank.get_drain_ml(self.frame, self.drain_model)
-            self.tank.get_sticker_position(self.frame, 'lab')
-            self.__predict_sticker()
-
-    def __process_side_camera(self):
-        self.tank.find_convex(self.frame)
-        if self.tank.found:
-            self.tank.get_sticker_position(self.frame, 'canny')
-            self.__predict_sticker()
 
     def __predict_sticker(self):
         for sticker in self.tank.stickers:

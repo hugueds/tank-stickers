@@ -74,23 +74,19 @@ class Tank:
         self.arc = config["arc"]
         self.drain_area_found = 0
 
-    def find_convex(self, frame, hull=False):
+    def find_convex(self, frame):
+
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         ys, ye, xs, xe = self.get_roi(frame)
         g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)
+        g_frame = cv.blur(g_frame, tuple(self.blur), 0)
         canny_output = cv.Canny(g_frame, self.threshold, self.threshold * 1.5)
         _, th = cv.threshold(g_frame, self.threshold, 255, cv.THRESH_BINARY)
         contours, _ = cv.findContours(canny_output, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-        hull_list = []
-        if hull:
-            for i in range(len(contours)):
-                hull = cv.convexHull(contours[i])
-                hull_list.append(hull)
-        drawing = np.zeros((canny_output.shape[0], canny_output.shape[1], 3), dtype=np.uint8)
+        drawing = np.zeros((canny_output.shape[0], canny_output.shape[1], 1), dtype=np.uint8)
         for i in range(len(contours)):
             color = (255, 255, 255)
             cv.drawContours(drawing, contours, i, color, 1)
-            # cv.drawContours(drawing, hull_list, i, color)
 
         g_frame = cv.cvtColor(drawing, cv.COLOR_BGR2GRAY)
 
@@ -168,7 +164,7 @@ class Tank:
                     self.found = True
                     self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
-    def find(self, frame: np.ndarray):
+    def find_up_camera(self, frame: np.ndarray, _filter='hsv'):
 
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         blur = cv.blur(hsv, tuple(self.blur), 0)
@@ -309,9 +305,9 @@ class Tank:
     def get_tank_image(self, frame: np.ndarray):
         return frame[self.y: self.y + self.h, self.x: self.x + self.w, :]
 
-    def find_2(self, frame, camera, mode='circle', _filter='lab'):
+    def find(self, camera: int, frame: np.ndarray, mode='circle', _filter='lab'):
         if camera == 1:
-            self.find(frame)
+            self.find_up_camera(frame)
         else:
             if mode == 'circle':
                 self.find_in_circle(frame, _filter)
