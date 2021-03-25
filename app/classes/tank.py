@@ -77,7 +77,7 @@ class Tank:
     def find_convex(self, frame, hull=False):
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         ys, ye, xs, xe = self.get_roi(frame)
-        g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)        
+        g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)
         canny_output = cv.Canny(g_frame, self.threshold, self.threshold * 1.5)
         _, th = cv.threshold(g_frame, self.threshold, 255, cv.THRESH_BINARY)
         contours, _ = cv.findContours(canny_output, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
@@ -85,7 +85,7 @@ class Tank:
         if hull:
             for i in range(len(contours)):
                 hull = cv.convexHull(contours[i])
-                hull_list.append(hull)                
+                hull_list.append(hull)
         drawing = np.zeros((canny_output.shape[0], canny_output.shape[1], 3), dtype=np.uint8)
         for i in range(len(contours)):
             color = (255, 255, 255)
@@ -109,7 +109,7 @@ class Tank:
         self.x, self.y, self.w, self.h = 0, 0, 0, 0
         if self.circles is not None:
             circles = np.uint16(np.around(self.circles))
-            for x, y, r in circles[0, :]:                
+            for x, y, r in circles[0, :]:
                 self.x = int(x - r) if (x - r) > 0 and x < frame.shape[1] else 0
                 self.y = int(y - r) if (y - r) > 0 and y < frame.shape[0] else 0
                 if self.x > 0 and self.x < 60_000 and self.y > 0 and self.y < 60_000 and r < 1_000:
@@ -229,10 +229,7 @@ class Tank:
         g_frame = cv.cvtColor(tank, cv.COLOR_BGR2GRAY)
 
         if _filter == 'thresh':
-            _, th = cv.threshold(g_frame, self.sticker_thresh, 255, cv.THRESH_BINARY)
-            if erode:
-                mask = cv.erode(th, None, iterations=2)
-                mask = cv.dilate(mask, None, iterations=2)
+            _, mask = cv.threshold(g_frame, self.sticker_thresh, 255, cv.THRESH_BINARY)
 
         elif _filter == 'canny':
             mask = cv.Canny(g_frame, self.sticker_thresh, self.sticker_thresh * 1.5)
@@ -246,6 +243,10 @@ class Tank:
                 mode = cv.cvtColor(tank, cv.COLOR_BGR2LAB)
             mask = cv.inRange(mode, lower, higher)
             mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel, iterations=5)
+
+        if erode:
+            mask = cv.erode(mask, None, iterations=2)
+            mask = cv.dilate(mask, None, iterations=2)
 
         self.append_stickers(mask, tank)
 
@@ -310,3 +311,11 @@ class Tank:
 
     def get_tank_image(self, frame: np.ndarray):
         return frame[self.y: self.y + self.h, self.x: self.x + self.w, :]
+
+
+
+    def find_2(frame, camera, mode='lab'):
+        if camera == 1:
+            pass
+        else:
+            pass

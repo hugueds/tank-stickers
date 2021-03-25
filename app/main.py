@@ -17,7 +17,7 @@ while True:
 
     elif controller.state == AppState.WAITING_REQUEST:
         if controller.new_request():
-            controller.confirm_request()            
+            controller.confirm_request()
             controller.set_state(AppState.PROCESSING_IMAGE)
 
     elif controller.state == AppState.PROCESSING_IMAGE:
@@ -25,7 +25,6 @@ while True:
         if controller.final_result:
             controller.set_state(AppState.SAVING_RESULTS)
         elif controller.new_request():
-            print('Aborting current Job...')
             controller.abort_job()
             controller.set_state(AppState.WAITING_REQUEST)
         else:

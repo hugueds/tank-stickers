@@ -170,7 +170,7 @@ def open_tracker(camera: Camera, tank: Tank):
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
         cv.createTrackbar("C_PARAM1", "config", tank.params[0], 500,  lambda value, key='params', index=(0,):  __updateTracker(tank, key, value, index))
         cv.createTrackbar("C_PARAM2", "config", tank.params[1], 500,  lambda value, key='params', index=(1,):  __updateTracker(tank, key, value, index))
-        cv.createTrackbar("THRESHOLD", "config", tank.threshold, 255,  lambda value, key='params', index=(0,):  __updateTracker(tank, key, value, index))
+        cv.createTrackbar("THRESHOLD", "config", tank.threshold, 255, lambda value, key='threshold', index=(0,):  __updateTracker(tank, key, value, index))
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
         cv.createTrackbar("TABLE_LH", "config", tank.table_hsv[0][0], 255,  lambda value, key='table_hsv', index=(0,0):  __updateTracker(tank, key, value, index))
         cv.createTrackbar("TABLE_HH", "config", tank.table_hsv[1][0], 255,  lambda value, key='table_hsv', index=(1,0):  __updateTracker(tank, key, value, index))

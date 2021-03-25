@@ -3,33 +3,24 @@ from classes import Tank, Sticker
 
 def wrong_position(tank, read_plc):
     print('Drain on Wrong Position')
-    status = Deviation.DRAIN_POSITION
-    error = True
+    return Deviation.DRAIN_POSITION
 
 def wrong_quantity():
     print('Found more stickers than needed')
-    status = Deviation.STICKER_QUANTITY
-    error = True
+    return Deviation.STICKER_QUANTITY
 
+def sticker_not_found():
     print('Sticker not found')
-    status = Deviation.STICKER_NOT_FOUND
-    error = True
+    return Deviation.STICKER_NOT_FOUND
 
-def wrong_label(sticker: Sticker, read_plc: PLCInterface, write_plc :PLCWriteInterface):
-    print('Wrong Label, expected:' + str(read_plc.sticker) + ', received: ' + str(sticker.label))
-    write_plc.inc_sticker = sticker.label_char_index
-    status = Deviation.STICKER_VALUE
-    error = True
+def wrong_label(expected, received):
+    print('Wrong Label, expected:' + str(expected) + ', received: ' + str(received))
+    return Deviation.STICKER_VALUE
 
+def wrong_angle(expected_angle, angle):
+    print('Wrong Label Angle, expected:' + str(expected_angle) + ', received: ' + str(angle))
+    return Deviation.STICKER_ANGLE
 
-def wrong_angle():
-    print('Wrong Label Angle, expected:' + str(read_plc.sticker_angle) + ', received: ' + str(sticker.angle))
-    write_plc.inc_angle = sticker.angle
-    status = Deviation.STICKER_ANGLE
-    error = True
-
-def wrong_drain():
-    print('Wrong Label Position, expected:' + str(self.read_plc.sticker_position) + ', received: ' + str(sticker.quadrant))
-    self.write_plc.position_inc_sticker = sticker.quadrant
-    status = Deviation.STICKER_POSITION
-    error = True
+def wrong_drain(expected_position, quadrant):
+    print('Wrong Label Position, expected:' + str(expected_position) + ', received: ' + str(quadrant))
+    return Deviation.STICKER_POSITION
