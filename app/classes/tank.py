@@ -6,8 +6,6 @@ from classes.sticker import Sticker
 from .drain import Drain
 from .tf_model import TFModel
 from .colors import *
-import random as rng
-from classes.knn import extract
 
 font = cv.FONT_HERSHEY_SIMPLEX
 
@@ -311,5 +309,7 @@ class Tank:
         else:
             if mode == 'circle':
                 self.find_in_circle(frame, _filter)
+            elif mode == 'contours':
+                pass
             else:
                 self.find_in_circle(frame, _filter)
