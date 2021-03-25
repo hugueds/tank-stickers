@@ -200,11 +200,11 @@ def open_camera_tracker(camera: Camera):
     if not camera_tracker_window:
         cv.namedWindow("camera_tracker")
         cv.resizeWindow('camera_tracker', 640, 480)
-        cv.createTrackbar("BRIGHTNESS", "camera_tracker",  camera.brightness, 255, lambda value, key='brightness':  update_camera_config(camera, key, value))
-        cv.createTrackbar("CONTRAST",   "camera_tracker",  camera.contrast,   255, lambda value, key='contrast':    update_camera_config(camera, key, value))
-        cv.createTrackbar("SATURATION", "camera_tracker",  camera.saturation, 255, lambda value,  key='saturation':  update_camera_config(camera, key, value))
+        cv.createTrackbar("BRIGHTNESS", "camera_tracker", camera.brightness, 255, lambda value, key='brightness':  update_camera_config(camera, key, value))
+        cv.createTrackbar("CONTRAST",   "camera_tracker", camera.contrast,   255, lambda value, key='contrast':    update_camera_config(camera, key, value))
+        cv.createTrackbar("SATURATION", "camera_tracker", camera.saturation, 255, lambda value,  key='saturation':  update_camera_config(camera, key, value))
         cv.createTrackbar("SHARPNESS", "camera_tracker",  camera.sharpness, 255, lambda value,  key='sharpness':  update_camera_config(camera, key, value))
-        cv.createTrackbar("EXPOSURE", "camera_tracker",    camera.exposure_comp, 255, lambda value,  key='exposure_comp':  update_camera_config(camera, key, value))
+        cv.createTrackbar("EXPOSURE", "camera_tracker",   camera.exposure_comp, 255, lambda value,  key='exposure_comp':  update_camera_config(camera, key, value))
     else:
         cv.destroyWindow('camera_tracker')
 
