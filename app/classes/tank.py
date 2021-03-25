@@ -72,25 +72,38 @@ class Tank:
         self.arc = config["arc"]
         self.drain_area_found = 0
 
-    def find_convex(self, frame):
+    def find(self, camera: int, frame: np.ndarray, mode='circle', _filter='lab'):
+        if camera == 1:
+            self.find_up_camera(frame)
+        else:
+            if mode == 'circle':
+                self.find_in_circle(frame, _filter)
+            elif mode == 'contours':
+                self.find_in_circle_2(frame, _filter='canny')
+            else:
+                self.find_convex(frame, _filter)
+
+    def find_convex(self, frame, _filter):
 
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         ys, ye, xs, xe = self.get_roi(frame)
         g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)
-        g_frame = cv.blur(g_frame, tuple(self.blur), 0)
+        g_frame = cv.GaussianBlur(g_frame, tuple(self.blur), 0)
         canny_output = cv.Canny(g_frame, self.threshold, self.threshold * 1.5)
-        _, th = cv.threshold(g_frame, self.threshold, 255, cv.THRESH_BINARY)
+        kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(5,5))
+        canny_output = cv.dilate(canny_output, kernel)
         contours, _ = cv.findContours(canny_output, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-        drawing = np.zeros((canny_output.shape[0], canny_output.shape[1], 1), dtype=np.uint8)
+        drawing = np.zeros((canny_output.shape[0], canny_output.shape[1], 3), dtype=np.uint8)
         for i in range(len(contours)):
             color = (255, 255, 255)
-            cv.drawContours(drawing, contours, i, color, 1)
+            area = cv.contourArea(contours[i])
+            if area > self.area[0] and area < self.area[1]:
+                cv.drawContours(drawing, contours, i, color, 1)
 
         g_frame = cv.cvtColor(drawing, cv.COLOR_BGR2GRAY)
 
         if self.debug_tank or True:
             cv.imshow('debug_tank', g_frame)
-            cv.imshow('debug_tank2', th)
 
         self.circles = cv.HoughCircles(g_frame, cv.HOUGH_GRADIENT,
                                         param1=self.params[0],
@@ -104,10 +117,11 @@ class Tank:
         if self.circles is not None:
             circles = np.uint16(np.around(self.circles))
             for x, y, r in circles[0, :]:
-                self.x = int(x - r) if (x - r) > 0 and x < frame.shape[1] else 0
-                self.y = int(y - r) if (y - r) > 0 and y < frame.shape[0] else 0
-                if self.x > 0 and self.x < 60_000 and self.y > 0 and self.y < 60_000 and r < 1_000:
+                calc_x = int(x - r) if (x - r) > 0 and x < frame.shape[1] else 0
+                calc_y = int(y - r) if (y - r) > 0 and y < frame.shape[0] else 0
+                if (calc_x > 0 and calc_x < frame.shape[1]) and (calc_y > 0 and calc_y < frame.shape[0]):
                     self.w, self.h = abs(2*r), abs(2*r)
+                    self.x, self.y = calc_x, calc_y
                     self.found = True
                     self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
@@ -118,7 +132,7 @@ class Tank:
         g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)
 
         if _filter == 'threshold':
-            blur = cv.blur(g_frame, tuple(self.blur), 0)
+            blur = cv.GaussianBlur(g_frame, tuple(self.blur), 0)
             _, mask = cv.threshold(blur, self.threshold, 255, cv.THRESH_BINARY_INV)
         elif _filter == 'adaptative':
             mask = cv.adaptiveThreshold(g_frame,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,5,2)
@@ -303,13 +317,6 @@ class Tank:
     def get_tank_image(self, frame: np.ndarray):
         return frame[self.y: self.y + self.h, self.x: self.x + self.w, :]
 
-    def find(self, camera: int, frame: np.ndarray, mode='circle', _filter='lab'):
-        if camera == 1:
-            self.find_up_camera(frame)
-        else:
-            if mode == 'circle':
-                self.find_in_circle(frame, _filter)
-            elif mode == 'contours':
-                pass
-            else:
-                self.find_in_circle(frame, _filter)
+    def find_in_circle_2(self, frame: np.ndarray, _filter='th'):
+        g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        blur = cv.GaussianBlur(g_frame, tuple(self.blur), 1)
