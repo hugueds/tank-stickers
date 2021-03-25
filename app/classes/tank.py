@@ -43,6 +43,7 @@ class Tank:
     def load_tank_config(self, config):
         self.weight = {"min": config["min"], "max": config["max"]}
         self.blur = config['blur']
+        self.area = config['area']
         self.threshold = config['threshold']
         width, height = config["size"]
         self.min_width = width[0]

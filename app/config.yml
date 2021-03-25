@@ -29,9 +29,9 @@ tank:
     min: [0, 1]
     max: [0, 1]
     size: [[300, 800], [150, 500]]
-    area: [0,99999]
+    area: [50_000,200_000]
     blur: [3,3]
-    threshold: 50
+    threshold: 60
     radius: [5, 100, 400]
     min_dist: 250
     params: [350,300]
