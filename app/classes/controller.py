@@ -15,8 +15,6 @@ from classes.tf_model import TFModel
 from models import AppState, PLCInterface, PLCWriteInterface, Deviation, JobStatus, job_status
 from logger import logger, results_logger
 
-# TO ADD LATER: TANK STATUS VIA DB
-
 class Controller:
 
     state: AppState = AppState.INITIAL
@@ -53,6 +51,16 @@ class Controller:
     def open_file(self, file):
         self.frame = cv.imread(file)
         self.file_frame = self.frame
+
+    def process_2(self):
+        self.tank.find(self.camera.number)
+        if self.tank.found:
+            self.tank.get_sticker_position(self.frame, 'lab')
+            self.__predict_sticker()
+            if self.read_plc.drain_camera:
+                if self.drain_model == None:
+                    self.drain_model = TFModel(model_name='drain')
+                self.tank.get_drain_ml(self.frame, self.drain_model)
 
     def process(self):
         if self.camera.number == 1:

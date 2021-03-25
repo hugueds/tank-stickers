@@ -117,8 +117,6 @@ class Tank:
                     self.found = True
                     self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
-
-
     def find_in_circle(self, frame: np.ndarray, _filter='lab', erode=True):
 
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
@@ -162,15 +160,13 @@ class Tank:
         if self.circles is not None:
             circles = np.uint16(np.around(self.circles))
             for x, y, r in circles[0, :]:
-                self.x = int(x - r) if (x - r) > 0 and x < frame.shape[1] else 0
-                self.y = int(y - r) if (y - r) > 0 and y < frame.shape[0] else 0
-
-                if self.x > 0 and self.x < 60_000 and self.y > 0 and self.y < 60_000:
-                    self.w, self.h = 2 * r, 2 * r
+                calc_x = int(x - r) if (x - r) > 0 and x < frame.shape[1] else 0
+                calc_y = int(y - r) if (y - r) > 0 and y < frame.shape[0] else 0
+                if (calc_x > 0 and calc_x < frame.shape[1]) and (calc_y > 0 and calc_y < frame.shape[0]):
+                    self.w, self.h = 2 * abs(r), 2 * abs(r)
+                    self.x, self.y = calc_x, calc_y
                     self.found = True
                     self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
-
-
 
     def find(self, frame: np.ndarray):
 
@@ -230,17 +226,18 @@ class Tank:
 
         if _filter == 'thresh':
             _, mask = cv.threshold(g_frame, self.sticker_thresh, 255, cv.THRESH_BINARY)
-
         elif _filter == 'canny':
             mask = cv.Canny(g_frame, self.sticker_thresh, self.sticker_thresh * 1.5)
         else:
             kernel = np.ones(self.sticker_kernel, np.uint8)
-            lower = np.array(self.sticker_lab[0], np.uint8)
-            higher = np.array(self.sticker_lab[1], np.uint8)
             if _filter == 'hsv':
                 mode = cv.cvtColor(tank, cv.COLOR_BGR2HSV)
+                lower = np.array(self.sticker_lab[0], np.uint8)
+                higher = np.array(self.sticker_lab[1], np.uint8)
             elif _filter == 'lab':
                 mode = cv.cvtColor(tank, cv.COLOR_BGR2LAB)
+                lower = np.array(self.sticker_hsv[0], np.uint8)
+                higher = np.array(self.sticker_hsv[1], np.uint8)
             mask = cv.inRange(mode, lower, higher)
             mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel, iterations=5)
 
@@ -289,7 +286,7 @@ class Tank:
         if self.found:
             y_off_start, y_off_end, x_off_start, x_off_end = self.get_roi(frame)
             croped_img = frame[y_off_start:y_off_end,x_off_start:x_off_end,:]
-            index, label = model.predict(croped_img)
+            _, label = model.predict(croped_img)
             self.drain_position = int(label)
 
     def get_roi(self, frame: np.ndarray):
@@ -312,10 +309,11 @@ class Tank:
     def get_tank_image(self, frame: np.ndarray):
         return frame[self.y: self.y + self.h, self.x: self.x + self.w, :]
 
-
-
-    def find_2(frame, camera, mode='lab'):
+    def find_2(self, frame, camera, mode='circle', _filter='lab'):
         if camera == 1:
-            pass
+            self.find(frame)
         else:
-            pass
+            if mode == 'circle':
+                self.find_in_circle(frame, _filter)
+            else:
+                self.find_in_circle(frame, _filter)
