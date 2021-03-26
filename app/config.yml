@@ -12,7 +12,7 @@ camera:
     center_y_offset: -2.0
     monitor_limit: 1920
     max_monitors: 1
-    full_screen: False
+    full_screen: 1
     roi:
         x: [15.0, 90.0]
         y: [5.0, 91.0]
