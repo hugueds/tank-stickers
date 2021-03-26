@@ -55,7 +55,7 @@ class Controller:
     def process(self):
         self.tank.find(self.camera.number, self.frame)
         if self.tank.found:
-            self.tank.get_sticker_position(self.frame, 'lab')
+            self.tank.get_sticker_position(self.frame)
             self.__predict_sticker()
             if self.read_plc.drain_camera:
                 if self.drain_model == None:

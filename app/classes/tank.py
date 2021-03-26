@@ -65,6 +65,7 @@ class Tank:
         self.sticker_area = config["area"]
         self.sticker_hsv = config["hsv_filter"]
         self.sticker_lab = config["lab_filter"]
+        self.sticker_filter = config["filter"]
 
     def load_drain_config(self, config):
         self.drain_blur = tuple(config["blur"])
@@ -220,7 +221,7 @@ class Tank:
         self.found = self.h >= self.min_height and self.w >= self.min_width
         self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
-    def get_sticker_position(self, frame: np.ndarray, _filter='thresh', erode=True):
+    def get_sticker_position(self, frame: np.ndarray, erode=True):
 
         if self.x <= 0:
             tank = frame.copy()
@@ -231,6 +232,7 @@ class Tank:
             return
 
         g_frame = cv.cvtColor(tank, cv.COLOR_BGR2GRAY)
+        _filter = self.sticker_filter
 
         if _filter == 'thresh':
             _, mask = cv.threshold(g_frame, self.sticker_thresh, 255, cv.THRESH_BINARY)
