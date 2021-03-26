@@ -42,7 +42,7 @@ class Sticker:
     def update_label_angle(self) -> None:
         split = self.label.split('_')
         if len(split) == 1:
-            self.angle = 0
+            self.angle = 1
         else:
             if split[1] == '90':
                 self.angle = 2
