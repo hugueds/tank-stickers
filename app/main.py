@@ -25,6 +25,7 @@ while True:
         if controller.final_result:
             controller.set_state(AppState.SAVING_RESULTS)
         elif controller.new_request():
+            print('Aborting current Job')
             controller.abort_job()
             controller.set_state(AppState.WAITING_REQUEST)
         else:

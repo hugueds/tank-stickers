@@ -126,12 +126,10 @@ class Controller:
         self.write_plc.inc_angle = 0
 
     def check_skid(self):
-        if not self.tank.found and self.read_plc.skid == 0:
-            print('Skid and Tank not Found')
+        if not self.tank.found and self.read_plc.skid == 0:            
             self.abort_job()
 
-    def abort_job(self):
-        print('Aborting current Job')
+    def abort_job(self):        
         self.__clear_plc()
         self.write_plc.cam_status = Deviation.TANK_NOT_FOUND
         self.write_plc.job_status = JobStatus.CANCELLED
