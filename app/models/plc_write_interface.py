@@ -1,9 +1,13 @@
+from snap7.util import set_bool
+
 class PLCWriteInterface:
 
     _bytearray: bytearray
 
     def __init__(self, size):
         self.request_ack = False
+        self.drain_found = False
+        self.tank_found = False
         self.life_beat = 0
         self.job_status = 0
         self.cam_status = 0
@@ -17,7 +21,9 @@ class PLCWriteInterface:
 
         _bytearray = bytearray(self.size)
 
-        _bytearray[0] = (self.request_ack << 0)
+        set_bool(_bytearray,0, 0, self.request_ack)
+        set_bool(_bytearray,0, 1, self.drain_found)
+        set_bool(_bytearray,0, 2, self.tank_found)
         _bytearray[1] = self.life_beat
         _bytearray[2] = self.job_status
         _bytearray[3] = self.cam_status

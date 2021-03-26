@@ -54,6 +54,7 @@ class Controller:
 
     def process(self):
         self.tank.find(self.camera.number, self.frame)
+        self.write_plc.tank_found = self.tank.found
         if self.tank.found:
             self.tank.get_sticker_position(self.frame)
             self.__predict_sticker()
@@ -108,6 +109,7 @@ class Controller:
 
     def __get_final_result(self, status: Deviation):
         self.result_list.append(status)
+        print(self.result_list)
         if len(self.result_list) >= self.total_reads:
             if Counter(self.result_list).most_common()[0][0] == 1:
                 self.__job_done()
@@ -126,10 +128,10 @@ class Controller:
         self.write_plc.inc_angle = 0
 
     def check_skid(self):
-        if not self.tank.found and self.read_plc.skid == 0:            
+        if not self.tank.found and self.read_plc.skid == 0:
             self.abort_job()
 
-    def abort_job(self):        
+    def abort_job(self):
         self.__clear_plc()
         self.write_plc.cam_status = Deviation.TANK_NOT_FOUND
         self.write_plc.job_status = JobStatus.CANCELLED

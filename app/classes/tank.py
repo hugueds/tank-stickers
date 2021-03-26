@@ -65,6 +65,7 @@ class Tank:
         self.sticker_hsv = config["hsv_filter"]
         self.sticker_lab = config["lab_filter"]
         self.sticker_filter = config["filter"]
+        self.sticker_canny = config["canny"]
 
     def load_drain_config(self, config):
         self.drain_blur = tuple(config["blur"])
@@ -254,16 +255,15 @@ class Tank:
             _, mask = cv.threshold(
                 g_frame, self.sticker_thresh, 255, cv.THRESH_BINARY)
         elif _filter == 'canny':
-            mask = cv.Canny(g_frame, self.sticker_thresh,
-                            self.sticker_thresh * 1.5)
+            mask = cv.Canny(g_frame, self.sticker_canny[0], self.sticker_canny[1])
         else:
             kernel = np.ones(self.sticker_kernel, np.uint8)
-            if _filter == 'hsv':
-                mode = cv.cvtColor(tank, cv.COLOR_BGR2HSV)
+            if _filter == 'lab':
+                mode = cv.cvtColor(tank, cv.COLOR_BGR2LAB)
                 lower = np.array(self.sticker_lab[0], np.uint8)
                 higher = np.array(self.sticker_lab[1], np.uint8)
-            elif _filter == 'lab':
-                mode = cv.cvtColor(tank, cv.COLOR_BGR2LAB)
+            elif _filter == 'hsv':
+                mode = cv.cvtColor(tank, cv.COLOR_BGR2HSV)
                 lower = np.array(self.sticker_hsv[0], np.uint8)
                 higher = np.array(self.sticker_hsv[1], np.uint8)
             mask = cv.inRange(mode, lower, higher)
