@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import IntEnum
 
-class AppState(Enum):
+class AppState(IntEnum):
     INITIAL = 0    
     WAITING_REQUEST = 1
     PROCESSING_IMAGE = 2    

@@ -101,7 +101,7 @@ class Controller:
             self.write_plc.position_inc_sticker = sticker.quadrant
             status = Deviation.STICKER_POSITION
 
-        self.write_plc.cam_status = status
+        self.write_plc.cam_status = int(status)
         self.__get_final_result(status)
         self.analyse_counter = self.analyse_counter + 1
 
@@ -159,7 +159,7 @@ class Controller:
         self.read_plc.read_request = False
         self.write_plc.request_ack = True
         self.write_plc.cam_status = 0
-        self.write_plc.job_status = JobStatus.RUNNING
+        self.write_plc.job_status = int(JobStatus.RUNNING)
         self.final_result = False
         self.analyse_counter = 0
         self.result_list.clear()

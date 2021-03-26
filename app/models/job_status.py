@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import IntEnum
 
-class JobStatus(Enum):
+class JobStatus(IntEnum):
     INITIAL = 0
     RUNNING = 1
     DONE = 2

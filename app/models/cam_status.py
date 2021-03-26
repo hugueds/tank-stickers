@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import IntEnum
 
-class CamStatus:
+class CamStatus(IntEnum):
     NONE = 1
     TANK_NOT_FOUND = 0
     STICKER_POSITION = 2
