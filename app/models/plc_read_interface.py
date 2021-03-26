@@ -19,12 +19,14 @@ class PLCInterface:
     skid = 0
 
     def update(self, data = None):
+        
         if data is None:
             return
+        
         self.read_request = get_bool(data, 0, 0)
         self.sticker_camera = get_bool(data, 0, 1)
         self.drain_camera = get_bool(data, 0, 2)
-        self.read_command = get_bool(data, 0, 3)
+        self.read_command = get_bool(data, 0, 2)
         self.request_number = int(data[1])
         self.life_beat = int(data[2])
         self.sticker = int(data[3])
