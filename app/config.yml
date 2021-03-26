@@ -48,8 +48,8 @@ sticker:
         min: 20
         max: 100
     kernel: [1,1]
-    filter: 'hsv'
-    canny: [50,200]
+    filter: 'canny'
+    canny: [50,50]
     hsv_filter: [[0, 0, 0], [179, 255, 255]]
     lab_filter: [[70, 115, 100], [255, 145, 140]]
 drain:

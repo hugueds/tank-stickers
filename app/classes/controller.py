@@ -84,6 +84,9 @@ class Controller:
         if qnt_stickers > 1:
             print('Found more stickers than needed')
             status = Deviation.STICKER_QUANTITY
+        if qnt_stickers > 0 and not self.read_plc.sticker_camera:
+            print('Found more stickers than needed')
+            status = Deviation.STICKER_QUANTITY
         if self.read_plc.sticker_camera and len(self.tank.stickers) == 0:
             print('Sticker not found')
             status = Deviation.STICKER_NOT_FOUND

@@ -256,6 +256,7 @@ class Tank:
                 g_frame, self.sticker_thresh, 255, cv.THRESH_BINARY)
         elif _filter == 'canny':
             mask = cv.Canny(g_frame, self.sticker_canny[0], self.sticker_canny[1])
+            mask = cv.dilate(mask, None, iterations=2)
         else:
             kernel = np.ones(self.sticker_kernel, np.uint8)
             if _filter == 'lab':
@@ -269,9 +270,9 @@ class Tank:
             mask = cv.inRange(mode, lower, higher)
             mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel, iterations=5)
 
-        if erode:
-            mask = cv.erode(mask, None, iterations=2)
-            mask = cv.dilate(mask, None, iterations=2)
+            if erode:
+                mask = cv.erode(mask, None, iterations=2)
+                mask = cv.dilate(mask, None, iterations=2)
 
         self.append_stickers(mask, tank)
 
