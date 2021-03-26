@@ -53,7 +53,7 @@ class Controller:
         self.file_frame = self.frame
 
     def process(self):
-        self.tank.find(self.camera.number, self.frame, 'other')
+        self.tank.find(self.camera.number, self.frame)
         if self.tank.found:
             self.tank.get_sticker_position(self.frame, 'lab')
             self.__predict_sticker()

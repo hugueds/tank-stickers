@@ -55,6 +55,8 @@ class Tank:
         self.params = config['params']
         self.table_hsv = config['table_filter']
         self.check_drain = config['check_drain']
+        self.canny = config['canny']
+        self._filter = config['filter']
 
     def load_sticker_config(self, config):
         self.sticker_kernel = config["kernel"]
@@ -73,33 +75,30 @@ class Tank:
         self.arc = config["arc"]
         self.drain_area_found = 0
 
-    def find(self, camera: int, frame: np.ndarray, mode='circle', _filter='lab'):
+    def find(self, camera: int, frame: np.ndarray, mode='circle', _filter='th'):
         if camera == 1:
             self.find_up_camera(frame)
         else:
             if mode == 'circle':
+                self.find_convex(frame)
+            else: 
                 self.find_in_circle(frame, _filter)
-            elif mode == 'contours':
-                self.find_in_circle_2(frame, _filter='canny')
-            else:
-                self.find_convex(frame, _filter)
 
-    def find_convex(self, frame, _filter):
-
-        g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    def find_convex(self, frame):
         ys, ye, xs, xe = self.get_roi(frame)
+        g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)
         g_frame = cv.GaussianBlur(g_frame, tuple(self.blur), 0)
-        canny_output = cv.Canny(g_frame, self.threshold, self.threshold * 1.5)
-        kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(5,5))
-        canny_output = cv.dilate(canny_output, kernel)
-        contours, _ = cv.findContours(canny_output, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-        drawing = np.zeros((canny_output.shape[0], canny_output.shape[1], 3), dtype=np.uint8)
-        for i in range(len(contours)):
-            color = (255, 255, 255)
+        canny = cv.Canny(g_frame, self.canny[0], self.canny[1])
+        kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (5,5))
+        canny = cv.dilate(canny, kernel)
+        contours, _ = cv.findContours(canny, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+        drawing = np.zeros((canny.shape[0], canny.shape[1], 3), dtype=np.uint8)
+
+        for i in range(len(contours)):            
             area = cv.contourArea(contours[i])
             if area > self.area[0] and area < self.area[1]:
-                cv.drawContours(drawing, contours, i, color, 1)
+                cv.drawContours(drawing, contours, i, (255, 255, 255), 1)
 
         g_frame = cv.cvtColor(drawing, cv.COLOR_BGR2GRAY)
 
@@ -120,13 +119,13 @@ class Tank:
             for x, y, r in circles[0, :]:
                 calc_x = int(x - r) if (x - r) > 0 and x < frame.shape[1] else 0
                 calc_y = int(y - r) if (y - r) > 0 and y < frame.shape[0] else 0
-                if (calc_x > 0 and calc_x < frame.shape[1]) and (calc_y > 0 and calc_y < frame.shape[0]):
+                if (calc_x > 0 and calc_x < frame.shape[1]) and (calc_y > 0 and calc_y < frame.shape[0]):                    
                     self.w, self.h = abs(2*r), abs(2*r)
                     self.x, self.y = calc_x, calc_y
                     self.found = True
                     self.image = frame[self.y: self.y + self.h, self.x: self.x + self.w]
 
-    def find_in_circle(self, frame: np.ndarray, _filter='lab', erode=True):
+    def find_in_circle(self, frame: np.ndarray, _filter, erode=True):
 
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         ys, ye, xs, xe = self.get_roi(frame)
@@ -318,6 +317,3 @@ class Tank:
     def get_tank_image(self, frame: np.ndarray):
         return frame[self.y: self.y + self.h, self.x: self.x + self.w, :]
 
-    def find_in_circle_2(self, frame: np.ndarray, _filter='th'):
-        g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        blur = cv.GaussianBlur(g_frame, tuple(self.blur), 1)

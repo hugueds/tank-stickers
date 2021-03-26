@@ -1,6 +1,6 @@
 app:
     name: "Sticker Tanks"
-    version: 0.1.0
+    version: 0.9.1
 camera:
     number: 0
     debug: False
@@ -22,20 +22,22 @@ camera:
     contrast: 200
     saturation: 230
     sharpness: 230
-    exposure: -4
+    exposure: 0
     white_balance: 4200
+    awb_mode: 'sunlight'
 tank:
     check_drain: 1
+    filter: "hsv"
     min: [0, 1]
     max: [0, 1]
     size: [[300, 800], [150, 500]]
-    area: [50_000,200_000]
-    blur: [3,3]
-    threshold: 60
+    area: [10_000,300_000]
+    blur: [9,9]
+    threshold: 80
     radius: [5, 100, 400]
     min_dist: 250
-    params: [350,300]
-    canny: [60,0]
+    params: [450,450]
+    canny: [50, 100]
     table_filter: [[42,10,10],[144,255,255]]
 sticker:
     threshold: 75
@@ -46,6 +48,7 @@ sticker:
         min: 20
         max: 100
     kernel: [1,1]
+    filter: 'hsv'
     hsv_filter: [[0, 0, 0], [179, 255, 255]]
     lab_filter: [[70, 115, 100], [255, 145, 140]]
 drain:

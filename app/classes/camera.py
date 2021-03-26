@@ -50,6 +50,7 @@ class Camera:
         self.exposure = config['exposure']
         self.exposure_comp = config['exposure']
         self.white_balance = config['white_balance']
+        self.awb_mode= config['awb_mode']
         self.threaded = config['threaded']
         self.monitor_display = tuple(config['display'])
         self.hue = 0
@@ -90,7 +91,7 @@ class Camera:
 
     def set_hardware_rpi(self) -> None:
         self.cap.stream.camera.iso = 640 # 100, 200, 320, 400, 500, 640, 800.
-        self.cap.stream.camera.awb_mode = 'sunlight' # change and watch
+        self.cap.stream.camera.awb_mode = self.awb_mode
         #awb_modes: 'off', 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
         self.cap.stream.camera.exposure_mode = 'off' # snow, beach, spotlight
         self.cap.stream.camera.exposure_compensation = self._scale(self.exposure_comp, -25, 25)
