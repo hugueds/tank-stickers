@@ -2,10 +2,11 @@ import yaml
 from typing import List
 import numpy as np
 import cv2 as cv
-from classes.sticker import Sticker
+from .sticker import Sticker
 from .drain import Drain
 from .tf_model import TFModel
 from .colors import *
+from .config_tanks import config_tanks
 
 font = cv.FONT_HERSHEY_SIMPLEX
 
@@ -189,6 +190,15 @@ class Tank:
                     self.found = True
                     self.image = frame[self.y: self.y +
                                        self.h, self.x: self.x + self.w]
+
+    def find_in_mask(self, frame, tank_number: int):
+        # check a list containing tank configurations
+        # create a white circle with the tank info (center_point, radius)
+        # mask with the original frame
+        # return the new frame
+        mask = np.zeros(frame.shape[0], frame.shape[1])
+        
+        return 
 
     def find_up_camera(self, frame: np.ndarray, _filter='hsv'):
 
