@@ -17,6 +17,7 @@ class Tracker:
         pass
 
     def open(self):
+                
         pass
 
     def close(self):

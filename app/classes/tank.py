@@ -6,7 +6,6 @@ from .sticker import Sticker
 from .drain import Drain
 from .tf_model import TFModel
 from .colors import *
-from .config_tanks import config_tanks
 
 font = cv.FONT_HERSHEY_SIMPLEX
 
@@ -38,6 +37,7 @@ class Tank:
         with open(self.config_file) as file:
             config = yaml.safe_load(file)
         self.config = config
+        self.mask = config['mask']
         self.load_tank_config(config['tank'])
         self.load_sticker_config(config["sticker"])
         self.load_drain_config(config["drain"])
@@ -77,12 +77,14 @@ class Tank:
         self.arc = config["arc"]
         self.drain_area_found = 0
 
-    def find(self, camera: int, frame: np.ndarray, mode='circle', _filter='th'):
+    def find(self, camera: int, frame: np.ndarray, mode='circle', _filter='th', tank_number=0):
         if camera == 1:
             self.find_up_camera(frame)
         else:
             if mode == 'circle':
                 self.find_convex(frame)
+            elif mode == 'mask':
+                self.find_in_mask(frame, '111')
             else:
                 self.find_in_circle(frame, _filter)
 
@@ -191,14 +193,26 @@ class Tank:
                     self.image = frame[self.y: self.y +
                                        self.h, self.x: self.x + self.w]
 
-    def find_in_mask(self, frame, tank_number: int):
+    def find_in_mask(self, frame: np.ndarray, tank_number: str):
+        # create a methos to inspect if the tank is present
         # check a list containing tank configurations
         # create a white circle with the tank info (center_point, radius)
         # mask with the original frame
-        # return the new frame
-        mask = np.zeros(frame.shape[0], frame.shape[1])
-        
-        return 
+        # return the new frame     
+        new_frame = frame.copy()
+        ct = self.mask
+        x,y = ct[tank_number][0] 
+        mask = np.zeros( (frame.shape[0], frame.shape[1], 3), dtype=np.uint8)        
+        mask = cv.circle(mask, (x + ct[tank_number][1],y + ct[tank_number][1]), ct[tank_number][1] , (255,255,255), -1)
+        new_frame = cv.bitwise_and(new_frame, mask)
+        if self.debug_tank:
+            cv.imshow('debug_tank', new_frame)
+        self.x = ct[tank_number][0][0]
+        self.y = ct[tank_number][0][1]
+        self.w, self.h = ct[tank_number][1] * 2, ct[tank_number][1] * 2
+        self.found = True if tank_number != '' else False
+        self.image = frame[self.y: self.y+self.h, self.x: self.x + self.w]
+        return new_frame
 
     def find_up_camera(self, frame: np.ndarray, _filter='hsv'):
 

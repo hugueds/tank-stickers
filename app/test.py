@@ -7,7 +7,7 @@ import sys
 
 controller = Controller(is_picture=True)
 
-file = './tests/images/test_3.jpg'
+file = './tests/images/test_4.jpg'
 
 if len(sys.argv) == 2:
     file = sys.argv[1]    
