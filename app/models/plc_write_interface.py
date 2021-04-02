@@ -4,7 +4,7 @@ class PLCWriteInterface:
 
     _bytearray: bytearray
 
-    def __init__(self, size):
+    def __init__(self, size=0):
         self.request_ack = False
         self.drain_found = False
         self.tank_found = False
