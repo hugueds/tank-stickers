@@ -27,6 +27,7 @@ camera:
     awb_mode: 'sunlight'
 tank:
     check_drain: 1
+    mode: 'mask'
     filter: "hsv"
     min: [0, 1]
     max: [0, 1]

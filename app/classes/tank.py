@@ -57,6 +57,7 @@ class Tank:
         self.check_drain = config['check_drain']
         self.canny = config['canny']
         self._filter = config['filter']
+        self.mode = config['mode']
 
     def load_sticker_config(self, config):
         self.sticker_kernel = config["kernel"]
@@ -77,10 +78,11 @@ class Tank:
         self.arc = config["arc"]
         self.drain_area_found = 0
 
-    def find(self, camera: int, frame: np.ndarray, mode='circle', _filter='th', tank_number=0):
+    def find(self, camera: int, frame: np.ndarray, _filter='th', tank_number=0):
         if camera == 1:
             self.find_up_camera(frame)
         else:
+            mode = self.mode
             if mode == 'circle':
                 self.find_convex(frame)
             elif mode == 'mask':
