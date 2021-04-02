@@ -78,7 +78,7 @@ class Tank:
         self.arc = config["arc"]
         self.drain_area_found = 0
 
-    def find(self, camera: int, frame: np.ndarray, _filter='th', tank_number=0):
+    def find(self, camera: int, frame: np.ndarray, tank_number=''):
         if camera == 1:
             self.find_up_camera(frame)
         else:
@@ -86,9 +86,9 @@ class Tank:
             if mode == 'circle':
                 self.find_convex(frame)
             elif mode == 'mask':
-                self.find_in_mask(frame, '111')
+                self.find_in_mask(frame, tank_number)
             else:
-                self.find_in_circle(frame, _filter)
+                self.find_in_circle(frame)
 
     def find_convex(self, frame):
         ys, ye, xs, xe = self.get_roi(frame)
@@ -135,11 +135,13 @@ class Tank:
                     self.image = frame[self.y: self.y +
                                        self.h, self.x: self.x + self.w]
 
-    def find_in_circle(self, frame: np.ndarray, _filter, erode=False):
+    def find_in_circle(self, frame: np.ndarray, erode=False):
 
         g_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         ys, ye, xs, xe = self.get_roi(frame)
         g_frame = self.__eliminate_non_roi(g_frame, ys, ye, xs, xe)
+
+        _filter = self._filter
 
         if _filter == 'threshold':
             blur = cv.GaussianBlur(g_frame, tuple(self.blur), 0)
@@ -216,7 +218,7 @@ class Tank:
         self.image = frame[self.y: self.y+self.h, self.x: self.x + self.w]
         return new_frame
 
-    def find_up_camera(self, frame: np.ndarray, _filter='hsv'):
+    def find_up_camera(self, frame: np.ndarray):
 
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         blur = cv.blur(hsv, tuple(self.blur), 0)
