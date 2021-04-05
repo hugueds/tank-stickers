@@ -94,13 +94,13 @@ class Camera:
         self.cap.stream.camera.awb_mode = self.awb_mode
         #awb_modes: 'off', 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
         self.cap.stream.camera.exposure_mode = 'off' # snow, beach, spotlight
-        self.cap.stream.camera.exposure_compensation = self._scale(self.exposure_comp, -25, 25)
-        self.cap.stream.camera.brightness = self._scale(self.brightness, 0, 100)
-        self.cap.stream.camera.contrast = self._scale(self.contrast, -100 , 100)
-        self.cap.stream.camera.saturation = self._scale(self.saturation, -100, 100)
-        self.cap.stream.camera.sharpness = self._scale(self.sharpness, -100, 100)
+        self.cap.stream.camera.exposure_compensation = self.__scale(self.exposure_comp, -25, 25)
+        self.cap.stream.camera.brightness = self.__scale(self.brightness, 0, 100)
+        self.cap.stream.camera.contrast = self.__scale(self.contrast, -100 , 100)
+        self.cap.stream.camera.saturation = self.__scale(self.saturation, -100, 100)
+        self.cap.stream.camera.sharpness = self.__scale(self.sharpness, -100, 100)
 
-    def _scale(self, x, y0, y1) -> int:
+    def __scale(self, x, y0, y1) -> int:
         x0, x1 = 0, 255
         return int(y0 + ( (y1 -y0) / (x1 - x0) * (x - x0)) )
 

@@ -106,8 +106,9 @@ class Controller:
             status = Deviation.STICKER_POSITION
 
         self.write_plc.cam_status = int(status)
-        self.__get_final_result(status)
         self.analyse_counter = self.analyse_counter + 1
+
+        self.__get_final_result(status)
 
 
     def __get_final_result(self, status: Deviation):

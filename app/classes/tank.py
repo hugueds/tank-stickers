@@ -198,15 +198,11 @@ class Tank:
                                        self.h, self.x: self.x + self.w]
 
     def find_in_mask(self, frame: np.ndarray, tank_number: str):
-        # create a methos to inspect if the tank is present
-        # check a list containing tank configurations
-        # create a white circle with the tank info (center_point, radius)
-        # mask with the original frame
-        # return the new frame     
+        # TODO create a method to inspect if the tank is present
         new_frame = frame.copy()
         ct = self.mask
-        x,y = ct[tank_number][0] 
-        mask = np.zeros( (frame.shape[0], frame.shape[1], 3), dtype=np.uint8)        
+        x,y = ct[tank_number][0]
+        mask = np.zeros( (frame.shape[0], frame.shape[1], 3), dtype=np.uint8)
         mask = cv.circle(mask, (x + ct[tank_number][1],y + ct[tank_number][1]), ct[tank_number][1] , (255,255,255), -1)
         new_frame = cv.bitwise_and(new_frame, mask)
         if self.debug_tank:

@@ -58,24 +58,28 @@ class Sticker:
             [7, 8, 9],
         ]
 
+        col_tolerance = [0.3, 0.6]
+        row_tolerance = [0.3, 0.6]
+
         temp_x = (self.x - tank_x) / tank_w
         temp_y = (self.y - tank_y) / tank_h
 
-        if temp_x <= 0.3:
+        if temp_x <= col_tolerance[0]:
             col = 0
-        elif temp_x > 0.3 and temp_x < 0.6:
+        elif temp_x > col_tolerance[0] and temp_x < col_tolerance[1]:
             col = 1
         else:
             col = 2
 
-        if temp_y <= 0.30:
+        if temp_y <= row_tolerance[0]:
             row = 0
-        elif temp_y > 0.30 and temp_y < 0.60:
+        elif temp_y > row_tolerance[0] and temp_y < row_tolerance[1]:
             row = 1
         else:
             row = 2
 
         quad = q_list[row][col]
+
         self.quadrant = get_quadrant(camera, quad)
 
 
