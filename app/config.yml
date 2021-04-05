@@ -93,5 +93,5 @@ model:
         labels_file: "labels.txt"
         default_labels: ["6", "7", "8", "9", "10", "11", "12", "13", "14"]
 device:
-    ip: '192.27.X.X'
+    ip: "192.27.X.X"
     mac: '00-00-00-00-00-00'
