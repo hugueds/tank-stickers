@@ -70,7 +70,7 @@ class PlcController():
         self.last_request = self.read_data.request_number
         self.read_data.read_request = False
         self.write_data.request_ack = True
-        self.write_data.cam_status = 0
+        self.write_data.cam_status = Deviation.TANK_NOT_FOUND
         self.write_data.job_status = int(JobStatus.RUNNING)
         self.final_result = False
         self.analyse_counter = 0

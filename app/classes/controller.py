@@ -121,7 +121,7 @@ class Controller:
 
     def __job_done(self):
         self.final_result = True
-        self.write_plc.cam_status = 1
+        self.write_plc.cam_status = Deviation.NONE
         self.write_plc.job_status = JobStatus.DONE
         self.write_plc.request_ack = False
 
@@ -164,7 +164,7 @@ class Controller:
         self.last_request = self.read_plc.request_number
         self.read_plc.read_request = False
         self.write_plc.request_ack = True
-        self.write_plc.cam_status = 0
+        self.write_plc.cam_status = Deviation.TANK_NOT_FOUND
         self.write_plc.job_status = int(JobStatus.RUNNING)
         self.final_result = False
         self.analyse_counter = 0
