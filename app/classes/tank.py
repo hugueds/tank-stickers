@@ -199,6 +199,8 @@ class Tank:
 
     def find_in_mask(self, frame: np.ndarray, tank_number: str):
         # TODO create a method to inspect if the tank is present
+        if not tank_number or tank_number == '':
+            return
         new_frame = frame.copy()
         ct = self.mask
         x,y = ct[tank_number][0]

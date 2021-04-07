@@ -1,0 +1,13 @@
+tank:
+    '1234':
+        size:
+            min: 30
+            max: 70
+        sticker_size:
+            min: 30
+            max: 70
+        sticker_area:
+            min: 1000
+            max: 3000
+        filter: 'canny'
+        params: [0,0]
