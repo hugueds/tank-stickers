@@ -29,18 +29,23 @@ class Tank:
     debug_sticker = False
     debug_drain = False
 
-    def __init__(self, config_file="config.yml"):
+    def __init__(self, config_file="config.yml", tank_config_file='tank_config.yml'):
         self.config_file = config_file
+        self.tank_config_file = tank_config_file
         self.load_config()
 
     def load_config(self):
         with open(self.config_file) as file:
             config = yaml.safe_load(file)
+        with open(self.tank_config_file) as file:
+            self.tank_config = yaml.safe_load(file)
         self.config = config
         self.mask = config['mask']
         self.load_tank_config(config['tank'])
         self.load_sticker_config(config["sticker"])
         self.load_drain_config(config["drain"])
+        print(self.tank_config)
+
 
     def load_tank_config(self, config):
         self.weight = {"min": config["min"], "max": config["max"]}

@@ -1,13 +1,96 @@
-tank:
-    '1234':
-        size:
-            min: 30
-            max: 70
-        sticker_size:
-            min: 30
-            max: 70
-        sticker_area:
-            min: 1000
-            max: 3000
-        filter: 'canny'
-        params: [0,0]
+'1357950':
+    size:
+        min: 30
+        max: 70
+    sticker_size:
+        min: 30
+        max: 70
+    sticker_area:
+        min: 1000
+        max: 3000
+    filter: 'canny'
+    params: [0,0]
+'1778889':
+    size:
+        min: 30
+        max: 70
+    sticker_size:
+        min: 30
+        max: 70
+    sticker_area:
+        min: 1000
+        max: 3000
+    filter: 'canny'
+    params: [0,0]
+'1792544':
+    size:
+        min: 30
+        max: 70
+    sticker_size:
+        min: 30
+        max: 70
+    sticker_area:
+        min: 1000
+        max: 3000
+    filter: 'canny'
+    params: [0,0]
+'2287886':
+    size:
+        min: 30
+        max: 70
+    sticker_size:
+        min: 30
+        max: 70
+    sticker_area:
+        min: 1000
+        max: 3000
+    filter: 'canny'
+    params: [0,0]
+'2507448':
+    size:
+        min: 30
+        max: 70
+    sticker_size:
+        min: 30
+        max: 70
+    sticker_area:
+        min: 1000
+        max: 3000
+    filter: 'canny'
+    params: [0,0]
+'1360401':
+    size:
+        min: 30
+        max: 70
+    sticker_size:
+        min: 30
+        max: 70
+    sticker_area:
+        min: 1000
+        max: 3000
+    filter: 'canny'
+    params: [0,0]
+'2052426':
+    size:
+        min: 30
+        max: 70
+    sticker_size:
+        min: 30
+        max: 70
+    sticker_area:
+        min: 1000
+        max: 3000
+    filter: 'canny'
+    params: [0,0]
+'1448883':
+    size:
+        min: 30
+        max: 70
+    sticker_size:
+        min: 30
+        max: 70
+    sticker_area:
+        min: 1000
+        max: 3000
+    filter: 'canny'
+    params: [0,0]
