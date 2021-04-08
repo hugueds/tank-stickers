@@ -44,8 +44,6 @@ class Tank:
         self.load_tank_config(config['tank'])
         self.load_sticker_config(config["sticker"])
         self.load_drain_config(config["drain"])
-        print(self.tank_config)
-
 
     def load_tank_config(self, config):
         self.weight = {"min": config["min"], "max": config["max"]}
@@ -219,7 +217,6 @@ class Tank:
         self.w, self.h = ct[tank_number][1] * 2, ct[tank_number][1] * 2
         self.found = True if tank_number != '' else False
         self.image = frame[self.y: self.y+self.h, self.x: self.x + self.w]
-        return new_frame
 
     def find_up_camera(self, frame: np.ndarray):
 
@@ -325,7 +322,7 @@ class Tank:
                 if len(poly) == 4:
                     (x, y, w, h) = cv.boundingRect(c)
                     ar = w / float(h)
-                    cond = ar >= 0.75 and ar <= 1.25
+                    cond = ar >= 0.8 and ar <= 1.2
                     cond = cond and (h) >= self.sticker_size["min"]
                     cond = cond and (h) <= self.sticker_size["max"]
                     cond = cond and (w) >= self.sticker_size["min"]

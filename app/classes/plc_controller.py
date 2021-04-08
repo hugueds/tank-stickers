@@ -77,7 +77,7 @@ class PlcController():
         self.result_list.clear()
         sleep(1)
 
-    def __print_plc_values(self) -> None:
+    def print_plc_values(self) -> None:
         print('PLC READ:')
         print(self.read_data.__dict__)
         print('\nPLC WRITE:')

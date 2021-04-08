@@ -92,7 +92,6 @@ class Camera:
     def set_hardware_rpi(self) -> None:
         self.cap.stream.camera.iso = 640 # 100, 200, 320, 400, 500, 640, 800.
         self.cap.stream.camera.awb_mode = self.awb_mode
-        #awb_modes: 'off', 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
         self.cap.stream.camera.exposure_mode = 'off' # snow, beach, spotlight
         self.cap.stream.camera.exposure_compensation = self.__scale(self.exposure_comp, -25, 25)
         self.cap.stream.camera.brightness = self.__scale(self.brightness, 0, 100)
