@@ -88,6 +88,7 @@ class Camera:
         self.cap.stream.set(cv.CAP_PROP_BRIGHTNESS, self.brightness) # # min: 0 max: 255 increment:1
         self.cap.stream.set(cv.CAP_PROP_CONTRAST, self.contrast)  # min: 0 max: 255 increment:1
         self.cap.stream.set(cv.CAP_PROP_SATURATION, self.saturation) #  min: 0 max: 255 increment:1
+        self.cap.stream.set(cv.CAP_PROP_SHARPNESS, self.sharpness) #  min: 0 max: 255 increment:1
 
     def set_hardware_rpi(self) -> None:
         self.cap.stream.camera.iso = 640 # 100, 200, 320, 400, 500, 640, 800.
